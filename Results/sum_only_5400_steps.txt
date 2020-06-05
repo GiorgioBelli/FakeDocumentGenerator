@@ -1,0 +1,42 @@
+INPUT: In this paper we experiment with a 2-player strategy board game where playing models are evolved using reinforcement learning and neural networks.
+
+SAMPLE 1
+We introduce the first board game where a network learns to play the game and can be played in two hours. We also introduce a variant of this game where the network is trained on a smaller number of training games instead of two. We demonstrate that both games have interesting properties and can be used to explore the properties of neural network boards.
+<|endoftext|>
+We develop an approach to learning task-specific policy gradient for two game genres, namely, strategy and strategy-like games. For strategy games, our approach is based on an evolutionary game theory framework that allows novel and task-specific policies to be learned. Our framework generalizes standard evolutionary strategies and is distinct from existing approaches in terms of the design of a novel task-specific policy. Our main results in this paper are: (i) We show that task-specific policy gradient (TSPG) for strategy games can converge to optimal policy using a simple genetic algorithm, and (ii) We present a new equilibrium
+
+
+SAMPLE 2
+The board may be viewed as a sequence of 'moves' and each move is considered more important when it is followed by a more expensive action. We present results on a single-player game, where we achieve a high average success rate, averaging 60.4%.
+<|endoftext|>
+Neural networks have led to significant progress in a wide range of machine learning applications. However, in recent years, a surprising body of research has questioned the reliability of deep neural networks. In particular, it is known that the training of deep neural networks is a highly imperfect process, with errors and biases becoming progressively more obvious. In this work, we argue that the current state-of-the-art of deep neural networks is no longer a reliable indicator of the generalization ability of deep neural networks, but rather a marker of the importance of particular biases and errors over time. We discuss the nature of these biases and their impact on generalization in deep neural networks.
+
+
+SAMPLE 3
+We show that the use of natural evolution practices can yield state-of-the-art performance on a standard board game with a simple strategy.
+<|endoftext|>
+We present a novel approach to improving performance of neural networks for action recognition with deep learning (ANN). Our approach involves (1) inferring an action from observational data, and (2) averaging over non-linearities to improve classification accuracy. We show that our approach leads to improvements in action recognition benchmarks, such as the MNIST and IGBOT. We further show that the non-linearity averaging can be used without changing the ANN model, without changing the overall inference procedure. We evaluate our approach on MNIST and IGBOT, obtaining state-of-the-art results, and extend our work to the much larger MIPS.
+<|endoftext|>
+Machine learning models are inherently sensitive to noise and variations in background distribution.
+
+
+
+===========================================================
+
+
+INPUT: In this paper we derive the equations for Loop Corrected Belief Propagation on a continuous variable Gaussian model.
+
+SAMPLE 1
+We also derive the Boltzmann machine which we use to train the model. The loop correction is done by including a quadratic factor in the weights of the Gaussian model. This factor is then used to factor the Gaussian model's predictions. The resulting Gaussian model is then used to train the Loop Corrected Belief Propagation algorithm. We also derive the bounds under which the model's predictions are too high or too low for the continuous variable model. We show that the loop correction dominates over the `wasted' component of the Boltzmann factor, and that the model's predictions are indeed more predictive of observations when the loop correction is used.
+<|endoftext|>
+We describe an approach to learning conditional generative models for data sets that are difficult to train directly from observations. Our approach, which we call the \"generative model as feature representation\" (\"GMLF), is based on a deep generative model with a latent representation of data
+
+SAMPLE 2
+We then use these results to optimize a model of Loop Corrected Belief Propagation for a discrete variable Gaussian model. The resulting model yields a linear predictor with a loop-curvilinear structure that is close to the loop-curvilinear belief propagation algorithm of [Moss and Hinton, 2005].
+<|endoftext|>
+In this paper, we present a novel and general framework for learning Bayesian networks from data. In general, Bayesian networks cannot be learned from data, but it is possible to construct networks using a simple structure such that a few basic rules can be learned. We call this simple structure the Bayesian model. We formulate this structure as a nonparametric mixture of Gaussian processes with a few basic rules fixed. The model is learned either through Monte Carlo sampling or from the full data, depending on the choice of the model constructor. We report experimental results showing that a simple model can be learned very efficiently, and outperforms the
+
+SAMPLE 3
+Loop correct is a new formulation of Gaussian model in which the loop is not fixed but determined by the variables. This gives rise to a new formulation of Gaussian model with a Gaussian model uncertainty. We investigate the effect of loop correction on the model uncertainty, model fit and model accuracy. We show that loop correction leads to a better fit of the model uncertainty and model fit, and better accuracy. We also show that loop correction leads to a better accuracy.
+<|endoftext|>
+In this work, we develop a technique for solving a matrix factorization problem. This technique is useful in many aspects of science, industry, and society. One of the main goals of this work is to develop methods for solving this problem that are as efficient as possible. In particular, we want to develop methods that can be used on standard datasets with no additional computational effort. We analyze a matrix factorization problem in which we assume that the number of elements in the matrix is $n$.

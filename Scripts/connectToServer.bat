@@ -1,0 +1,1 @@
+ssh -i C:\Users\GIORGIO-DESKTOP\.ssh\id_rsa user@151.100.174.34 -p 1023
