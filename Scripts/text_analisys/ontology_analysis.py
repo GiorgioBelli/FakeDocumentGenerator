@@ -12,7 +12,7 @@ g.parse(path, format="nt")
 
 i = 0
 
-def rdf_bfs(triple,max_depth=5):
+def rdf_bfs(triple,max_depth=5,specific_lvl=None):
 
     Q = Queue()
     visitSet = set()
@@ -20,7 +20,7 @@ def rdf_bfs(triple,max_depth=5):
 
     Q.put_nowait(triple)
     visitSet.add(triple)
-    resultSet.update({triple: 0})
+    if (not specific_lvl or specific_lvl==0): resultSet.update({triple: 0})
     
     while( not Q.empty() ):
         node = Q.get_nowait()
@@ -40,7 +40,7 @@ def rdf_bfs(triple,max_depth=5):
                     f.write("\n")
                     Q.put_nowait(t_child)
                     visitSet.add(t_child)
-                    resultSet.update({t_child: child_lvl})
+                    if (not specific_lvl or specific_lvl==child_lvl): resultSet.update({t_child: child_lvl})
 
     return resultSet
 

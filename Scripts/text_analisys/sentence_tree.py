@@ -228,15 +228,15 @@ class Repository():
 
 def main():
 
-    os.environ['STANFORD_PARSER'] = 'C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\Tesi\\Scripts\\text_analisys\\stanford-parser-full-2018-10-17\\stanford-parser.jar'
-    os.environ['STANFORD_MODELS'] = 'C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\Tesi\\Scripts\\text_analisys\\stanford-parser-full-2018-10-17\\stanford-parser-3.9.2-models.jar'
+    os.environ['STANFORD_PARSER'] = 'C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\FakeDocumentGenerator\\models\\stanford-parser-full-2018-10-17\\stanford-parser.jar'
+    os.environ['STANFORD_MODELS'] = 'C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\FakeDocumentGenerator\\models\\stanford-parser-full-2018-10-17\\stanford-parser-3.9.2-models.jar'
     
     java_path = "C:\\Program Files\\Java\\jre-10.0.1\\bin\\java.exe"
     os.environ['JAVAHOME'] = java_path
 
-    parser = stanford.StanfordParser(model_path="C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\Tesi\\Scripts\\text_analisys\\stanford-parser-full-2018-10-17\\models\\englishPCFG.ser.gz")
+    parser = stanford.StanfordParser(model_path="C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\FakeDocumentGenerator\\models\\stanford-parser-full-2018-10-17\\models\\englishPCFG.ser.gz")
     
-    csv_path = "C:\\Users\GIORGIO-DESKTOP\\Documents\\Universita\\Tesi\\datasets\\arxiv\\4500_summaries_trainingSet.csv"
+    csv_path = "C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\FakeDocumentGenerator\\datasets\\arxiv\\4500_summaries_trainingSet.csv"
     csv_path = "C:\\Users\\GIORGIO-DESKTOP\\Desktop\\intros.csv"
     dataset = pandas.read_csv(csv_path, delimiter = '\f\n', engine="python")
 
@@ -254,7 +254,7 @@ def main():
     paper_count = len(dataset['intros'])
     printProgressBar(0,paper_count,prefix="Creating papers [{},{}]".format(0,paper_count),suffix="",length=50)
     for i,entry in enumerate(dataset['intros']):
-        if(i==200): break
+        # if(i==200): break
         paper_list.append(Paper(entry,entry,parser))
         printProgressBar(i+1,paper_count,prefix="Creating papers [{},{}]".format(i+1,paper_count),suffix="",length=50)
 
