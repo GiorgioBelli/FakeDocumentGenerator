@@ -2,15 +2,19 @@ import rdflib #requirement
 from rdflib import plugin, URIRef
 from rdflib.namespace import Namespace
 from rdflib.graph import Graph
+import urllib
+
+from nltk.corpus import wordnet as wn
+from pprint import pprint
 
 from queue import Queue
 
-path = "C:\\Users\\GIORGIO-DESKTOP\\Desktop\\CSO.3.1.12.nt"
+cso_nt_path = "C:\\Users\\GIORGIO-DESKTOP\\Desktop\\CSO.3.1.12.nt"
 
 g = Graph()
-g.parse(path, format="nt")
+g.parse(cso_nt_path, format="nt")
 
-i = 0
+CSO_SUPER_TOPIC = URIRef("http://cso.kmi.open.ac.uk/schema/cso#superTopicOf")
 
 def rdf_bfs(triple,max_depth=5,specific_lvl=None):
 
@@ -44,85 +48,48 @@ def rdf_bfs(triple,max_depth=5,specific_lvl=None):
 
     return resultSet
 
-CSO_SUPER_TOPIC = URIRef("http://cso.kmi.open.ac.uk/schema/cso#superTopicOf")
 
-with open("C:\\Users\\GIORGIO-DESKTOP\\Desktop\\query_res.txt", "w") as f:
-    # for s, p, o in g:
-    #     if(i==1): break
-    #     i += 1
-        # f.write(str(s)+"\n")
-
-    # <https://cso.kmi.open.ac.uk/topics/communication_channels_%28information_theory%29>
-    # <http://cso.kmi.open.ac.uk/schema/cso#superTopicOf>
-    # <https://cso.kmi.open.ac.uk/topics/antenna_array> .
-
-    s = URIRef("https://cso.kmi.open.ac.uk/topics/communication_channels_%28information_theory%29")
-    p = URIRef("http://cso.kmi.open.ac.uk/schema/cso#superTopicOf")
-    o = URIRef("https://cso.kmi.open.ac.uk/topics/antenna_arrays")
-
-
-    f.write(str(rdf_bfs((s,p,o),max_depth=2)))
-
-        ## neighbours
-        # for sp, pp, op in g.triples((s,CSO_SUPER_TOPIC,None)):
-        #     f.write("\t")
-        #     f.write(str(sp)+"\t")
-        #     f.write(str(pp)+"\t")
-        #     f.write(str(op)+"\t")
-        #     f.write("\n")
-# g.parse("http://bigasterisk.com/foaf.rdf")
-
-
-# qres = g.query(
-#     """SELECT ?rel ?t2
-#        WHERE {
-#            csot:automated_pattern_recognition ?rel ?t2 .
-#        }""",
-#     initNs=dict(
-#         csot=Namespace("https://cso.kmi.open.ac.uk/topics/"),
-#         csor=Namespace("https://cso.kmi.open.ac.uk/schema/")
-#         )
-#     ) csor:cso#superTopicOf
-
-# parentTopicQuery = g.query(
-#     """SELECT ?superClass
-#        WHERE {
-#            ?superClass <http://cso.kmi.open.ac.uk/schema/cso#superTopicOf> <https://cso.kmi.open.ac.uk/topics/reinforcement_learning> .
-#        }""",
-#     initNs=dict(
-#         csot=Namespace("https://cso.kmi.open.ac.uk/topics/"),
-#         csor=Namespace("https://cso.kmi.open.ac.uk/schema/")
-#         )
-#     )
-
+def isInOntology(topic,space_separator="#"):
+    ont_topic = urllib.parse.quote("_".join(topic.split(space_separator)))
+    cso_topic_prefix = "https://cso.kmi.open.ac.uk/topics/"
+    triples = g.triples((None,None,URIRef(cso_topic_prefix+ont_topic)))
     
+    print(cso_topic_prefix+ont_topic)
 
-# p_topic = parentTopicQuery.result[0][0].split("/")[-1]
+    try: next(triples)
+    except StopIteration: return False 
+    
+    return True
 
-# print(p_topic)
+def getWnTerm(term):
+    synset = wn.synsets(term)
+    if(not synset): 
+        return None
+    syn = synset[0]
+    return syn
 
-# childrenTopicsQuery = g.query(
-#     '''SELECT ?child
-#        WHERE {
-#            <https://cso.kmi.open.ac.uk/topics/%s> <http://cso.kmi.open.ac.uk/schema/cso#superTopicOf> ?child .
-#        }''' % p_topic,
-#     initNs=dict(
-#         csot=Namespace("https://cso.kmi.open.ac.uk/topics/"),
-#         csor=Namespace("https://cso.kmi.open.ac.uk/schema/")
-#         )
-#     )
+def showTree(synset):
+    hyp = lambda s:s.hyponyms()
+    pprint(synset.tree(hyp,depth=5))
 
-# parentTopicQuery = g.query(
-#     """SELECT ?superClass
-#        WHERE {
-#            ?superClass <http://cso.kmi.open.ac.uk/schema/cso#superTopicOf> <https://cso.kmi.open.ac.uk/topics/reinforcement_learning> .
-#        }""",
-#     initNs=dict(
-#         csot=Namespace("https://cso.kmi.open.ac.uk/topics/"),
-#         csor=Namespace("https://cso.kmi.open.ac.uk/schema/")
-#         )
-#     )
+if __name__ == "__main__":
+    # syn = wn.synsets("dog")[0]
 
-# with open("C:\\Users\\GIORGIO-DESKTOP\\Desktop\\query_res.txt", "w") as f:
-    # for row in childrenTopicsQuery.result:
-    #     f.write(" ".join([str(x).split("/")[-1] for x in row])+"\n")
+    with open("C:\\Users\\GIORGIO-DESKTOP\\Desktop\\query_res.txt", "w") as f:
+
+        # <https://cso.kmi.open.ac.uk/topics/communication_channels_%28information_theory%29>
+        # <http://cso.kmi.open.ac.uk/schema/cso#superTopicOf>
+        # <https://cso.kmi.open.ac.uk/topics/antenna_array> .
+
+        # s = URIRef("https://cso.kmi.open.ac.uk/topics/communication_channels_%28information_theory%29")
+        # p = URIRef("http://cso.kmi.open.ac.uk/schema/cso#superTopicOf")
+        o = URIRef("https://cso.kmi.open.ac.uk/topics/antenna_arrays")
+
+        paren_topic = g.value(subject=None,predicate=CSO_SUPER_TOPIC,object=o)
+        print(paren_topic)
+        f.write(str(rdf_bfs((None,CSO_SUPER_TOPIC,paren_topic),max_depth=2)))
+
+
+        # print(isInOntology("antenna#arrays"))
+
+

@@ -25,6 +25,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 # from sklearn.feature_extraction.text import CountVectorizer
 
 from nltk.parse import stanford
+from ontology_analysis import isInOntology, getWnTerm, showTree
 
 stopwords_en_set=set(stopwords.words('english'))
 
@@ -254,7 +255,7 @@ def main():
     paper_count = len(dataset['intros'])
     printProgressBar(0,paper_count,prefix="Creating papers [{},{}]".format(0,paper_count),suffix="",length=50)
     for i,entry in enumerate(dataset['intros']):
-        # if(i==200): break
+        if(i==100): break
         paper_list.append(Paper(entry,entry,parser))
         printProgressBar(i+1,paper_count,prefix="Creating papers [{},{}]".format(i+1,paper_count),suffix="",length=50)
 
@@ -267,30 +268,38 @@ def main():
     p_test = paper_list[-1]
 
     
+    found = []
+    for t in p_test.transformedTopics:
+        isInOnt = isInOntology(t)
+        if(isInOnt):
+            for term in t.split("#"):
+                showTree(getWnTerm(term))
 
-    with open(out_file,"wb") as result:
-        print("writing results...",end="")
 
-        text = ""
 
-        text += "="*20+"KEYWORDS"+"="*20+"\n"
-        text += "\n"+str(p_test.topics)
-        text += "\n"+"="*40+"\n"
+    # with open(out_file,"wb") as result:
+    #     print("writing results...",end="")
 
-        matrix = repo.computeJCforPaper(p_test)
-        l = [(k,matrix[k][0],matrix[k][1])for k in matrix.keys()]
-        l.sort(reverse=True,key=(lambda x: x[2]))
-        text += "="*20+"JC"+"="*20+"\n"
-        text += "\n"+str(l)
-        text += "\n"+"="*40+"\n"
+    #     text = ""
+
+    #     text += "="*20+"KEYWORDS"+"="*20+"\n"
+    #     text += "\n"+str(p_test.topics)
+    #     text += "\n"+"="*40+"\n"
+
+    #     matrix = repo.computeJCforPaper(p_test)
+    #     l = [(k,matrix[k][0],matrix[k][1])for k in matrix.keys()]
+    #     l.sort(reverse=True,key=(lambda x: x[2]))
+    #     text += "="*20+"JC"+"="*20+"\n"
+    #     text += "\n"+str(l)
+    #     text += "\n"+"="*40+"\n"
         
-        text += "="*20+"INTRO"+"="*20+"\n"
-        text += p_test.text
-        text += "\n"+"="*40+"\n"
+    #     text += "="*20+"INTRO"+"="*20+"\n"
+    #     text += p_test.text
+    #     text += "\n"+"="*40+"\n"
 
-        result.write(text.encode("utf-8"))
-        print("\t[done]")
-    return
+    #     result.write(text.encode("utf-8"))
+    #     print("\t[done]")
+    # return
     
     # replace_matrix = {}
     
