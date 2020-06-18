@@ -25,7 +25,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 # from sklearn.feature_extraction.text import CountVectorizer
 
 from nltk.parse import stanford
-from ontology_analysis import isInOntology, getWnTerm, showTree
+from ontology_analysis import rdf_get_sibligs, isInOntology, getWnTerm, showTree, sentence_similarity
 
 stopwords_en_set=set(stopwords.words('english'))
 
@@ -50,7 +50,7 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
     print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = printEnd)
-    if( iteration == total): print()
+    # if( iteration == total): print()
 
 
 with open("C:\\Users\GIORGIO-DESKTOP\\Documents\\Universita\\Tesi\\datasets\\AI_glossary.txt","r") as ai_glossary_fd:
@@ -82,8 +82,8 @@ def forge_jaccard_distance(label1, label2):
 
 class Paper():
     def __init__(self,text,fulltext,parser):
-        self.text = text 
-        self.fulltext = fulltext
+        self.text = text.replace("ï¬�","fi")
+        self.fulltext = fulltext.replace("ï¬�","fi")
         self.topics = set()
         self.contexts = dict()
         self.proximityFrequences = {}
@@ -159,7 +159,28 @@ class Paper():
                     for j in range(i+1,min((i+window+1),len(sentenceWords)-1)):
                         if(sentenceWords[j]!=word and sentenceWords[j] in allTopics):
                             new_val = self.proximityFrequences.get((word,sentenceWords[j]),0)+1
-                            self.proximityFrequences.update({(word,sentenceWords[j]): new_val})
+                            self.proximityFrequences.update({(word,sentenceWords[j]): new_val}) 
+    
+    def getSubstituteConcept(self,focus_topic,alternatives):
+        best_candidate = (None, None, -1)
+        topic_set = alternatives-self.topics    
+        for topic in topic_set:
+            t = (focus_topic,topic,sentence_similarity(focus_topic,topic))
+            if(best_candidate[2]<t[2]): best_candidate = t
+
+        return best_candidate
+
+        
+    def getCandicateConcepts(self,focus_topic,alternatives):
+        distances = []
+        topic_set = alternatives-self.topics
+        for topic in topic_set:
+            distances.append((focus_topic,topic,sentence_similarity(focus_topic,topic)))
+        distances.sort(reverse=True,key=lambda x: x[2])
+        return distaces
+
+
+
 
 class Repository():
     def __init__(self,paper_list = []):
@@ -223,8 +244,6 @@ class Repository():
                     if(jc != 0 and jc > (paper.jcMatrix.get(tp,(tp,0)))[1]): 
                         paper.jcMatrix[tp] = (tpp,jc)
         return paper.jcMatrix
-
-    # TODO compute JC only among paper relevant topics and generalTopics 
         
 
 def main():
@@ -255,63 +274,86 @@ def main():
     paper_count = len(dataset['intros'])
     printProgressBar(0,paper_count,prefix="Creating papers [{},{}]".format(0,paper_count),suffix="",length=50)
     for i,entry in enumerate(dataset['intros']):
-        if(i==100): break
+        # if(i==100): break
         paper_list.append(Paper(entry,entry,parser))
         printProgressBar(i+1,paper_count,prefix="Creating papers [{},{}]".format(i+1,paper_count),suffix="",length=50)
 
-    print("creating repo...")
+    print("\ncreating repo...")
     repo = Repository(paper_list=paper_list)
     print()
 
     out_file = "C:\\Users\\GIORGIO-DESKTOP\\Desktop\\result.out"
 
-    p_test = paper_list[-1]
+    p_test = paper_list[-3]
 
     
-    found = []
-    for t in p_test.transformedTopics:
-        isInOnt = isInOntology(t)
-        if(isInOnt):
-            for term in t.split("#"):
-                showTree(getWnTerm(term))
-
-
-
-    # with open(out_file,"wb") as result:
-    #     print("writing results...",end="")
-
-    #     text = ""
-
-    #     text += "="*20+"KEYWORDS"+"="*20+"\n"
-    #     text += "\n"+str(p_test.topics)
-    #     text += "\n"+"="*40+"\n"
-
-    #     matrix = repo.computeJCforPaper(p_test)
-    #     l = [(k,matrix[k][0],matrix[k][1])for k in matrix.keys()]
-    #     l.sort(reverse=True,key=(lambda x: x[2]))
-    #     text += "="*20+"JC"+"="*20+"\n"
-    #     text += "\n"+str(l)
-    #     text += "\n"+"="*40+"\n"
-        
-    #     text += "="*20+"INTRO"+"="*20+"\n"
-    #     text += p_test.text
-    #     text += "\n"+"="*40+"\n"
-
-    #     result.write(text.encode("utf-8"))
-    #     print("\t[done]")
-    # return
+    # found = []
+    # for t in p_test.transformedTopics:
+    #     isInOnt = isInOntology(t)
+    #     if(isInOnt):
+    #         for term in t.split("#"):
+    #             showTree(getWnTerm(term))
     
-    # replace_matrix = {}
+    focus_topic = p_test.topics.pop()
+    print("finding substitution for: ",focus_topic)
+    distances = []
+
+    treplace = None
+    # for topic in p_test.topics:
+    #     if isInOntology(topic,space_separator=" "):
+    #         print("ontology concept: "+topic)
+    #         siblings = rdf_get_sibligs(topic)
+    #         print(siblings)
+    #         treplace=max(siblings.keys(),key=lambda x: sentence_similarity(topic,x))
+    #         break
+
+    substitutions = []
+    num_concepts = len(p_test.topics)
+    printProgressBar(0,num_concepts,prefix="Finding substitution [{}/{}]".format(0,num_concepts),suffix="",length=50)
+
+    for i,focus_topic in enumerate(p_test.topics):
+        printProgressBar(i+1,num_concepts,prefix="Finding substitutions [{}/{}]".format(i+1,num_concepts),suffix="computing: "+focus_topic,length=50)
+        substitutions.append(p_test.getSubstituteConcept(focus_topic,repo.generalTopics))
+
+
+    newIntro = p_test.text
+    for old, new, score in substitutions:
+        newIntro = newIntro.replace(old,new)
+
+    with open(out_file,"wb") as result:
+        print("writing results...",end="")
+
+        text = ""
+
+        text += "="*20+"KEYWORDS"+"="*20+"\n"
+        text += "\n"+str(p_test.topics)
+        text += "\n"+"="*40+"\n"
+
+        # text += "="*20+"REPLACEMENT"+"="*20+"\n"
+        # text += "\n"+"\n".join([str(s) for s in distances[1:5]])
+        # text += "\n"
+        # text += "\n"+str(treplace)
+        # text += "\n"+"="*40+"\n"
+
+        matrix = repo.computeJCforPaper(p_test)
+        l = [(k,matrix[k][0],matrix[k][1])for k in matrix.keys()]
+        l.sort(reverse=True,key=(lambda x: x[2]))
+        text += "="*20+"JC"+"="*20+"\n"
+        text += "\n"+str(l)
+        text += "\n"+"="*40+"\n"
+
+        text += "="*20+"ORIGINAL INTRO"+"="*20+"\n"
+        text += p_test.text
+        text += "\n"+"="*40+"\n"
+
+        text += "="*20+"NEW INTRO"+"="*20+"\n"
+        text += newIntro
+        text += "\n"+"="*40+"\n"
+
+        result.write(text.encode("utf-8"))
+        print("\t[done]")
     
-    # for tp in transformed_topics:
-    #     for tpp in transformed_topics:
-    #         if(tp != tpp):
-    #             jc = forge_jaccard_distance(context[tp],context[tpp])
-    #             if(jc != 0 and jc > (replace_matrix.get(tp,(tp,0)))[1]): replace_matrix[tp] = (tpp,jc)
-    
-    # print(replace_matrix)
-    
-    
+    return    
     
 
 import timeit
