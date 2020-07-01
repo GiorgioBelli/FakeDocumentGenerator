@@ -1,0 +1,45 @@
+1 Introduction  Active learning is an important machine learning paradigm with a rich class of problems and mature literature [Prince, 2004, Settles, 2012, Hanneke et al., 2014]. Oftentimes, users have access to a large pool of unlabeled data and an oracle that can provide a label to a data point that is queried. Querying the oracle for the label comes at a cost, computational and/or monetary. Hence, a key objective for the algorithm is to â€œwiselyâ€� choose the set of points from the unlabelled pool that can provide better generalization. In this paper, we propose a probabilistic querying procedure to choose the points to be labeled by the oracle motivated from importance sampling literature [Tokdar and Kass, 2010]. Importance sampling is a popular statistical technique widely used for fast convergence in Monte Carlo based methods [Doucet et al., 2001] and stochastic optimization [Zhao and Zhang, 2015].  The main contributions of this paper are as follows. (a) We propose an importance sampling based algorithm for active learning, which we call Active Learning with Importance Sampling (ALIS). (b) We derive a high probability upper bound on the true loss and design the ALIS algorithm to directly minimize the bound. (c) We determine an optimal sampling probability distribution for the algorithm. (d) We demonstrate that the optimal sampling distribution gives a tighter bound on the true loss compared to the baseline uniform sampling procedure.
+
+
+RESULT TEXT - BERT
+
+1 Introduction  Active learning is an important machine learning paradigm with a rich class of problems and mature literature [Prince, 2004, Settles, 2012, Hanneke et al., 2014]. Oftentimes, users have access to a large pool of unlabeled data and an oracle that can provide a label to a data point that is queried. Querying the oracle for the label comes at a cost, unbounded computational power. Hence, a key objective for the algorithm is to â€œwiselyâ€� choose the set of points from the unlabelled pool that can provide better generalization. In this paper, we propose a probabilistic machine learning to choose the points to be labeled by the oracle motivated from importance sampling [Tokdar and Kass, 2010]. Importance sampling is a popular statistical technique widely used for fast convergence in Monte Carlo based methods [Doucet et al., 2001] and stochastic optimization [Zhao and Zhang, 2015].  The main contributions of this paper are as follows. (a) We propose an importance sampling based algorithm for active learning, which we call Active Learning with Importance Sampling (ALIS). (b) We derive a high probability upper bound on the true loss and design the ALIS algorithm to directly minimize the bound. (c) We determine an optimal sampling probability distribution for the algorithm. (d) We demonstrate that the optimal decision making gives a tighter bound on the expected true error to the baseline uniform sampling procedure.
+
+RESULT TEXT - SCIBERT
+
+1 Introduction  Active learning is an important machine learning paradigm with a rich class of problems and mature literature [Prince, 2004, Settles, 2012, Hanneke et al., 2014]. Oftentimes, users have access to a large pool of unlabeled data and an oracle that can provide a label to a data point that is queried. Querying the oracle for the label comes at a cost, high computational complexities. Hence, a key objective for the algorithm is to â€œwiselyâ€� choose the set of points from the unlabelled pool that can provide better generalization. In this paper, we propose a probabilistic machine learning to choose the points to be labeled by the oracle motivated from importance sampling [Tokdar and Kass, 2010]. Importance sampling is a popular statistical technique widely used for fast convergence in Monte Carlo based methods [Doucet et al., 2001] and stochastic optimization [Zhao and Zhang, 2015].  The main contributions of this paper are as follows. (a) We propose an importance sampling based algorithm for active learning, which we call Active Learning with Importance Sampling (ALIS). (b) We derive a high probability upper bound on the true loss and design the ALIS algorithm to directly minimize the bound. (c) We determine an optimal sampling probability distribution for the algorithm. (d) We demonstrate that the optimal restart strategy gives a tighter bound on the true probability distribution to the baseline uniform sampling procedure.
+
+SUBSTITUTIONS
+
+Replacing [1,5]
+Hence, a key objective for the algorithm is to â€œwiselyâ€� choose the set of points from the unlabelled pool that can provide better generalization. In this paper, we propose a probabilistic querying procedure to choose the points to be labeled by the oracle motivated from ***mask*** [Tokdar and Kass, 2010]. Importance sampling is a popular statistical technique widely used for fast convergence in Monte Carlo based methods [Doucet et al., 2001] and stochastic optimization [Zhao and Zhang, 2015]
+
+['Hence, a key objective for the algorithm is to â€œwiselyâ€� choose the set of points from the unlabelled pool that can provide better generalization', 'In this paper, we propose a probabilistic querying procedure to choose the points to be labeled by the oracle motivated from importance sampling [Tokdar and Kass, 2010]', 'Importance sampling is a popular statistical technique widely used for fast convergence in Monte Carlo based methods [Doucet et al., 2001] and stochastic optimization [Zhao and Zhang, 2015]']
+
+
+
+Replacing [2,5]
+(c) We determine an optimal sampling probability distribution for the algorithm. (d) We demonstrate that the optimal sampling distribution gives a tighter bound on the ***mask*** to the baseline uniform sampling procedure.
+
+['(c) We determine an optimal sampling probability distribution for the algorithm', '(d) We demonstrate that the optimal sampling distribution gives a tighter bound on the expected true error to the baseline uniform sampling procedure.']
+
+
+
+Replacing [3,5]
+Oftentimes, users have access to a large pool of unlabeled data and an oracle that can provide a label to a data point that is queried. Querying the oracle for the label comes at a cost, ***mask***. Hence, a key objective for the algorithm is to â€œwiselyâ€� choose the set of points from the unlabelled pool that can provide better generalization
+
+['Oftentimes, users have access to a large pool of unlabeled data and an oracle that can provide a label to a data point that is queried', 'Querying the oracle for the label comes at a cost, unbounded computational power', 'Hence, a key objective for the algorithm is to â€œwiselyâ€� choose the set of points from the unlabelled pool that can provide better generalization']
+
+
+
+Replacing [4,5]
+(c) We determine an optimal sampling probability distribution for the algorithm. (d) We demonstrate that the ***mask*** gives a tighter bound on the expected true error to the baseline uniform sampling procedure.
+
+['(c) We determine an optimal sampling probability distribution for the algorithm', '(d) We demonstrate that the optimal decision making gives a tighter bound on the expected true error to the baseline uniform sampling procedure.']
+
+
+
+Replacing [5,5]
+Hence, a key objective for the algorithm is to â€œwiselyâ€� choose the set of points from the unlabelled pool that can provide better generalization. In this paper, we propose a ***mask*** to choose the points to be labeled by the oracle motivated from importance sampling [Tokdar and Kass, 2010]. Importance sampling is a popular statistical technique widely used for fast convergence in Monte Carlo based methods [Doucet et al., 2001] and stochastic optimization [Zhao and Zhang, 2015]
+
+['Hence, a key objective for the algorithm is to â€œwiselyâ€� choose the set of points from the unlabelled pool that can provide better generalization', 'In this paper, we propose a probabilistic machine learning to choose the points to be labeled by the oracle motivated from importance sampling [Tokdar and Kass, 2010]', 'Importance sampling is a popular statistical technique widely used for fast convergence in Monte Carlo based methods [Doucet et al., 2001] and stochastic optimization [Zhao and Zhang, 2015]']
