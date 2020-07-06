@@ -53,24 +53,33 @@ def pdf_to_txt(path):
     return output_string.getvalue()
         
 
-class Paper():
+class PaperSections():
+    PAPER_ABSTRACT = "abstract"
+    PAPER_INTRO    = "introduction"
+    PAPER_CORPUS   = "corpus"
+    PAPER_CONCLUSION = "conclusion"
+
+class RawPaper():
     def __init__(self,text="",path=""):
-        self.text = text
+        self.full_text = text #complete text
         self.path=path
-        self.contents = []
+        self.contents = [] #
         
-        self.intro = ""
+        self.sections_dict = {
+            PaperSections.PAPER_ABSTRACT : "",
+            PaperSections.PAPER_INTRO : "",
+            PaperSections.PAPER_CORPUS : "",
+            PaperSections.PAPER_CONCLUSION : ""
+        }
     
     def fromPdf(path=""):
         # print("processing",path.split("\\")[-1],end="")
         if(not path): raise Exception("Empty path is not valid")
-        p = Paper(path=path)
+        p = RawPaper(path=path)
         p.text = re.sub(r'\f',"\n", pdf_to_txt(p.path))
         p.text = removeWordWrap(p.text)
+        p.extract_content_table()
         p.extract_sections()
-        p.extract_introduction()
-
-        # print("\t[done]")
         
         return p
     
@@ -78,23 +87,25 @@ class Paper():
         if(not outPath): raise Exception("Empty path is not valid")
         text=""
         with open(outPath,mode) as fout:
-#            if(includeSections): text = "="*16+"SECTIONS"+"="*16+"\n"+"\n".join([str(x[1])+":\t"+x[0] for x in p.extract_sections()])+"\n"+"="*40+"\n"
-            if(includeSections): text += "\n"+"="*16+"COMMON FORMAT"+"="*16+"\n"+"\n".join([str(x[1])+":\t"+x[0] for x in self.contents])+"\n"+"="*40+"\n"
+            text+= "PAPER PATH: {}\n\n".format(self.path)
+
+            if(includeSections): text += "\n"+"="*16+"TABLE OF CONTENTS"+"="*16+"\n"+"\n".join([str(x[1])+":\t"+x[0] for x in self.contents])+"\n"+"="*40+"\n"
             
-            self.extract_introduction()
-            text +="="*20+"INTRO"+"="*20+"\n"
-            text += self.intro+"\n"
-            text+="="*40+"\n"
+            
+            for sec in self.sections_dict.keys():
+                text +="="*20+sec.upper()+"="*20+"\n"
+                text += self.sections_dict[sec]+"\n"
+                text+="="*40+"\n"
             
             text +="="*20+"COMPLETE TEXT"+"="*20+"\n"
             text += self.text
             fout.write((text).encode('utf-8'))
 
         
-    def extract_sections(self):
+    def extract_content_table(self):
         lines = []
         for idx,line in enumerate(self.text.split("\n")):
-            if(Paper.isTitle(line,idx,self.contents)): lines.append((line,idx))
+            if(RawPaper.isTitle(line,idx,self.contents)): lines.append((line,idx))
 
         hasContentTable = False
         counter = 0
@@ -116,9 +127,10 @@ class Paper():
         notBeginEndsInPunctualization = bool(re.search(r'^[^,.=]{1}.*[^,.=]{1}$',string))
         hasMinLen = not len(string)<3
         hasMinLetters = bool(re.search(r'[a-zA-Z]{1}',string))
+        isAbstract = bool(re.search(r'^(Abstract|ABSTRACT)\. ',string))
 
-        isTitle = hasMinLen and isTitleCase and hasMinLetters and (not Paper.isCitation(sentence)) and notBeginEndsInPunctualization
-        if((hasListEnum and isTitle) or (string in knownTitles)): contentsList.append((sentence,idx))
+        isTitle = (hasMinLen and isTitleCase and hasMinLetters and (not RawPaper.isCitation(sentence)) and notBeginEndsInPunctualization) or isAbstract
+        if((hasListEnum and isTitle) or (string in knownTitles) or (isAbstract)): contentsList.append((sentence,idx))
         # if(idx==118 and False): ##DEBUG
             # print(sentence+"->"+string," ",idx," ",hasListEnum," ",hasMinLen," ", isTitleCase ," ",  hasMinLetters ," ",  (not Paper.isCitation(sentence)) ," ",  notBeginEndsInPunctualization)
             # print(contentsList)
@@ -130,6 +142,23 @@ class Paper():
         startsWithCitation = bool(re.search(r'^\[[0-9]+\] ',string))
         return isTitleCase and startsWithCitation
     
+    def extract_abstract(self):
+        abs_start_line = None
+        abs_end_line = None
+        lines = self.text.split("\n")
+        
+        for idx,c in enumerate(self.contents):
+            sentence = c[0]
+
+            if(sentence.lower().endswith("abstract") or sentence.lower().startswith("abstract. ")): 
+                abs_start_line = c[1]
+                abs_end_line = self.contents[idx+1][1]
+                break
+
+        if(not abs_start_line or not abs_end_line): return ""
+
+        return "\n".join(lines[abs_start_line:abs_end_line])
+
     def extract_introduction(self):
         intro_end_line = -1
         intro_start_line = -1
@@ -147,50 +176,86 @@ class Paper():
                 intro_start_line = c[1]
                 if((len(self.contents)-1-idx)>0 ):
                     intro_end_line = self.contents[idx+1][1]
-#                    self.intro =  self.intro = "\n".join(lines[c[1]:self.contents[idx+1][1]])
-#                    return  
+                    # self.intro =  self.intro = "\n".join(lines[c[1]:self.contents[idx+1][1]])
+                    # return  
             elif(intro_found and hasListEnum and (sentence.startswith("I.") or sentence.startswith("1.") and (len(self.contents)-1-idx)>0 )):
                 intro_end_line = self.contents[idx+1][1]
             elif(intro_found): break
                 
-        self.intro = "\n".join(lines[intro_start_line:intro_end_line])
+        return "\n".join(lines[intro_start_line:intro_end_line])
+
+    def extract_sections(self):
+        
+        self.sections_dict[PaperSections.PAPER_ABSTRACT] = self.extract_abstract()
+        self.sections_dict[PaperSections.PAPER_INTRO] = self.extract_introduction()
+
+        return self.sections_dict
+
+
 
 def removeWordWrap(text):
     return re.sub(r'-\n','',text)
 
-if __name__ == "__main__":
-    pdf_repo = "C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\Tesi\\datasets\\downloaded_papers\\"
-    papers = []
-    l = []
-    dir_files = os.listdir(pdf_repo)
-    file_num = len(dir_files)
-    failed_files = []
-    failed = 0
-    printProgressBar(0,file_num,prefix="Extracting txt",suffix="---",length=50)
-    for idx,file in enumerate(dir_files):
-        if(not file.endswith(".pdf")): continue
-        full_path = os.path.join(pdf_repo, file)
-        failed_files.append(file)
-        try:
-            p = Paper.fromPdf(path=full_path)
-        except PDFSyntaxError as e:
-            failed_files.append(file)
-            failed += 1
-            pass
-        papers.append(p)
-        printProgressBar(idx+1,file_num,prefix="Extracting txt [{}/{}]".format(idx+1,file_num),suffix=file[:20]+"[{} failed]".format(failed)+"   ",length=50)
+def removeEOL(text):
+    return re.sub(r'\n',' ',text)
 
-    if failed_files:
-        with open("paper_to_txt.log","wb") as csv_out:
-            log_text = "\n".join(failed_files)
-            csv_out.write(log_text.encode("utf-8"))
-    
-    csv_path = "C:\\Users\\GIORGIO-DESKTOP\\Desktop\\intros.csv"
 
-    with open(csv_path,"wb") as csv_out:
-        csv_text = "\f\n".join([x.intro for x in papers])
-        csv_out.write(csv_text.encode("utf-8"))
+class RepoExportTypes():
+    TYPE_CSV = "csv"
+    TYPE_JSON = "json"
+
+class Repository():
+
+    def __init__(self, path, log_path="paper_to_txt.log"):
+        self.repo_path = path 
+        self.papers = []
+        self.log_path = log_path
+        l = []
         
-
-    #TODO trovare un modo di scaricaricare molti pdf (libgen o sci-hub) se non di CS di qualsiasi cosa sceintifica
     
+    def extract(self):
+        dir_files = os.listdir(self.repo_path)
+        file_num = len(dir_files)
+        failed_files = []
+        failed = 0
+        printProgressBar(0,file_num,prefix="Extracting txt",suffix="---",length=50)
+        for idx,file in enumerate(dir_files):
+            if(idx > 4): break
+            if(not file.endswith(".pdf")): continue
+            full_path = os.path.join(self.repo_path, file)
+            try:
+                p = RawPaper.fromPdf(path=full_path)
+            except PDFSyntaxError as e:
+                failed_files.append(file)
+                failed += 1
+                pass
+            self.papers.append(p)
+            printProgressBar(idx+1,file_num,prefix="Extracting txt [{}/{}]".format(idx+1,file_num),suffix=file[:20]+"[{} failed]".format(failed)+"   ",length=50)
+
+        if failed_files:
+            with open(self.log_path,"wb") as log_out:
+                log_text = "\n".join(failed_files)
+                log_out.write(log_text.encode("utf-8"))
+        
+        return (self.papers,failed_files)
+
+    def export(self,csv_path,section=PaperSections.PAPER_INTRO, type=RepoExportTypes.TYPE_CSV, remove_word_wrap=True):
+        with open(csv_path,"wb") as csv_out:
+            csv_text = "\f\n".join([removeEOL(x.sections_dict[section]) for x in self.papers])
+            csv_text = removeWordWrap(csv_text)
+            csv_out.write(csv_text.encode("utf-8"))
+
+
+if __name__ == "__main__":
+    path = "C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\Tesi\\datasets\\downloaded_papers\\"
+
+    csv_path = "C:\\Users\\GIORGIO-DESKTOP\\Desktop\\intros_oop.csv"
+
+    repo = Repository(path)
+
+    repo.extract()
+    repo.export(csv_path)
+    for i,p in enumerate(repo.papers):
+        p.extract_sections()
+        p.dump(outPath="./paper-%s.txt"%i)
+        
