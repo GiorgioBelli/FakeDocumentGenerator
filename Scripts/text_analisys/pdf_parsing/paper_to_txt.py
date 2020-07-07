@@ -39,6 +39,7 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
     print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = printEnd)
 
 
+
 def pdf_to_txt(path):
     if(not path): raise Exception("Empty path is not valid")
     output_string = StringIO()
@@ -204,23 +205,23 @@ class RepoExportTypes():
     TYPE_CSV = "csv"
     TYPE_JSON = "json"
 
-class Repository():
+class RepositoryExtractor():
 
-    def __init__(self, path, log_path="paper_to_txt.log"):
+    def __init__(self, path, log_path="./paper_to_txt.log"):
         self.repo_path = path 
         self.papers = []
         self.log_path = log_path
         l = []
         
     
-    def extract(self):
+    def extract(self,limit=None):
         dir_files = os.listdir(self.repo_path)
         file_num = len(dir_files)
         failed_files = []
         failed = 0
         printProgressBar(0,file_num,prefix="Extracting txt",suffix="---",length=50)
         for idx,file in enumerate(dir_files):
-            if(idx > 4): break
+            if(limit and idx > limit): break
             if(not file.endswith(".pdf")): continue
             full_path = os.path.join(self.repo_path, file)
             try:
@@ -251,7 +252,7 @@ if __name__ == "__main__":
 
     csv_path = "C:\\Users\\GIORGIO-DESKTOP\\Desktop\\intros_oop.csv"
 
-    repo = Repository(path)
+    repo = RepositoryExtractor(path)
 
     repo.extract()
     repo.export(csv_path)

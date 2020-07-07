@@ -1,0 +1,1456 @@
+PAPER PATH: ../datasets/downloaded/2004.12076v2.Quantum_machine_learning_and_quantum_biomimetics_A_perspective.pdf
+
+====================ABSTRACT====================
+Abstract. Quantum machine learning has emerged as an exciting and promising
+paradigm inside quantum technologies.
+It may permit, on the one hand, to carry
+out more eﬃcient machine learning calculations by means of quantum devices, while,
+on the other hand, to employ machine learning techniques to better control quantum
+systems. Inside quantum machine learning, quantum reinforcement learning aims at
+developing “intelligent” quantum agents that may interact with the outer world and
+adapt to it, with the strategy of achieving some ﬁnal goal. Another paradigm inside
+quantum machine learning is that of quantum autoencoders, which may allow one
+for employing fewer resources in a quantum device via a training process. Moreover,
+the ﬁeld of quantum biomimetics aims at establishing analogies between biological
+and quantum systems, to look for previously inadvertent connections that may enable
+useful applications. Two recent examples are the concepts of quantum artiﬁcial life,
+as well as of quantum memristors. In this Perspective, we give an overview of these
+topics, describing the related research carried out by the scientiﬁc community.
+
+Keywords: Quantum machine learning; quantum biomimetics; quantum artiﬁcial
+intelligence; quantum reinforcement learning; quantum autoencoders; quantum artiﬁcial
+life; quantum memristors
+
+========================================
+====================INTRODUCTION====================
+1. Introduction
+
+The ﬁeld of quantum technologies has experienced a signiﬁcant boost in the past ﬁve
+years. The interest of multinational companies such as Google, IBM, Microsoft, Intel,
+and Alibaba in this area has increased the worldwide competition and available funding
+not only from these ﬁrms, but also from national and supranational governments,
+such as the European Union [1, 2]. Most of these companies have also a strong
+focus on machine learning, which is a wider-deployed technology, as it is currently
+more advanced. Increases in the past decade in computing power, via, e.g., Graphical
+Processing Units (GPUs), and the extensive availability of data in internet, have enabled
+a signiﬁcantly good performance of deep learning. Among others, image recognition,
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+2
+
+language translation, search engines, automated cars, and personal assistants, have
+become widespread nowadays [3, 4].
+
+Given that quantum systems are well described by linear algebra, and this also
+applies to several machine learning algorithms,
+it was only a matter of time that
+these two ﬁelds merged in a new area, namely, quantum machine learning. An
+exponentially-growing amount of papers has appeared in this area in the past three
+to four years [5], and already several books and reviews on this ﬁeld have been
+published [6, 7, 8, 9, 10, 11, 12]. Existing algorithms include quantum solvers of
+linear systems of equations [13], quantum support vector machines [14], quantum
+principal component analysis [15], quantum gradient estimation [16], and distributed
+secure quantum machine learning [17], among others. Further research areas inside
+quantum machine learning include quantum reinforcement learning [18, 19, 20, 21,
+22, 23, 24, 25], quantum autoencoders [26, 27, 28, 29, 30, 31], quantum neural
+networks [11, 27, 32, 33, 34, 35, 36, 37], as well as quantum annealing [38, 39, 40],
+quantum Boltzmann [41, 42, 43] and quantum Helmholtz machines [44, 45]. Another
+research avenue complementary to the former ones, consists in employing machine
+learning algorithms to better control quantum systems, reduce gate errors, increase
+state preparation ﬁdelities, and compute quantum phases of matter [46, 47, 48, 49, 50,
+51, 52, 53]. Moreover, inside this emerging area, a growing amount of papers in the ﬁeld
+of machine learning for better understanding quantum systems can be also classiﬁed
+in reinforcement learning [54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66], supervised
+learning [67, 68, 69, 70, 71, 72, 73, 74, 75], and unsupervised learning [76, 77] works. For
+a recent review on this speciﬁc ﬁeld, see [78]. Finally, another interesting topic that has
+appeared recently is the one of quantum-inspired algorithms, namely, classical machine
+learning algorithms that get inspiration from quantum algorithms [79, 80].
+
+Another ﬁeld that aims at connecting two previously disconnected research areas
+such as quantum technologies and biological systems [81, 82, 83] is the one of quantum
+biomimetics. This has some overlap with quantum machine learning in topics such
+as, e.g., quantum neural networks, which are also biomimetic: They consist of a
+quantization of neural networks that, in turn, get inspiration from the human brain,
+a biological system. Quantum artiﬁcial life is an area inside quantum biomimetics in
+which the aim is to design quantum individuals that can self-replicate in a quantum
+fashion, namely, without breaking the no-cloning theorem [84, 85, 86, 87]. They can
+also mutate, and evolve with a quantum Darwinian process. Even though this is still
+a ﬁeld in its infancy, we expect that it could have connections with quantum game
+theory [88] and could allow one for encoding optimization problems, being this way
+connected again with the quantum machine learning ﬁeld. Related research has been
+carried out by diverse groups [89, 90, 91, 92]. A second area inside quantum biomimetics
+is the one of quantum memristors [93, 94, 95, 96]. These are devices with processing
+power, memory, and quantum character, inspired in the classical memristor, the fourth
+element in electronic engineering in addition to the resistor, capacitor, and inductor [97].
+A classical memristor has processing capacity at the same time as memory, and has been
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+3
+
+conjectured to be able to solve NP problems in polynomial time. Classical memristors
+may provide a novel paradigm for computing, with a neuromorphic architecture, and,
+equivalently, quantum memristors represent the basic building block for a neuromorphic
+quantum computer. They have also a close connection to quantum neural networks, and
+may provide a platform to quantum simulate non-Markovian quantum open systems.
+
+In this Perspective, we will revise the ﬁelds of quantum machine learning and
+quantum biomimetics, without the goal of being exhaustive, and focusing mainly on
+our own research of the past six years, as well as related research by other groups. Our
+motivation is to give our vision of what has been the development of these two ﬁelds in
+the past few years, and what could be their future evolution. Even though these two
+areas may seem rather disconnected at ﬁrst sight, they have a strong relationship, as
+described for example in Ref. [82] for the classical cases: living systems, either natural
+or artiﬁcial, have often the ability to learn. Being this article also a Perspective, it is
+naturally more biased towards my own research, and that of my collaborators at the
+QUTIS Group in University of the Basque Country [98], which has considered these
+two ﬁelds in parallel and with multiple links. As examples of this, one can mention the
+international conference we coorganized in Bilbao in March 2018, on “Quantum Machine
+Learning & Biomimetic Quantum Technologies”, as well as the Special Issue we edited
+on “Quantum Machine Learning and Bioinspired Quantum Technologies” [99]. We will
+ﬁrst start with Section 2, on quantum machine learning, in which we will describe two
+emerging topics inside this area, namely, quantum reinforcement learning, and quantum
+autoencoders. In Section 3, on quantum biomimetics, we will revise other two topics, i.e.,
+quantum artiﬁcial life, both as a proposal and its experimental realization in the IBM
+cloud quantum computer, and quantum memristors. We will then give our conclusions
+in Section 4.
+
+2. Quantum machine learning
+
+Machine learning is one of the ﬁelds with a larger impact in computer science
+nowadays [4].
+Its inﬂuence is widespread along a large number of technologies and
+economies, and this will only grow in the future. One of the reasons for this success
+is the so-called deep learning technology [3]. This kind of approach, based on neural
+networks with several layers, and the backpropagation algorithm, has existed since the
+80’s, but only recently has started to work eﬃciently. This is due to the availability of
+higher processing capabilities, via GPUs, and the large amount of data at disposal, i.e.,
+Big Data from the internet [3]. The typical machine learning algorithms are divided
+into three classes. A ﬁrst class of machine learning algorithms is named supervised
+learning [4]. These algorithms are trained via feeding them with labeled data, e.g.,
+training a neural network with pictures of cats. After several iterations of the learning
+process, the network is able, if properly trained, to diﬀerentiate a picture from a cat from
+one of, say, a dog. A second class of machine learning algorithms is named unsupervised
+learning [4]. In this case, no labeled data is provided, while, in turn, the learning is
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+4
+
+produced via establishing correlations in the available data itself that one wants to
+classify. Via grouping this data in clusters, one is able to allocate new data inside
+one of these clusters, according to the highest proximity to it following some ﬁgure of
+merit, e.g., mathematical distance. Finally, a third class of machine learning algorithms,
+that is possibly more similar to the way the human brain itself learns, is the one of
+reinforcement learning [4, 100]. In this kind of learning, a system, the agent, which can
+be, for instance, a robot, a computer program, a chemical molecule, or a quantum device,
+interacts with another system, the environment, which is the outer world to it, that is
+also relevant to its dynamics [4, 100]. In this interaction, the agent obtains information
+from the environment, and also carries out some action on it, possibly modifying it. It
+then decides on a strategy, or policy, on how to proceed, depending on the feedback
+obtained from the interaction and action, and, iterating this procedure several times,
+aims at achieving some ﬁnal goal. Reinforcement learning is the kind of learning that has
+taken more time to develop inside machine learning, but it has proven one of the most
+successful ones in the past few years, with the impressive achievements of AlphaGo and
+AlphaGo Zero in beating the Grandmasters of Go [101, 102]. Go is a highly strategic
+game, much more complex than chess, which was not expected to be won by an artiﬁcial
+intelligence anytime soon. However, via a combination of supervised and reinforcement
+learning, AlphaGo beat some of the leading human experts at Go [101]. Later on,
+AlphaGo Zero beat AlphaGo by 100-0, employing only reinforcement learning, playing
+millions of times against itself and learning in each iteration a bit more, an impressive
+achievement without any external training [102].
+
+A diﬀerent kind of approach is the concept of autoencoder [3]. It consists of a neural
+network that allows for compressing information, in the following fashion: the network
+contains an input layer (encoder), with a number of neurons, say, n. Then, it has one
+or more inner layers, with a number of neurons n(cid:48) < n. And ﬁnally, it is connected to
+an output layer (decoder) with again n neurons. One then trains this kind of network
+with data, assuming that it can be compressed (namely, it has common features). The
+process consists on aiming at matching the output signal of the network with the input
+signal, i.e., being able to employ only the n(cid:48) neurons to encode the information, instead
+of the n initial ones, which is a larger number. If the process is successful, one may then
+discard the decoder and keep only the input layer, the encoder, therefore compressing
+the information.
+
+In this Section, we will focus ﬁrstly on the machine learning algorithm known as
+reinforcement learning, and its recent development in the quantum realm, i.e., quantum
+reinforcement learning. We will describe the pioneering work by diﬀerent groups in this
+topic, as well as our own results of the past few years.
+
+Later on, we will analyze the quantum version of autoencoders, namely, quantum
+autoencoders, and describe the eﬀorts by several groups both in theory and experiments
+in developing this technology.
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+5
+
+2.1. Quantum reinforcement learning
+
+Figure 1. Scheme of reinforcement learning. A system, called agent, interacts with
+the external world, the environment, realizing some action on it, as well as obtaining
+information from it, via a percept. Subsequently, the agent decides on a strategy on
+how to act or improve itself, by means of a reward criterion that depends on the action
+and percept, and the process is iterated. The motivation for the agent to follow this
+procedure is achieving a ﬁnal goal. In the quantum reinforcement learning scenario,
+either agent, environment, or both, should be quantum, and they may exchange either
+quantum or classical information, or a mixture of both, with possible feedback in each
+iteration. Adapted from Ref. [21].
+
+In the ﬁeld of quantum machine learning, quantum reinforcement learning (see
+Fig. 1) is a paradigm that has emerged in recent years [18, 19, 20, 21, 22, 23, 24,
+25, 54, 55]. Some of the published works consider a quantum agent and a quantum
+environment (so called QQ scenario) [20, 21, 22, 23, 24, 25], others consider a quantum
+agent and classical environment (QC) [18, 19, 20], another possibility would be to analyze
+a classical agent and quantum environment (CQ), while the fourth available combination
+(CC) corresponds to the purely classical situation of standard reinforcement learning.
+
+In Ref.
+
+[18], a mapping of classical reinforcement learning onto quantum
+reinforcement learning, connecting states of the former with quantum states of the
+is proposed. Quantum superposition and entanglement are involved in the
+latter,
+quantum algorithm, giving evidence of a possible resource gain with respect to classical
+reinforcement learning. The proposed protocol
+is based on Grover algorithm for
+unstructured search with quantum computers [103].
+
+Ref. [19] analyzes a possible quantum advantage of a quantum agent interacting
+with a classical environment with classical channels, where the speedup would come
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+6
+
+from a faster quantum processor in the agent. This would be based, as in the previous
+case, in Grover search.
+
+Ref. [20] explores quantum reinforcement learning among other types of quantum
+learning, showing that quadratic improvements in learning eﬃciency, as well as
+exponential
+improvements in performance over limited amounts of time, may be
+achieved. For this, they consider a quantum agent and a quantum oracular environment.
+The series of references [21, 22, 23, 24, 25] deal with quantum reinforcement learning
+in the QQ scenario, namely, quantum agent and quantum environment, in an increasing
+amount of complexity, and focusing on possible implementations. Refs. [21, 22] propose
+basic protocols of quantum reinforcement learning with superconducting circuits,
+including either coherent feedback inside the protocol, or projective measurements. In
+both cases, a single copy of the quantum environment state is considered, and the goal
+of the agent is to achieve a ﬁnal quantum state that is identical to the environment
+one while, necessarily, modifying the latter. Ref. [23] goes a step forward, taking
+into account several copies of the quantum environment state, such that the agent
+can achieve an increasing overlap with this state, which is its ﬁnal goal. In Ref. [24], an
+experimental implementation of the previous proposal in quantum photonics was carried
+out. Interestingly, a gain of this quantum reinforcement learning protocol with respect
+to standard quantum tomography was achieved, in the limited resources scenario. In
+the subsequent Ref. [25], an extension of the protocol to unknown operations, instead of
+states, was analyzed. Namely, this proposal would allow one to determine an unknown
+quantum operation, or, equivalently, its eigenvectors and eigenvalues, via a quantum
+reinforcement learning protocol.
+
+2.2. Quantum autoencoders
+
+Recently, proposals and experiments for quantum autoencoders have been explored by
+diﬀerent groups (see Fig. 2).
+In Refs. [26, 27], one is given a set of states, inside a
+certain Hilbert space, and the aim is to be able to consider a smaller section of the
+Hilbert space that contains all the relevant information, namely, to somehow compress
+the quantum information onto a smaller amount of quantum bits or qubits. To this
+aim, in analogy with classical autoencoders, a quantum circuit composed of an input
+series of qubits is connected, via a parameterized unitary operation, to a smaller amount
+of qubits, and, subsequently, by means of a second parameterized unitary gate, to the
+same amount of qubits as the input. By feeding this quantum circuit with the set of
+states considered initially, and by measuring the output of the circuit, one may train
+the device, via classical feedback onto the parameters of the two unitary gates, in order
+to maximize the output ﬁdelity with respect to the input states. This is similar to the
+standard autoencoder but in a quantum scenario.
+If the training is successful, then
+one may discard the ﬁnal unitary gate, equivalent to the decoder, and keep only the
+initial one, the encoder, therefore reducing the amount of quantum information needed
+for practical applications. This could be useful, e.g., for quantum simulations [26]. An
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+7
+
+experimental realization of the previous proposal [26] has been carried out in a quantum
+photonics platform employing a three-level quantum system, a qutrit [29].
+
+Figure 2. Scheme of a quantum autoencoder, based on the algorithms in Refs. [26, 27].
+A set of input quantum states in a certain Hilbert space is encoded into a smaller
+Hilbert space via a learning process. Adapted from Ref. [28].
+
+A diﬀerent approach to quantum autoencoders was put forward in Refs. [28, 30] (see
+Fig. 3). This is based on encoding the initial quantum information in a more reduced
+amount of qubits via the use of approximate quantum adders. In Ref. [104], a theorem
+was proven that showed that a unitary operation able to add two unknown quantum
+states is forbidden by the laws of quantum physics (see also Ref. [105]). Nevertheless,
+this paper deﬁned approximate quantum adders optimized according to diverse prespeciﬁed criteria. In Ref. [49], an optimization of approximate quantum adders based
+on genetic algorithms, a kind of machine learning algorithm, was realized. Subsequently,
+Ref. [28] developed a proposal for a quantum autoencoder based on the quantum adders
+optimized in Ref. [49]. Finally, Ref. [30] implemented the previous proposal in the
+Rigetti cloud quantum computer, showing its feasibility.
+
+Finally, another kind of autoencoders in the quantum realm has been proposed and
+implemented in the same article [31], namely, variational quantum autoencoders, which
+describe generative models implemented via quantum Boltzmann machines [41].
+
+3. Quantum biomimetics
+
+Quantum biomimetics is the ﬁeld that aims at connecting other two previously
+disconnected research areas such as quantum technologies and biological systems [81, 83].
+This has links to quantum machine learning in areas such as, e.g., quantum neural
+networks, which are also biomimetic systems. Quantum artiﬁcial life is a ﬁeld inside
+quantum biomimetics in which the objective is to design quantum individuals that can
+self-replicate in a quantum way, namely, in a compatible manner with the no-cloning
+theorem [84, 85, 86, 87]. A second ﬁeld in quantum biomimetics is the one called
+quantum memristors [93, 94, 95, 96]. These are inspired in the classical memristor,
+
+M1| 1i| 2i|0iM2M2U1U2
+Quantum machine learning and quantum biomimetics: A perspective
+
+8
+
+Figure 3. Scheme of a quantum autoencoder based on approximate quantum adders.
+The two unknown input qubit states are encoded onto a single qubit, to a certain
+ﬁdelity, via an approximate quantum adder operation. Adapted from Ref. [28].
+
+the fourth element in electronic engineering in addition to the resistor, capacitor, and
+inductor [97]. A classical memristor can process information at the same time as having
+a memory, and may provide a novel paradigm for computing, with a neuromorphic
+architecture. Equivalently, quantum memristors constitute a basic building block for a
+neuromorphic quantum processor.
+
+In this Section, we will ﬁrst revise the topic of quantum artiﬁcial life, beginning
+with theoretical works [84, 85] and ﬁnishing with an experimental implementation in
+the IBM cloud quantum computer [86].
+
+Later on, we will describe the topic of quantum memristors, according to a series
+
+of results in the literature [93, 94, 95, 96].
+
+3.1. Quantum artiﬁcial life
+
+Artiﬁcial life is a research ﬁeld that aims to reproduce biological properties common
+to living systems in artiﬁcially engineered systems [81, 82]. Some examples are selfassembling robots [106], self-replicating chemicals [107] or computing programs [108],
+as well as living neurons grown in the lab and connected to external devices [109].
+One of the main areas inside this thriving ﬁeld is the self-replicating systems. Living
+systems acquire complexity and structure via Darwinian evolution, or natural selection,
+and this is a combination of self-replication, introduction of variability via mutations
+as well as genome exchange, and selection of the ﬁttest. Therefore, self-replication is
+In the research line of quantum artiﬁcial life, a series
+one of the hallmarks of life.
+of works has explored the possibility for elementary quantum systems to undergo selfreplication [84, 85, 86] . This is a non-trivial issue given that the no-cloning theorem [87]
+prevents the perfect copying of unknown quantum states. Thus, perfect self-replication
+onto distinct progeny individuals would not be allowed. What these works show is that
+the full quantum information can be faithfully transferred to the progeny individuals,
+
+Memory1| 1i| 2iUautadd| outi⇠| 1i+| 2i|0iMemory2
+Quantum machine learning and quantum biomimetics: A perspective
+
+9
+
+under ideal conditions, if one maps the classical information of the diagonal elements of
+the parent density matrix onto the diﬀerent progeny systems. On the other hand, the
+coherences of the parent density matrix would be mapped onto quantum correlations
+of the progeny systems. Therefore, entanglement plays a crucial role in the context of
+having self-replicating quantum systems.
+
+Figure 4. Scheme for quantum artiﬁcial life. A quantum living unit, or quantum
+individual, is created from two qubits, which constitute the genotype and phenotype.
+The phenotype then decoheres when coupled with a quantum reservoir, until producing
+the “death” of the quantum individual. While still “alive”, the quantum individual can
+undergo self-replication, via coupling with further ancillary qubits. In order to transfer
+its full quantum information, the original quantum individual becomes entangled with
+its progeny quantum individuals. Adapted from Ref. [85].
+
+In Ref. [84], a ﬁrst analysis of biomimetic cloning of quantum observables was
+carried out, suggesting that the full quantum information may be transferred onto
+successive generations via cloning of classical
+information together with controlled
+transfer of quantum correlations. Later on, Ref. [85] proposed an implementation of
+a model of quantum artiﬁcial life. In this model, a quantum living unit, or quantum
+individual, is composed of two qubits, one for the genetic information, or genotype,
+and another for the expression of the genotype in the environment, or phenotype.
+The individual is created via a partial cloning operation of the genotype onto the
+phenotype via a Controlled-NOT operation, a kind of entangling two-qubit quantum
+gate. Subsequently, the phenotype can get coupled with a quantum reservoir, that
+induces decoherence on it. After a certain amount of time, the phenotype has almost
+totally decohered, and one considers that it has “died”, at least as an artiﬁcial life
+individual, and according to this model. While the quantum individual is still “alive”,
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+10
+
+it can couple with further ancillary qubits, carrying out additional partial cloning
+operations with Controlled-NOT gates, and produce new quantum individuals, which
+become entangled to the initial one, as previously explained (see Fig. 4).
+
+Figure 5. Quantum circuit for the most complex quantum artiﬁcial life protocol
+experimentally carried out in Ref. [86]. The number of two-qubit Controlled-NOT
+entangling gates is of 20. H denotes a Hadamard gate, and the numbers inside the
+single-qubit gates indicate diﬀerent phases, as described in Ref. [86].
+
+Figure 6. Theoretical (yellow) and experimental (blue) data of the diﬀerent
+experiments of a quantum artiﬁcial life system in the IBM cloud quantum computer.
+Adapted from Ref. [86].
+
+In Ref. [86], a quantum implementation of the quantum artiﬁcial life model of
+Ref. [85] was carried out in the IBM cloud quantum computer. Fig. 5 shows the most
+complex quantum circuit that was implemented in this experiment. The number of
+entangling gates was of 20. On the other hand, Fig. 6 depicts the theoretical (yellow)
+together with the experimental (blue) data of the diﬀerent experiments of quantum
+artiﬁcial life carried out in the IBM cloud quantum computer. Even though the
+
+1/43/4HHHHHHHHS1/41/4,0,1|0i1|0i0|0i2|0i4T+1/4-1/4T1/4-1/40,3/40,-1/2HHHHHH1/81/81/81/8Basis elementProbability00.20.40.60.8IBasis elementProbability00.20.40.60.8IIBasis elementProbability00.050.10.15IIIBasis elementProbability00.10.20.30.40.50.6IVBasis elementProbability00.10.20.30.40.5V
+Quantum machine learning and quantum biomimetics: A perspective
+
+11
+
+ﬁdelities are not perfect, the experimental setup qualitatively reproduces the theoretical
+prediction to a large extent, for an experiment of a certain complexity.
+
+3.2. Quantum memristors
+
+Subsequently,
+
+The other topic in quantum biomimetics we will describe here is the one of quantum
+In Ref. [93], a quantum version of a memristor was
+memristors [93, 94, 95, 96].
+introduced, in which a two level quantum system encodes the quantum information,
+being supplemented with a weak measurement to acquire information, as well as
+It was proven
+feedback onto the system depending on the measurement outcome.
+that this device possesses hysteresis, and therefore a memory, in addition to processing
+capabilities. It was conjectured to be able to simulate non-Markovian quantum systems.
+two proposals for implementations of quantum memristors in
+diﬀerent quantum platforms were put forward, namely, superconducting circuits [94]
+and quantum photonics [95].
+In the former, the memristive behavior emerges from
+quasiparticle-induced tunneling when supercurrent cancellation takes place. For realistic
+parameters, the appearing hysteretic behavior may be measured using state-of-theart tomography of the phase-driven tunneling current.
+In the latter, the memristive
+behaviour arises from a tunable beam splitter, to which the input state is directed,
+together with feedback from one of the output ports onto the beam splitter that modiﬁes
+its reﬂectivity depending on the output signal.
+
+Finally, another result has been published on some complementary devices to
+
+quantum memristors, namely, qubit-based memcapacitors and meminductors [96].
+
+As we have introduced, classical memristors constitute a paradigm for neuromorphic
+Equivalently, quantum memristors represent a building block for a
+computing.
+neuromorphic quantum device. A proven speedup with respect to their classical
+counterparts is still an open problem. Nevertheless, they represent a novel and promising
+quantum system that may play an important role in the future in a wide variety of
+scenarios as distributed quantum computing, quantum neural networks, and simulation
+of non-Markovian quantum systems.
+
+========================================
+====================CORPUS====================
+
+========================================
+====================CONCLUSION====================
+
+========================================
+====================COMPLETE TEXT====================
+0
+2
+0
+2
+ 
+y
+a
+M
+ 
+0
+3
+ 
+] 
+h
+p
+t
+n
+a
+u
+[q
+
+ 
+ 
+2
+v
+6
+7
+0
+2
+1
+.
+4
+0
+0
+2
+:
+v
+i
+X
+r
+a
+
+Quantum machine learning and quantum
+biomimetics: A perspective
+
+Departamento de F´ısica At´omica, Molecular y Nuclear, Universidad de Sevilla, 41080
+Sevilla, Spain
+
+Lucas Lamata
+
+April 2020
+
+Abstract. Quantum machine learning has emerged as an exciting and promising
+paradigm inside quantum technologies.
+It may permit, on the one hand, to carry
+out more eﬃcient machine learning calculations by means of quantum devices, while,
+on the other hand, to employ machine learning techniques to better control quantum
+systems. Inside quantum machine learning, quantum reinforcement learning aims at
+developing “intelligent” quantum agents that may interact with the outer world and
+adapt to it, with the strategy of achieving some ﬁnal goal. Another paradigm inside
+quantum machine learning is that of quantum autoencoders, which may allow one
+for employing fewer resources in a quantum device via a training process. Moreover,
+the ﬁeld of quantum biomimetics aims at establishing analogies between biological
+and quantum systems, to look for previously inadvertent connections that may enable
+useful applications. Two recent examples are the concepts of quantum artiﬁcial life,
+as well as of quantum memristors. In this Perspective, we give an overview of these
+topics, describing the related research carried out by the scientiﬁc community.
+
+Keywords: Quantum machine learning; quantum biomimetics; quantum artiﬁcial
+intelligence; quantum reinforcement learning; quantum autoencoders; quantum artiﬁcial
+life; quantum memristors
+
+1. Introduction
+
+The ﬁeld of quantum technologies has experienced a signiﬁcant boost in the past ﬁve
+years. The interest of multinational companies such as Google, IBM, Microsoft, Intel,
+and Alibaba in this area has increased the worldwide competition and available funding
+not only from these ﬁrms, but also from national and supranational governments,
+such as the European Union [1, 2]. Most of these companies have also a strong
+focus on machine learning, which is a wider-deployed technology, as it is currently
+more advanced. Increases in the past decade in computing power, via, e.g., Graphical
+Processing Units (GPUs), and the extensive availability of data in internet, have enabled
+a signiﬁcantly good performance of deep learning. Among others, image recognition,
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+2
+
+language translation, search engines, automated cars, and personal assistants, have
+become widespread nowadays [3, 4].
+
+Given that quantum systems are well described by linear algebra, and this also
+applies to several machine learning algorithms,
+it was only a matter of time that
+these two ﬁelds merged in a new area, namely, quantum machine learning. An
+exponentially-growing amount of papers has appeared in this area in the past three
+to four years [5], and already several books and reviews on this ﬁeld have been
+published [6, 7, 8, 9, 10, 11, 12]. Existing algorithms include quantum solvers of
+linear systems of equations [13], quantum support vector machines [14], quantum
+principal component analysis [15], quantum gradient estimation [16], and distributed
+secure quantum machine learning [17], among others. Further research areas inside
+quantum machine learning include quantum reinforcement learning [18, 19, 20, 21,
+22, 23, 24, 25], quantum autoencoders [26, 27, 28, 29, 30, 31], quantum neural
+networks [11, 27, 32, 33, 34, 35, 36, 37], as well as quantum annealing [38, 39, 40],
+quantum Boltzmann [41, 42, 43] and quantum Helmholtz machines [44, 45]. Another
+research avenue complementary to the former ones, consists in employing machine
+learning algorithms to better control quantum systems, reduce gate errors, increase
+state preparation ﬁdelities, and compute quantum phases of matter [46, 47, 48, 49, 50,
+51, 52, 53]. Moreover, inside this emerging area, a growing amount of papers in the ﬁeld
+of machine learning for better understanding quantum systems can be also classiﬁed
+in reinforcement learning [54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66], supervised
+learning [67, 68, 69, 70, 71, 72, 73, 74, 75], and unsupervised learning [76, 77] works. For
+a recent review on this speciﬁc ﬁeld, see [78]. Finally, another interesting topic that has
+appeared recently is the one of quantum-inspired algorithms, namely, classical machine
+learning algorithms that get inspiration from quantum algorithms [79, 80].
+
+Another ﬁeld that aims at connecting two previously disconnected research areas
+such as quantum technologies and biological systems [81, 82, 83] is the one of quantum
+biomimetics. This has some overlap with quantum machine learning in topics such
+as, e.g., quantum neural networks, which are also biomimetic: They consist of a
+quantization of neural networks that, in turn, get inspiration from the human brain,
+a biological system. Quantum artiﬁcial life is an area inside quantum biomimetics in
+which the aim is to design quantum individuals that can self-replicate in a quantum
+fashion, namely, without breaking the no-cloning theorem [84, 85, 86, 87]. They can
+also mutate, and evolve with a quantum Darwinian process. Even though this is still
+a ﬁeld in its infancy, we expect that it could have connections with quantum game
+theory [88] and could allow one for encoding optimization problems, being this way
+connected again with the quantum machine learning ﬁeld. Related research has been
+carried out by diverse groups [89, 90, 91, 92]. A second area inside quantum biomimetics
+is the one of quantum memristors [93, 94, 95, 96]. These are devices with processing
+power, memory, and quantum character, inspired in the classical memristor, the fourth
+element in electronic engineering in addition to the resistor, capacitor, and inductor [97].
+A classical memristor has processing capacity at the same time as memory, and has been
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+3
+
+conjectured to be able to solve NP problems in polynomial time. Classical memristors
+may provide a novel paradigm for computing, with a neuromorphic architecture, and,
+equivalently, quantum memristors represent the basic building block for a neuromorphic
+quantum computer. They have also a close connection to quantum neural networks, and
+may provide a platform to quantum simulate non-Markovian quantum open systems.
+
+In this Perspective, we will revise the ﬁelds of quantum machine learning and
+quantum biomimetics, without the goal of being exhaustive, and focusing mainly on
+our own research of the past six years, as well as related research by other groups. Our
+motivation is to give our vision of what has been the development of these two ﬁelds in
+the past few years, and what could be their future evolution. Even though these two
+areas may seem rather disconnected at ﬁrst sight, they have a strong relationship, as
+described for example in Ref. [82] for the classical cases: living systems, either natural
+or artiﬁcial, have often the ability to learn. Being this article also a Perspective, it is
+naturally more biased towards my own research, and that of my collaborators at the
+QUTIS Group in University of the Basque Country [98], which has considered these
+two ﬁelds in parallel and with multiple links. As examples of this, one can mention the
+international conference we coorganized in Bilbao in March 2018, on “Quantum Machine
+Learning & Biomimetic Quantum Technologies”, as well as the Special Issue we edited
+on “Quantum Machine Learning and Bioinspired Quantum Technologies” [99]. We will
+ﬁrst start with Section 2, on quantum machine learning, in which we will describe two
+emerging topics inside this area, namely, quantum reinforcement learning, and quantum
+autoencoders. In Section 3, on quantum biomimetics, we will revise other two topics, i.e.,
+quantum artiﬁcial life, both as a proposal and its experimental realization in the IBM
+cloud quantum computer, and quantum memristors. We will then give our conclusions
+in Section 4.
+
+2. Quantum machine learning
+
+Machine learning is one of the ﬁelds with a larger impact in computer science
+nowadays [4].
+Its inﬂuence is widespread along a large number of technologies and
+economies, and this will only grow in the future. One of the reasons for this success
+is the so-called deep learning technology [3]. This kind of approach, based on neural
+networks with several layers, and the backpropagation algorithm, has existed since the
+80’s, but only recently has started to work eﬃciently. This is due to the availability of
+higher processing capabilities, via GPUs, and the large amount of data at disposal, i.e.,
+Big Data from the internet [3]. The typical machine learning algorithms are divided
+into three classes. A ﬁrst class of machine learning algorithms is named supervised
+learning [4]. These algorithms are trained via feeding them with labeled data, e.g.,
+training a neural network with pictures of cats. After several iterations of the learning
+process, the network is able, if properly trained, to diﬀerentiate a picture from a cat from
+one of, say, a dog. A second class of machine learning algorithms is named unsupervised
+learning [4]. In this case, no labeled data is provided, while, in turn, the learning is
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+4
+
+produced via establishing correlations in the available data itself that one wants to
+classify. Via grouping this data in clusters, one is able to allocate new data inside
+one of these clusters, according to the highest proximity to it following some ﬁgure of
+merit, e.g., mathematical distance. Finally, a third class of machine learning algorithms,
+that is possibly more similar to the way the human brain itself learns, is the one of
+reinforcement learning [4, 100]. In this kind of learning, a system, the agent, which can
+be, for instance, a robot, a computer program, a chemical molecule, or a quantum device,
+interacts with another system, the environment, which is the outer world to it, that is
+also relevant to its dynamics [4, 100]. In this interaction, the agent obtains information
+from the environment, and also carries out some action on it, possibly modifying it. It
+then decides on a strategy, or policy, on how to proceed, depending on the feedback
+obtained from the interaction and action, and, iterating this procedure several times,
+aims at achieving some ﬁnal goal. Reinforcement learning is the kind of learning that has
+taken more time to develop inside machine learning, but it has proven one of the most
+successful ones in the past few years, with the impressive achievements of AlphaGo and
+AlphaGo Zero in beating the Grandmasters of Go [101, 102]. Go is a highly strategic
+game, much more complex than chess, which was not expected to be won by an artiﬁcial
+intelligence anytime soon. However, via a combination of supervised and reinforcement
+learning, AlphaGo beat some of the leading human experts at Go [101]. Later on,
+AlphaGo Zero beat AlphaGo by 100-0, employing only reinforcement learning, playing
+millions of times against itself and learning in each iteration a bit more, an impressive
+achievement without any external training [102].
+
+A diﬀerent kind of approach is the concept of autoencoder [3]. It consists of a neural
+network that allows for compressing information, in the following fashion: the network
+contains an input layer (encoder), with a number of neurons, say, n. Then, it has one
+or more inner layers, with a number of neurons n(cid:48) < n. And ﬁnally, it is connected to
+an output layer (decoder) with again n neurons. One then trains this kind of network
+with data, assuming that it can be compressed (namely, it has common features). The
+process consists on aiming at matching the output signal of the network with the input
+signal, i.e., being able to employ only the n(cid:48) neurons to encode the information, instead
+of the n initial ones, which is a larger number. If the process is successful, one may then
+discard the decoder and keep only the input layer, the encoder, therefore compressing
+the information.
+
+In this Section, we will focus ﬁrstly on the machine learning algorithm known as
+reinforcement learning, and its recent development in the quantum realm, i.e., quantum
+reinforcement learning. We will describe the pioneering work by diﬀerent groups in this
+topic, as well as our own results of the past few years.
+
+Later on, we will analyze the quantum version of autoencoders, namely, quantum
+autoencoders, and describe the eﬀorts by several groups both in theory and experiments
+in developing this technology.
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+5
+
+2.1. Quantum reinforcement learning
+
+Figure 1. Scheme of reinforcement learning. A system, called agent, interacts with
+the external world, the environment, realizing some action on it, as well as obtaining
+information from it, via a percept. Subsequently, the agent decides on a strategy on
+how to act or improve itself, by means of a reward criterion that depends on the action
+and percept, and the process is iterated. The motivation for the agent to follow this
+procedure is achieving a ﬁnal goal. In the quantum reinforcement learning scenario,
+either agent, environment, or both, should be quantum, and they may exchange either
+quantum or classical information, or a mixture of both, with possible feedback in each
+iteration. Adapted from Ref. [21].
+
+In the ﬁeld of quantum machine learning, quantum reinforcement learning (see
+Fig. 1) is a paradigm that has emerged in recent years [18, 19, 20, 21, 22, 23, 24,
+25, 54, 55]. Some of the published works consider a quantum agent and a quantum
+environment (so called QQ scenario) [20, 21, 22, 23, 24, 25], others consider a quantum
+agent and classical environment (QC) [18, 19, 20], another possibility would be to analyze
+a classical agent and quantum environment (CQ), while the fourth available combination
+(CC) corresponds to the purely classical situation of standard reinforcement learning.
+
+In Ref.
+
+[18], a mapping of classical reinforcement learning onto quantum
+reinforcement learning, connecting states of the former with quantum states of the
+is proposed. Quantum superposition and entanglement are involved in the
+latter,
+quantum algorithm, giving evidence of a possible resource gain with respect to classical
+reinforcement learning. The proposed protocol
+is based on Grover algorithm for
+unstructured search with quantum computers [103].
+
+Ref. [19] analyzes a possible quantum advantage of a quantum agent interacting
+with a classical environment with classical channels, where the speedup would come
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+6
+
+from a faster quantum processor in the agent. This would be based, as in the previous
+case, in Grover search.
+
+Ref. [20] explores quantum reinforcement learning among other types of quantum
+learning, showing that quadratic improvements in learning eﬃciency, as well as
+exponential
+improvements in performance over limited amounts of time, may be
+achieved. For this, they consider a quantum agent and a quantum oracular environment.
+The series of references [21, 22, 23, 24, 25] deal with quantum reinforcement learning
+in the QQ scenario, namely, quantum agent and quantum environment, in an increasing
+amount of complexity, and focusing on possible implementations. Refs. [21, 22] propose
+basic protocols of quantum reinforcement learning with superconducting circuits,
+including either coherent feedback inside the protocol, or projective measurements. In
+both cases, a single copy of the quantum environment state is considered, and the goal
+of the agent is to achieve a ﬁnal quantum state that is identical to the environment
+one while, necessarily, modifying the latter. Ref. [23] goes a step forward, taking
+into account several copies of the quantum environment state, such that the agent
+can achieve an increasing overlap with this state, which is its ﬁnal goal. In Ref. [24], an
+experimental implementation of the previous proposal in quantum photonics was carried
+out. Interestingly, a gain of this quantum reinforcement learning protocol with respect
+to standard quantum tomography was achieved, in the limited resources scenario. In
+the subsequent Ref. [25], an extension of the protocol to unknown operations, instead of
+states, was analyzed. Namely, this proposal would allow one to determine an unknown
+quantum operation, or, equivalently, its eigenvectors and eigenvalues, via a quantum
+reinforcement learning protocol.
+
+2.2. Quantum autoencoders
+
+Recently, proposals and experiments for quantum autoencoders have been explored by
+diﬀerent groups (see Fig. 2).
+In Refs. [26, 27], one is given a set of states, inside a
+certain Hilbert space, and the aim is to be able to consider a smaller section of the
+Hilbert space that contains all the relevant information, namely, to somehow compress
+the quantum information onto a smaller amount of quantum bits or qubits. To this
+aim, in analogy with classical autoencoders, a quantum circuit composed of an input
+series of qubits is connected, via a parameterized unitary operation, to a smaller amount
+of qubits, and, subsequently, by means of a second parameterized unitary gate, to the
+same amount of qubits as the input. By feeding this quantum circuit with the set of
+states considered initially, and by measuring the output of the circuit, one may train
+the device, via classical feedback onto the parameters of the two unitary gates, in order
+to maximize the output ﬁdelity with respect to the input states. This is similar to the
+standard autoencoder but in a quantum scenario.
+If the training is successful, then
+one may discard the ﬁnal unitary gate, equivalent to the decoder, and keep only the
+initial one, the encoder, therefore reducing the amount of quantum information needed
+for practical applications. This could be useful, e.g., for quantum simulations [26]. An
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+7
+
+experimental realization of the previous proposal [26] has been carried out in a quantum
+photonics platform employing a three-level quantum system, a qutrit [29].
+
+Figure 2. Scheme of a quantum autoencoder, based on the algorithms in Refs. [26, 27].
+A set of input quantum states in a certain Hilbert space is encoded into a smaller
+Hilbert space via a learning process. Adapted from Ref. [28].
+
+A diﬀerent approach to quantum autoencoders was put forward in Refs. [28, 30] (see
+Fig. 3). This is based on encoding the initial quantum information in a more reduced
+amount of qubits via the use of approximate quantum adders. In Ref. [104], a theorem
+was proven that showed that a unitary operation able to add two unknown quantum
+states is forbidden by the laws of quantum physics (see also Ref. [105]). Nevertheless,
+this paper deﬁned approximate quantum adders optimized according to diverse prespeciﬁed criteria. In Ref. [49], an optimization of approximate quantum adders based
+on genetic algorithms, a kind of machine learning algorithm, was realized. Subsequently,
+Ref. [28] developed a proposal for a quantum autoencoder based on the quantum adders
+optimized in Ref. [49]. Finally, Ref. [30] implemented the previous proposal in the
+Rigetti cloud quantum computer, showing its feasibility.
+
+Finally, another kind of autoencoders in the quantum realm has been proposed and
+implemented in the same article [31], namely, variational quantum autoencoders, which
+describe generative models implemented via quantum Boltzmann machines [41].
+
+3. Quantum biomimetics
+
+Quantum biomimetics is the ﬁeld that aims at connecting other two previously
+disconnected research areas such as quantum technologies and biological systems [81, 83].
+This has links to quantum machine learning in areas such as, e.g., quantum neural
+networks, which are also biomimetic systems. Quantum artiﬁcial life is a ﬁeld inside
+quantum biomimetics in which the objective is to design quantum individuals that can
+self-replicate in a quantum way, namely, in a compatible manner with the no-cloning
+theorem [84, 85, 86, 87]. A second ﬁeld in quantum biomimetics is the one called
+quantum memristors [93, 94, 95, 96]. These are inspired in the classical memristor,
+
+M1| 1i| 2i|0iM2M2U1U2
+Quantum machine learning and quantum biomimetics: A perspective
+
+8
+
+Figure 3. Scheme of a quantum autoencoder based on approximate quantum adders.
+The two unknown input qubit states are encoded onto a single qubit, to a certain
+ﬁdelity, via an approximate quantum adder operation. Adapted from Ref. [28].
+
+the fourth element in electronic engineering in addition to the resistor, capacitor, and
+inductor [97]. A classical memristor can process information at the same time as having
+a memory, and may provide a novel paradigm for computing, with a neuromorphic
+architecture. Equivalently, quantum memristors constitute a basic building block for a
+neuromorphic quantum processor.
+
+In this Section, we will ﬁrst revise the topic of quantum artiﬁcial life, beginning
+with theoretical works [84, 85] and ﬁnishing with an experimental implementation in
+the IBM cloud quantum computer [86].
+
+Later on, we will describe the topic of quantum memristors, according to a series
+
+of results in the literature [93, 94, 95, 96].
+
+3.1. Quantum artiﬁcial life
+
+Artiﬁcial life is a research ﬁeld that aims to reproduce biological properties common
+to living systems in artiﬁcially engineered systems [81, 82]. Some examples are selfassembling robots [106], self-replicating chemicals [107] or computing programs [108],
+as well as living neurons grown in the lab and connected to external devices [109].
+One of the main areas inside this thriving ﬁeld is the self-replicating systems. Living
+systems acquire complexity and structure via Darwinian evolution, or natural selection,
+and this is a combination of self-replication, introduction of variability via mutations
+as well as genome exchange, and selection of the ﬁttest. Therefore, self-replication is
+In the research line of quantum artiﬁcial life, a series
+one of the hallmarks of life.
+of works has explored the possibility for elementary quantum systems to undergo selfreplication [84, 85, 86] . This is a non-trivial issue given that the no-cloning theorem [87]
+prevents the perfect copying of unknown quantum states. Thus, perfect self-replication
+onto distinct progeny individuals would not be allowed. What these works show is that
+the full quantum information can be faithfully transferred to the progeny individuals,
+
+Memory1| 1i| 2iUautadd| outi⇠| 1i+| 2i|0iMemory2
+Quantum machine learning and quantum biomimetics: A perspective
+
+9
+
+under ideal conditions, if one maps the classical information of the diagonal elements of
+the parent density matrix onto the diﬀerent progeny systems. On the other hand, the
+coherences of the parent density matrix would be mapped onto quantum correlations
+of the progeny systems. Therefore, entanglement plays a crucial role in the context of
+having self-replicating quantum systems.
+
+Figure 4. Scheme for quantum artiﬁcial life. A quantum living unit, or quantum
+individual, is created from two qubits, which constitute the genotype and phenotype.
+The phenotype then decoheres when coupled with a quantum reservoir, until producing
+the “death” of the quantum individual. While still “alive”, the quantum individual can
+undergo self-replication, via coupling with further ancillary qubits. In order to transfer
+its full quantum information, the original quantum individual becomes entangled with
+its progeny quantum individuals. Adapted from Ref. [85].
+
+In Ref. [84], a ﬁrst analysis of biomimetic cloning of quantum observables was
+carried out, suggesting that the full quantum information may be transferred onto
+successive generations via cloning of classical
+information together with controlled
+transfer of quantum correlations. Later on, Ref. [85] proposed an implementation of
+a model of quantum artiﬁcial life. In this model, a quantum living unit, or quantum
+individual, is composed of two qubits, one for the genetic information, or genotype,
+and another for the expression of the genotype in the environment, or phenotype.
+The individual is created via a partial cloning operation of the genotype onto the
+phenotype via a Controlled-NOT operation, a kind of entangling two-qubit quantum
+gate. Subsequently, the phenotype can get coupled with a quantum reservoir, that
+induces decoherence on it. After a certain amount of time, the phenotype has almost
+totally decohered, and one considers that it has “died”, at least as an artiﬁcial life
+individual, and according to this model. While the quantum individual is still “alive”,
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+10
+
+it can couple with further ancillary qubits, carrying out additional partial cloning
+operations with Controlled-NOT gates, and produce new quantum individuals, which
+become entangled to the initial one, as previously explained (see Fig. 4).
+
+Figure 5. Quantum circuit for the most complex quantum artiﬁcial life protocol
+experimentally carried out in Ref. [86]. The number of two-qubit Controlled-NOT
+entangling gates is of 20. H denotes a Hadamard gate, and the numbers inside the
+single-qubit gates indicate diﬀerent phases, as described in Ref. [86].
+
+Figure 6. Theoretical (yellow) and experimental (blue) data of the diﬀerent
+experiments of a quantum artiﬁcial life system in the IBM cloud quantum computer.
+Adapted from Ref. [86].
+
+In Ref. [86], a quantum implementation of the quantum artiﬁcial life model of
+Ref. [85] was carried out in the IBM cloud quantum computer. Fig. 5 shows the most
+complex quantum circuit that was implemented in this experiment. The number of
+entangling gates was of 20. On the other hand, Fig. 6 depicts the theoretical (yellow)
+together with the experimental (blue) data of the diﬀerent experiments of quantum
+artiﬁcial life carried out in the IBM cloud quantum computer. Even though the
+
+1/43/4HHHHHHHHS1/41/4,0,1|0i1|0i0|0i2|0i4T+1/4-1/4T1/4-1/40,3/40,-1/2HHHHHH1/81/81/81/8Basis elementProbability00.20.40.60.8IBasis elementProbability00.20.40.60.8IIBasis elementProbability00.050.10.15IIIBasis elementProbability00.10.20.30.40.50.6IVBasis elementProbability00.10.20.30.40.5V
+Quantum machine learning and quantum biomimetics: A perspective
+
+11
+
+ﬁdelities are not perfect, the experimental setup qualitatively reproduces the theoretical
+prediction to a large extent, for an experiment of a certain complexity.
+
+3.2. Quantum memristors
+
+Subsequently,
+
+The other topic in quantum biomimetics we will describe here is the one of quantum
+In Ref. [93], a quantum version of a memristor was
+memristors [93, 94, 95, 96].
+introduced, in which a two level quantum system encodes the quantum information,
+being supplemented with a weak measurement to acquire information, as well as
+It was proven
+feedback onto the system depending on the measurement outcome.
+that this device possesses hysteresis, and therefore a memory, in addition to processing
+capabilities. It was conjectured to be able to simulate non-Markovian quantum systems.
+two proposals for implementations of quantum memristors in
+diﬀerent quantum platforms were put forward, namely, superconducting circuits [94]
+and quantum photonics [95].
+In the former, the memristive behavior emerges from
+quasiparticle-induced tunneling when supercurrent cancellation takes place. For realistic
+parameters, the appearing hysteretic behavior may be measured using state-of-theart tomography of the phase-driven tunneling current.
+In the latter, the memristive
+behaviour arises from a tunable beam splitter, to which the input state is directed,
+together with feedback from one of the output ports onto the beam splitter that modiﬁes
+its reﬂectivity depending on the output signal.
+
+Finally, another result has been published on some complementary devices to
+
+quantum memristors, namely, qubit-based memcapacitors and meminductors [96].
+
+As we have introduced, classical memristors constitute a paradigm for neuromorphic
+Equivalently, quantum memristors represent a building block for a
+computing.
+neuromorphic quantum device. A proven speedup with respect to their classical
+counterparts is still an open problem. Nevertheless, they represent a novel and promising
+quantum system that may play an important role in the future in a wide variety of
+scenarios as distributed quantum computing, quantum neural networks, and simulation
+of non-Markovian quantum systems.
+
+4. Conclusions
+
+In this Perspective, we have given an overview of topics inside the ﬁelds of quantum
+In quantum machine learning, we have
+machine learning and quantum biomimetics.
+explored the topics of quantum reinforcement learning, on the one hand, and quantum
+autoencoders, on the other hand. In quantum biomimetics, we have described the results
+in quantum artiﬁcial life and quantum memristors.
+
+Quantum reinforcement
+
+interacting with an
+environment, obtaining information from it, as well as acting on it. The agent, typically
+a quantum system, can follow a policy to achieve a predetermined goal. Diﬀerent works
+in the literature show possible resource gains of quantum reinforcement learning with
+
+learning considers an agent
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+12
+
+respect to its classical counterpart, as well as describe feasible experimental realizations
+in controllable quantum platforms.
+
+Quantum autoencoders are a kind of quantum machine learning protocol in which
+the aim is to reduce the amount of quantum resources needed to encode a certain set of
+quantum states. Via a training process, with a certain parameterized quantum circuit,
+one may compress the quantum information from a certain Hilbert space onto a smaller
+space of states. A further variant of quantum autoencoders proposed in the literature
+is the one based on approximate quantum adders. These would allow for encoding a
+certain number of quantum states on a reduced number of quantum states via previouslyoptimized approximate quantum adders. Both kinds of quantum autoencoders have
+been realized experimentally. The ﬁrst one in quantum photonics, while the second one
+in superconducting circuits.
+
+Quantum artiﬁcial life is a novel paradigm inside quantum biomimetics that may
+enable a quantum system to self-replicate and propagate its quantum information to
+further quantum systems. An open problem that remains to be addressed in these
+systems is whether one may be able to encode optimization problems by allowing the
+quantum individuals to compete, in some kind of quantum Darwinian evolution.
+
+Quantum memristors are quantum devices with processing capabilities and memory,
+and constitute the basic building blocks for neuromorphic quantum computing. They
+may be employed in the future for distributed quantum computing, quantum neural
+networks, as well as quantum simulation of non-Markovian quantum systems.
+
+Summarizing, quantum machine learning and quantum biomimetics are two
+emerging and promising ﬁelds inside quantum technologies, which may enable a wide
+variety of applications in the future.The connection between both ﬁelds is apparent
+in the sense that living systems, either natural or artiﬁcial, have often the ability to
+learn. With the advent of Noisy Intermediate-Scale Quantum (NISQ) computers [110],
+an enormous amount of computing power will be available, with desirable properties of
+speed and low energy consumption. Only the future can tell which progress may these
+technologies bring about.
+
+Acknowledgements
+
+I acknowledge collaborations and useful discussions on the topics presented in this article
+with Enrique Solano, Mikel Sanz, Unai Alvarez-Rodriguez, Jos´e Mart´ın-Guerrero, Pablo
+Escandell-Montero, Francisco Albarr´an-Arriagada, Juan Carlos Retamal, Francisco
+C´ardenas-L´opez, Yongcheng Ding, Xi Chen, Shang Yu, and Rei Li. Funding from
+Spanish PGC2018-095113-B-I00 (MCIU/AEI/FEDER, UE) is acknowledged.
+
+Data Availability Statement
+
+Data sharing does not apply to this article as no new data were created or analysed.
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+13
+
+References
+
+[1] Mohseni M, Read P, Neven H, Boixo S, Denchev V, Babbush R, Fowler A, Smelyanskiy V and
+
+Martinis J 2017 Commercialize early quantum technologies, Nature 543 171.
+
+[2] New Strategic Research Agenda on Quantum technologies, European Commission, 2020.
+https://ec.europa.eu/digital-single-market/en/news/new-strategic-research-agenda-quantumtechnologies (last accessed: March 24, 2020).
+
+[3] LeCun Y, Bengio Y, and Hinton G 2015 Deep learning. Nature 521 436.
+[4] Russell S and Norvig P 2009 Artiﬁcial Intelligence: A Modern Approach (Pearson).
+[5] Making a topic search at the Web of Science (Clarivate), http://apps.webofknowledge.com, with
+both the topics “machine learning” and “quantum”, retrieves a number of articles of about 10
+per year in the period 2008-2013, and then a sustained growth, with a rapid rise in 2017 with
+121 articles, 2018 with 249 articles, and 2019 with 354 articles.
+
+[6] Wittek P 2014 Quantum Machine Learning (Academic Press).
+[7] Biamonte J, Wittek P, Pancotti N, Rebentrost P, Wiebe N and Lloyd S 2017 Quantum machine
+
+learning Nature 549 074001
+
+[8] Dunjko V and Briegel H J 2018 Machine learning & artiﬁcial intelligence in the quantum domain:
+
+a review of recent progress Rep. Prog. Phys. 81 074001.
+
+[9] Schuld M, Sinayskiy I, and Petruccione F 2015 An introduction to quantum machine learning
+
+[10] Schuld M and Petruccione F 2018 Supervised Learning with Quantum Computers (Springer).
+[11] Schuld M, Sinayskiy I, and Petruccione F 2014 The quest for a Quantum Neural Network Quantum
+
+[12] Dunjko V and Wittek P 2020 A non-review of Quantum Machine Learning:
+
+trends and
+
+[13] Harrow A W, Hassidim A, and Lloyd S 2009 Quantum Algorithm for Linear Systems of Equations
+
+Contemp. Phys. 56 172.
+
+Inf. Process. 13 2567.
+
+explorations Quantum 4 32.
+
+Phys. Rev. Lett. 103 150502.
+
+[14] Rebentrost P, Mohseni M, and Lloyd S 2014 Quantum Support Vector Machine for Big Data
+
+Classiﬁcation Phys. Rev. Lett. 113 130503.
+
+[15] Lloyd S, Mohseni M, and Rebentrost P 2014 Quantum principal component analysis Nat. Phys.
+
+10 631.
+
+[16] Gily´en A, Arunachalam S, and Wiebe N 2019 Optimizing quantum optimization algorithms
+via faster quantum gradient computation Proceedings of the Thirtieth Annual ACM-SIAM
+Symposium on Discrete Algorithms.
+
+[17] Sheng Y-B and Zhou L 2017 Distributed secure quantum machine learning Sci. Bull. 62 1025.
+[18] Dong D, Chen C, Li, H, and Tarn, T-J 2008 Quantum Reinforcement Learning IEEE Transactions
+
+on Systems, Man, and Cybernetics, Part B (Cybernetics) 38 1207.
+
+[19] Paparo G D, Dunjko V, Makmal A, Martin-Delgado M A, and Briegel H J 2014 Quantum Speedup
+
+for Active Learning Agents Phys. Rev. X 4 031002.
+
+[20] Dunjko V, Taylor J M, and Briegel H J 2016 Quantum-Enhanced Machine Learning Phys. Rev.
+
+Lett. 117, 130501.
+
+Sci. Rep. 7 1609.
+
+[21] Lamata L 2017 Basic protocols in quantum reinforcement learning with superconducting circuits
+
+[22] C´ardenas-L´opez F A, Lamata L, Retamal J C, and Solano E 2018 Multiqubit and multilevel
+quantum reinforcement learning with quantum technologies PLoS ONE 13 e0200455.
+[23] Albarr´an-Arriagada F, Retamal J C, Solano E, and Lamata L 2018 Measurement-based
+
+adaptation protocol with quantum reinforcement learning Phys. Rev. A 98, 042315.
+
+[24] Yu S, Albarr´an-Arriagada F, Retamal J C, Wang Y-T, Liu W, Ke Z-J, Meng Y, Li Z-P, Tang
+J-S, Solano E, Lamata L, Li C-F, and Guo G-C 2019 Reconstruction of a Photonic Qubit State
+with Reinforcement Learning Adv. Quantum Technol. 2, 1800074.
+
+[25] Albarr´an-Arriagada F, Retamal J C, Solano E, and Lamata L 2020 Reinforcement learning for
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+14
+
+semi-autonomous approximate quantum eigensolver Mach. Learn.: Sci. Technol. 1, 015002.
+
+[26] Romero J, Olson J P, and Aspuru-Guzik A 2017 Quantum autoencoders for eﬃcient compression
+
+of quantum data Quantum Sci. Technol. 2 045001.
+
+[27] Wan K H, Dahlsten O, Kristj´ansson H, Gardner R and Kim M S 2017 Quantum generalisation
+
+of feedforward neural networks npj Quantum Information 3 36.
+
+[28] Lamata L, Alvarez-Rodriguez U, Mart´ın-Guerrero J D, Sanz M, and Solano E 2018 Quantum
+
+autoencoders via quantum adders with genetic algorithms Quantum Sci. Technol. 4 014007.
+
+[29] Pepper A, Tischler N, and Pryde G J 2019 Experimental Realization of a Quantum Autoencoder:
+
+The Compression of Qutrits via Machine Learning Phys. Rev. Lett. 122 060501.
+
+[30] Ding Y, Lamata L, Sanz M, Chen X, and Solano E 2019 Experimental Implementation of a
+
+Quantum Autoencoder via Quantum Adders Adv. Quantum Technol. 2 1800065.
+
+[31] Khoshaman A, Vinci W, Denis B, Andriyash E, Sadeghi H, and Amin M H 2019 Quantum
+
+variational autoencoder Quantum Sci. Technol. 4 014001.
+
+[32] Tacchino F, Macchiavello C, Gerace D, and Bajoni D 2019 An artiﬁcial neuron implemented on
+
+an actual quantum processor npj Quantum Inf. 5 26.
+
+[33] Torrontegui E and Garca-Ripoll J J 2019 Unitary quantum perceptron as eﬃcient universal
+
+approximator EPL 125 30004.
+
+[34] Cao Y, Guerreschi G G, and Aspuru-Guzik A 2017 Quantum Neuron: an elementary building
+
+block for machine learning on quantum computers arXiv:1711.11240
+
+[35] Gonzalez-Raya T, Cheng X-H, Egusquiza I L, Chen X, Sanz M, and Solano E 2019 Quantized
+Single-Ion-Channel Hodgkin-Huxley Model for Quantum Neurons Phys. Rev. Appl. 12 014037.
+[36] Gonzalez-Raya T, Solano E, and Sanz M 2020 Quantized Three-Ion-Channel Neuron Model for
+
+Neural Action Potentials Quantum 4 224.
+
+[37] Alvarez-Rodriguez U, Lamata L, Escandell-Montero P, Mart´ın-Guerrero J D, and Solano E 2017
+
+Supervised Quantum Learning without Measurements Sci. Rep. 7 13645.
+
+[38] Johnson M W, Amin M H S, Gildert S, Lanting T, Hamze F, Dickson N, Harris R, Berkley
+A J, Johansson J, Bunyk P, Chapple E M, Enderud C, Hilton J P, Karimi K, Ladizinsky E,
+Ladizinsky N, Oh T, Perminov I, Rich C, Thom M C, Tolkacheva E, Truncik C J S, Uchaikin
+S, Wang J, Wilson B, and Rose G 2011 Quantum annealing with manufactured spins Nature
+473 194.
+
+[39] Venturelli D, Mandr`a S, Knysh S, O’Gorman B, Biswas R, and Smelyanskiy V 2015 Quantum
+
+Optimization of Fully Connected Spin Glasses 2015 Phys. Rev. X 5 031040.
+
+[40] Rieﬀel E G, Venturelli D, O’Gorman B, Do M B, Prystay E M, and Smelyanskiy V M 2015 A case
+study in programming a quantum annealer for hard operational planning problems Quantum
+Inf. Proc. 14 1.
+
+[41] Amin M H, Andriyash E, Rolfe J, Kulchytskyy B, and Melko R 2018 Quantum Boltzmann
+
+[42] Kieferov´a M and Wiebe N 2017 Tomography and generative training with quantum Boltzmann
+
+Machine Phys. Rev. X 8 021050.
+
+machines Phys. Rev. A 96, 062327.
+
+[43] Benedetti M, Realpe-G´omez J, Biswas R, and Perdomo-Ortiz A 2017 Quantum-Assisted Learning
+
+of Hardware-Embedded Probabilistic Graphical Models Phys. Rev. X 7 041052.
+
+[44] Benedetti M, Realpe-G´omez J, and Perdomo-Ortiz A 2018 Quantum-assisted Helmholtz
+machines: A quantumclassical deep learning framework for industrial datasets in near-term
+devices Quantum Sci. Technol. 3 034007.
+
+[45] Perdomo-Ortiz A, Benedetti M, Realpe-G´omez J and Biswas R 2018 Opportunities and challenges
+for quantum-assisted machine learning in near-term quantum computers Quantum Sci. Technol.
+3 030502.
+
+[46] Zahedinejad E, Ghosh J, and Sanders B C 2015 High-ﬁdelity single-shot Toﬀoli gate via quantum
+
+control Phys. Rev. Lett. 114 200502.
+
+[47] Zahedinejad E, Ghosh J, and Sanders B C 2016 Designing high-ﬁdelity single-shot three-qubit
+
+gates: a machine-learning approach Phys. Rev. Applied 6 054005.
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+15
+
+[60] Sgroi P, Palma G M, and Paternostro M 2020 Reinforcement learning approach to non-equilibrium
+
+[48] Las Heras U, Alvarez-Rodriguez U, Solano E, and Sanz M Genetic algorithms for digital quantum
+
+simulations Phys. Rev. Lett. 116 230504.
+
+[49] Li R, Alvarez-Rodriguez U, Lamata L, and Solano E 2017 Approximate Quantum Adders with
+
+Genetic Algorithms: An IBM Quantum Experience Quantum Meas. Quantum Metrol. 4 1
+
+[50] Carrasquilla J and Melko R G 2017 Machine learning phases of matter Nat. Phys. 13 431.
+[51] Mehta P, Bukov M, Wang C-H, Day A G R, Richardson C, Fisher C K, and Schwab D J 2019 A
+
+high-bias, low-variance introduction to Machine Learning for physicists Phys. Rep. 810 1.
+
+[52] Liu N and Rebentrost P 2018 Quantum machine learning for quantum anomaly detection Phys.
+
+Rev. A 97 042315.
+
+[53] Carleo G, Cirac I, Cranmer K, Daudet L, Schuld M, Tishby N, Vogt-Maranto L, and Zdeborov´a
+
+L 2019 Machine learning and the physical sciences Rev. Mod. Phys. 91 045002.
+
+[54] F¨osel T, Tighineanu P, Weiss T, and Marquardt F 2018 Reinforcement Learning with Neural
+
+Networks for Quantum Feedback Phys. Rev. X 8, 031084.
+
+[55] Bukov M, Day A G R, Sels D, Weinberg P, Polkovnikov A, and Mehta P 2018 Reinforcement
+
+Learning in Diﬀerent Phases of Quantum Control Phys. Rev. X 8, 031086.
+
+[56] Bukov M 2018 Reinforcement learning for autonomous preparation of Floquet-engineered states:
+
+Inverting the quantum Kapitza oscillator Phys. Rev. B 98 224305.
+
+[57] Melnikov A A, Nautrup H P, Krenn M, Dunjko V, Tiersch M, Zeilinger A, and Briegel H J 2018
+Active learning machine learns to create new quantum experiments PNAS 115 1221.
+[58] Melnikov A A, Sekatski P, and Sangouard N 2020 Setting up experimental Bell test with
+
+[59] Mackeprang J, Dasari D B R, and Wrachtrup J 2019 A Reinforcement Learning approach for
+
+reinforcement learning arXiv:2005.01697.
+
+Quantum State Engineering arXiv:1908.05981.
+
+quantum thermodynamics arXiv:2004.07770.
+
+quantum communication arXiv:1904.10797.
+
+quantum control arXiv:2002.08376.
+
+[61] Walln¨ofer, Melnikov A A, D¨ur W, and Briegel H J 2019 Machine learning for long-distance
+
+[62] Sch¨afer F, Kloc M, Bruder C, and L¨orch N 2002 A diﬀerentiable programming method for
+
+[63] Zhang X-M, Wei Z, Asad R, Yang X-C and Wang X 2019 When does reinforcement learning stand
+out in quantum control? A comparative study on state preparation npj Quantum Information
+5 85.
+
+[64] Xu H, Li J, Liu L, Wang Y, Yuan H, and Wang X 2019 Generalizable control for quantum
+parameter estimation through reinforcement learning npj Quantum Information 5 82.
+[65] Sweke R, Kesselring M S, van Nieuwenburg E P L, and Eisert J 2018 Reinforcement Learning
+
+Decoders for Fault-Tolerant Quantum Computation arXiv:1810.07207.
+
+[66] F¨osel T, Krastanov S, Marquardt F, and Jiang L 2020 Eﬃcient cavity control with SNAP gates
+
+arXiv:2004.14256.
+
+[67] Innocenti L, Banchi L, Ferraro A, Bose S, and Paternostro M Supervised learning of
+time-independent Hamiltonians for gate design New J. Phys. https://doi.org/10.1088/13672630/ab8aaf
+
+[68] Youssry A, Chapman R J, Peruzzo A, Ferrie C, and Tomamichel M 2020 Modeling and control
+of a reconﬁgurable photonic circuit using deep learning Quantum Sci. Technol. 5 025001.
+[69] Shrapnel S, Costa F, and Milburn G 2018 Quantum Markovianity as a supervised learning task
+
+Int. J. Quantum Info. 16 1840010.
+
+[70] Luchnikov I A, Vintskevich S V, Grigoriev D A, and Filippov S N 2020 Machine Learning Non
+Markovian Quantum Dynamics Phys. Rev. Lett. 124 140502.
+
+[71] Melnikov A A, Fedichkin L E, Lee R-K, and Alodjants A 2020 Machine Learning Transfer
+
+Eﬃciencies for Noisy Quantum Walks Adv. Quantum Technol. 3 1900115.
+
+[72] Melnikov A A, Fedichkin L E, and Alodjants A 2019 Predicting quantum advantage by quantum
+
+walk with convolutional neural networks New J. Phys. 21 125002.
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+16
+
+[73] Kalantre S S, Zwolak J P, Ragole S, Wu X, Zimmerman N M, Stewart Jr. M D, and Taylor J M
+2019 Machine learning techniques for state recognition and auto-tuning in quantum dots npj
+Quantum Information 5 6.
+
+[74] Torlai G, Timar B, van Nieuwenburg E P L, Levine H, Omran A, Keesling A, Bernien H, Greiner
+M, Vuleti´c V, Lukin M D, Melko R G, and Endres M 2019 Integrating Neural Networks with
+a Quantum Simulator for State Reconstruction Phys. Rev. Lett. 123 230504.
+
+[75] Torlai G, Mazzola G, Carrasquilla J, Troyer M, Melko R, and Carleo G 2018 Neural-network
+
+quantum state tomography Nat. Phys. 14 447.
+
+[76] Liu G, Chen M, Liu Y-X, Layden D, and Cappellaro P 2020 Repetitive readout enhanced by
+
+machine learning Mach. Learn.: Sci. Technol. 1 015003.
+
+[77] Agresti I, Viggianiello N, Flamini F, Spagnolo N, Crespi A, Osellame R, Wiebe N, and Sciarrino
+F 2019 Pattern Recognition Techniques for Boson Sampling Validation Phys. Rev. X 9 011013.
+
+[78] Carrasquilla, J 2020 Machine Learning for Quantum Matter arXiv:2003.11040.
+[79] Tang E 2019 A quantum-inspired classical algorithm for recommendation systems. In Proceedings
+of the 51st Annual ACM SIGACT Symposium on Theory of Computing, STOC 217, New York,
+NY, USA.
+
+[80] Arrazola J M, Delgado A, Bardhan B R, and Lloyd S 2019 Quantum-inspired algorithms in
+
+practice arXiv:1905.10415.
+
+[81] Langton C G 1997 Artiﬁcial Life: An overview (MIT Press, Cambridge USA).
+[82] Aguilar W, Santamar´ıa-Bonﬁl G, Froese T and Gershenson C 2014 The past, present, and future
+
+[83] Gardner M, 1970 The fantastic combinations of John Conway’s new solitaire game “life”, Sci.
+
+of artiﬁcial life Front. Robot. AI 1 8.
+
+Am. 223 120.
+
+Observables, Sci. Rep. 4 4910.
+
+Technologies Sci. Rep. 6 20956.
+
+Quantum Computer Sci. Rep. 8 14793.
+
+[84] Alvarez-Rodriguez U, Sanz M, Lamata L, and Solano E 2014 Biomimetic Cloning of Quantum
+
+[85] Alvarez-Rodriguez U, Sanz M, Lamata L, and Solano E 2016 Artiﬁcial Life in Quantum
+
+[86] Alvarez-Rodriguez U, Sanz M, Lamata L, and Solano E 2018 Quantum Artiﬁcial Life in an IBM
+
+[87] Wootters W K and Zurek W H 1982 A single quantum cannot be cloned Nature 299 802.
+[88] Eisert J, Wilkens M, and Lewenstein M 1999 Quantum games and quantum strategies Phys. Rev.
+
+[89] Martin-Delgado M A, 2012 On Quantum Eﬀects in a Theory of Biological Evolution Sci. Rep. 2
+
+[90] Abbott D, Davies P C W, and Pati A K 2008 Quantum Aspects of Life (Imperial College Press,
+
+[91] Arrighi P and Grattage J 2010 A Quantum Game of Life. Paper presented at Journ´ees Automates
+
+Cellulaires, Turku, Finland.
+
+[92] Bleh D, Calarco T, and Montangero S 2012 Quantum Game of Life. EPL 97 20012.
+[93] Pfeiﬀer P, Egusquiza I L, Di Ventra M, Sanz M, and Solano E 2016 Quantum Memristors Sci.
+
+Lett. 83 3077.
+
+302.
+
+London).
+
+Rep. 6 29507.
+
+[94] Salmilehto J, Deppe F, Di Ventra M, Sanz M, and Solano E, 2017 Quantum Memristors with
+
+Superconducting Circuits, Sci. Rep. 7 42044.
+
+[95] Sanz M, Lamata L, and Solano E, 2018 Invited article: Quantum memristors in quantum
+
+[96] Shevchenko S N, Pershin Y V, and Nori F 2016 Qubit-based memcapacitors and meminductors
+
+photonics APL Phot. 3 080801.
+
+Phys. Rev. Applied 6, 014006.
+
+[97] Di Ventra M, Pershin Y V, and Chua L O 2009 Circuit elements with memory: memristors,
+
+memcapacitors, and meminductors Proc. IEEE 97 1717
+
+[98] https://www.qutisgroup.com
+[99] Lamata L, Sanz M, and Solano E 2019 Quantum Machine Learning and Bioinspired Quantum
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+17
+
+Technologies Adv. Quantum Technol. 2 1900075.
+
+[100] Sutton R S and Barto A G 2018 Reinforcement Learning: An Introduction (MIT Press).
+[101] Silver D, Huang A, Maddison C J, Guez A, Sifre L, van den Driessche G, Schrittwieser J,
+Antonoglou I, Panneershelvam V, Lanctot M, Dieleman S, Grewe D, Nham J, Kalchbrenner N,
+Sutskever I, Lillicrap T, Leach M, Kavukcuoglu K, Graepel T, and Hassabis D 2016 Mastering
+the game of Go with deep neural networks and tree search Nature 529 484.
+
+[102] Silver D, Schrittwieser J, Simonyan K, Antonoglou I, Huang A, Guez A, Hubert T, Baker L,
+Lai M, Bolton A, Chen Y, Lillicrap T, Hui F, Sifre L, van den Driessche G, Graepel T, and
+Hassabis D 2017 Mastering the game of Go without human knowledge Nature 550 354.
+[103] Grover L K 1997 Quantum Mechanics Helps in Searching for a Needle in a Haystack Phys. Rev.
+
+[104] Alvarez-Rodriguez U, Sanz M, Lamata L, and Solano E 2015 The Forbidden Quantum Adder
+
+Lett. 79, 325.
+
+Sci. Rep. 5 11983.
+
+[105] Oszmaniec M, Grudka A, Horodecki M, and W´ojcik A 2016 Creating a Superposition of Unknown
+
+[106] Werfel J, Petersen K, and Nagpal R 2014 Designing collective behavior in a termite-inspired robot
+
+Quantum States Phys. Rev. Lett. 116 110403.
+
+construction team Science 343 754.
+
+[107] Dittrich P, Ziegler J, and Banzhaf W 2001 Artiﬁcial chemistries – a review Artif. Life 7 225.
+[108] Baeck T, Fogel D, and Michalewicz Z. 1997. Handbook of Evolutionary Computation (Taylor &
+
+Francis, London, UK).
+
+[109] Benner S A and Sismour A M 2005 Synthetic biology Nat. Rev. Genet. 6, 533.
+[110] Preskill J 2018 Quantum Computing in the NISQ era and beyond Quantum 2 79.
+
+
