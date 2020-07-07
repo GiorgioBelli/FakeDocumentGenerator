@@ -307,7 +307,7 @@ def main(args):
 
     for i,p in enumerate(repo_extr.papers):
         p.extract_sections()
-        # p.dump(outPath="../Results/extraction/paper-rawtest-%s.txt"%i)
+        p.dump(outPath="../Results/extraction/paper-rawtest-%s.txt"%i)
 
     raw_papers = repo_extr.papers
     paper_list = []

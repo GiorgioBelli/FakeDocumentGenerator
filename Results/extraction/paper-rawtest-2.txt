@@ -1,5 +1,12 @@
 PAPER PATH: ../datasets/downloaded/2004.12076v2.Quantum_machine_learning_and_quantum_biomimetics_A_perspective.pdf
 
+
+================TABLE OF CONTENTS================
+52:	Abstract. Quantum machine learning has emerged as an exciting and promising
+72:	1. Introduction
+506:	4. Conclusions
+579:	References
+========================================
 ====================ABSTRACT====================
 Abstract. Quantum machine learning has emerged as an exciting and promising
 paradigm inside quantum technologies.
@@ -462,6 +469,489 @@ of non-Markovian quantum systems.
 
 ========================================
 ====================CONCLUSION====================
+4. Conclusions
+
+In this Perspective, we have given an overview of topics inside the ﬁelds of quantum
+In quantum machine learning, we have
+machine learning and quantum biomimetics.
+explored the topics of quantum reinforcement learning, on the one hand, and quantum
+autoencoders, on the other hand. In quantum biomimetics, we have described the results
+in quantum artiﬁcial life and quantum memristors.
+
+Quantum reinforcement
+
+interacting with an
+environment, obtaining information from it, as well as acting on it. The agent, typically
+a quantum system, can follow a policy to achieve a predetermined goal. Diﬀerent works
+in the literature show possible resource gains of quantum reinforcement learning with
+
+learning considers an agent
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+12
+
+respect to its classical counterpart, as well as describe feasible experimental realizations
+in controllable quantum platforms.
+
+Quantum autoencoders are a kind of quantum machine learning protocol in which
+the aim is to reduce the amount of quantum resources needed to encode a certain set of
+quantum states. Via a training process, with a certain parameterized quantum circuit,
+one may compress the quantum information from a certain Hilbert space onto a smaller
+space of states. A further variant of quantum autoencoders proposed in the literature
+is the one based on approximate quantum adders. These would allow for encoding a
+certain number of quantum states on a reduced number of quantum states via previouslyoptimized approximate quantum adders. Both kinds of quantum autoencoders have
+been realized experimentally. The ﬁrst one in quantum photonics, while the second one
+in superconducting circuits.
+
+Quantum artiﬁcial life is a novel paradigm inside quantum biomimetics that may
+enable a quantum system to self-replicate and propagate its quantum information to
+further quantum systems. An open problem that remains to be addressed in these
+systems is whether one may be able to encode optimization problems by allowing the
+quantum individuals to compete, in some kind of quantum Darwinian evolution.
+
+Quantum memristors are quantum devices with processing capabilities and memory,
+and constitute the basic building blocks for neuromorphic quantum computing. They
+may be employed in the future for distributed quantum computing, quantum neural
+networks, as well as quantum simulation of non-Markovian quantum systems.
+
+Summarizing, quantum machine learning and quantum biomimetics are two
+emerging and promising ﬁelds inside quantum technologies, which may enable a wide
+variety of applications in the future.The connection between both ﬁelds is apparent
+in the sense that living systems, either natural or artiﬁcial, have often the ability to
+learn. With the advent of Noisy Intermediate-Scale Quantum (NISQ) computers [110],
+an enormous amount of computing power will be available, with desirable properties of
+speed and low energy consumption. Only the future can tell which progress may these
+technologies bring about.
+
+Acknowledgements
+
+I acknowledge collaborations and useful discussions on the topics presented in this article
+with Enrique Solano, Mikel Sanz, Unai Alvarez-Rodriguez, Jos´e Mart´ın-Guerrero, Pablo
+Escandell-Montero, Francisco Albarr´an-Arriagada, Juan Carlos Retamal, Francisco
+C´ardenas-L´opez, Yongcheng Ding, Xi Chen, Shang Yu, and Rei Li. Funding from
+Spanish PGC2018-095113-B-I00 (MCIU/AEI/FEDER, UE) is acknowledged.
+
+Data Availability Statement
+
+Data sharing does not apply to this article as no new data were created or analysed.
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+13
+
+References
+
+[1] Mohseni M, Read P, Neven H, Boixo S, Denchev V, Babbush R, Fowler A, Smelyanskiy V and
+
+Martinis J 2017 Commercialize early quantum technologies, Nature 543 171.
+
+[2] New Strategic Research Agenda on Quantum technologies, European Commission, 2020.
+https://ec.europa.eu/digital-single-market/en/news/new-strategic-research-agenda-quantumtechnologies (last accessed: March 24, 2020).
+
+[3] LeCun Y, Bengio Y, and Hinton G 2015 Deep learning. Nature 521 436.
+[4] Russell S and Norvig P 2009 Artiﬁcial Intelligence: A Modern Approach (Pearson).
+[5] Making a topic search at the Web of Science (Clarivate), http://apps.webofknowledge.com, with
+both the topics “machine learning” and “quantum”, retrieves a number of articles of about 10
+per year in the period 2008-2013, and then a sustained growth, with a rapid rise in 2017 with
+121 articles, 2018 with 249 articles, and 2019 with 354 articles.
+
+[6] Wittek P 2014 Quantum Machine Learning (Academic Press).
+[7] Biamonte J, Wittek P, Pancotti N, Rebentrost P, Wiebe N and Lloyd S 2017 Quantum machine
+
+learning Nature 549 074001
+
+[8] Dunjko V and Briegel H J 2018 Machine learning & artiﬁcial intelligence in the quantum domain:
+
+a review of recent progress Rep. Prog. Phys. 81 074001.
+
+[9] Schuld M, Sinayskiy I, and Petruccione F 2015 An introduction to quantum machine learning
+
+[10] Schuld M and Petruccione F 2018 Supervised Learning with Quantum Computers (Springer).
+[11] Schuld M, Sinayskiy I, and Petruccione F 2014 The quest for a Quantum Neural Network Quantum
+
+[12] Dunjko V and Wittek P 2020 A non-review of Quantum Machine Learning:
+
+trends and
+
+[13] Harrow A W, Hassidim A, and Lloyd S 2009 Quantum Algorithm for Linear Systems of Equations
+
+Contemp. Phys. 56 172.
+
+Inf. Process. 13 2567.
+
+explorations Quantum 4 32.
+
+Phys. Rev. Lett. 103 150502.
+
+[14] Rebentrost P, Mohseni M, and Lloyd S 2014 Quantum Support Vector Machine for Big Data
+
+Classiﬁcation Phys. Rev. Lett. 113 130503.
+
+[15] Lloyd S, Mohseni M, and Rebentrost P 2014 Quantum principal component analysis Nat. Phys.
+
+10 631.
+
+[16] Gily´en A, Arunachalam S, and Wiebe N 2019 Optimizing quantum optimization algorithms
+via faster quantum gradient computation Proceedings of the Thirtieth Annual ACM-SIAM
+Symposium on Discrete Algorithms.
+
+[17] Sheng Y-B and Zhou L 2017 Distributed secure quantum machine learning Sci. Bull. 62 1025.
+[18] Dong D, Chen C, Li, H, and Tarn, T-J 2008 Quantum Reinforcement Learning IEEE Transactions
+
+on Systems, Man, and Cybernetics, Part B (Cybernetics) 38 1207.
+
+[19] Paparo G D, Dunjko V, Makmal A, Martin-Delgado M A, and Briegel H J 2014 Quantum Speedup
+
+for Active Learning Agents Phys. Rev. X 4 031002.
+
+[20] Dunjko V, Taylor J M, and Briegel H J 2016 Quantum-Enhanced Machine Learning Phys. Rev.
+
+Lett. 117, 130501.
+
+Sci. Rep. 7 1609.
+
+[21] Lamata L 2017 Basic protocols in quantum reinforcement learning with superconducting circuits
+
+[22] C´ardenas-L´opez F A, Lamata L, Retamal J C, and Solano E 2018 Multiqubit and multilevel
+quantum reinforcement learning with quantum technologies PLoS ONE 13 e0200455.
+[23] Albarr´an-Arriagada F, Retamal J C, Solano E, and Lamata L 2018 Measurement-based
+
+adaptation protocol with quantum reinforcement learning Phys. Rev. A 98, 042315.
+
+[24] Yu S, Albarr´an-Arriagada F, Retamal J C, Wang Y-T, Liu W, Ke Z-J, Meng Y, Li Z-P, Tang
+J-S, Solano E, Lamata L, Li C-F, and Guo G-C 2019 Reconstruction of a Photonic Qubit State
+with Reinforcement Learning Adv. Quantum Technol. 2, 1800074.
+
+[25] Albarr´an-Arriagada F, Retamal J C, Solano E, and Lamata L 2020 Reinforcement learning for
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+14
+
+semi-autonomous approximate quantum eigensolver Mach. Learn.: Sci. Technol. 1, 015002.
+
+[26] Romero J, Olson J P, and Aspuru-Guzik A 2017 Quantum autoencoders for eﬃcient compression
+
+of quantum data Quantum Sci. Technol. 2 045001.
+
+[27] Wan K H, Dahlsten O, Kristj´ansson H, Gardner R and Kim M S 2017 Quantum generalisation
+
+of feedforward neural networks npj Quantum Information 3 36.
+
+[28] Lamata L, Alvarez-Rodriguez U, Mart´ın-Guerrero J D, Sanz M, and Solano E 2018 Quantum
+
+autoencoders via quantum adders with genetic algorithms Quantum Sci. Technol. 4 014007.
+
+[29] Pepper A, Tischler N, and Pryde G J 2019 Experimental Realization of a Quantum Autoencoder:
+
+The Compression of Qutrits via Machine Learning Phys. Rev. Lett. 122 060501.
+
+[30] Ding Y, Lamata L, Sanz M, Chen X, and Solano E 2019 Experimental Implementation of a
+
+Quantum Autoencoder via Quantum Adders Adv. Quantum Technol. 2 1800065.
+
+[31] Khoshaman A, Vinci W, Denis B, Andriyash E, Sadeghi H, and Amin M H 2019 Quantum
+
+variational autoencoder Quantum Sci. Technol. 4 014001.
+
+[32] Tacchino F, Macchiavello C, Gerace D, and Bajoni D 2019 An artiﬁcial neuron implemented on
+
+an actual quantum processor npj Quantum Inf. 5 26.
+
+[33] Torrontegui E and Garca-Ripoll J J 2019 Unitary quantum perceptron as eﬃcient universal
+
+approximator EPL 125 30004.
+
+[34] Cao Y, Guerreschi G G, and Aspuru-Guzik A 2017 Quantum Neuron: an elementary building
+
+block for machine learning on quantum computers arXiv:1711.11240
+
+[35] Gonzalez-Raya T, Cheng X-H, Egusquiza I L, Chen X, Sanz M, and Solano E 2019 Quantized
+Single-Ion-Channel Hodgkin-Huxley Model for Quantum Neurons Phys. Rev. Appl. 12 014037.
+[36] Gonzalez-Raya T, Solano E, and Sanz M 2020 Quantized Three-Ion-Channel Neuron Model for
+
+Neural Action Potentials Quantum 4 224.
+
+[37] Alvarez-Rodriguez U, Lamata L, Escandell-Montero P, Mart´ın-Guerrero J D, and Solano E 2017
+
+Supervised Quantum Learning without Measurements Sci. Rep. 7 13645.
+
+[38] Johnson M W, Amin M H S, Gildert S, Lanting T, Hamze F, Dickson N, Harris R, Berkley
+A J, Johansson J, Bunyk P, Chapple E M, Enderud C, Hilton J P, Karimi K, Ladizinsky E,
+Ladizinsky N, Oh T, Perminov I, Rich C, Thom M C, Tolkacheva E, Truncik C J S, Uchaikin
+S, Wang J, Wilson B, and Rose G 2011 Quantum annealing with manufactured spins Nature
+473 194.
+
+[39] Venturelli D, Mandr`a S, Knysh S, O’Gorman B, Biswas R, and Smelyanskiy V 2015 Quantum
+
+Optimization of Fully Connected Spin Glasses 2015 Phys. Rev. X 5 031040.
+
+[40] Rieﬀel E G, Venturelli D, O’Gorman B, Do M B, Prystay E M, and Smelyanskiy V M 2015 A case
+study in programming a quantum annealer for hard operational planning problems Quantum
+Inf. Proc. 14 1.
+
+[41] Amin M H, Andriyash E, Rolfe J, Kulchytskyy B, and Melko R 2018 Quantum Boltzmann
+
+[42] Kieferov´a M and Wiebe N 2017 Tomography and generative training with quantum Boltzmann
+
+Machine Phys. Rev. X 8 021050.
+
+machines Phys. Rev. A 96, 062327.
+
+[43] Benedetti M, Realpe-G´omez J, Biswas R, and Perdomo-Ortiz A 2017 Quantum-Assisted Learning
+
+of Hardware-Embedded Probabilistic Graphical Models Phys. Rev. X 7 041052.
+
+[44] Benedetti M, Realpe-G´omez J, and Perdomo-Ortiz A 2018 Quantum-assisted Helmholtz
+machines: A quantumclassical deep learning framework for industrial datasets in near-term
+devices Quantum Sci. Technol. 3 034007.
+
+[45] Perdomo-Ortiz A, Benedetti M, Realpe-G´omez J and Biswas R 2018 Opportunities and challenges
+for quantum-assisted machine learning in near-term quantum computers Quantum Sci. Technol.
+3 030502.
+
+[46] Zahedinejad E, Ghosh J, and Sanders B C 2015 High-ﬁdelity single-shot Toﬀoli gate via quantum
+
+control Phys. Rev. Lett. 114 200502.
+
+[47] Zahedinejad E, Ghosh J, and Sanders B C 2016 Designing high-ﬁdelity single-shot three-qubit
+
+gates: a machine-learning approach Phys. Rev. Applied 6 054005.
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+15
+
+[60] Sgroi P, Palma G M, and Paternostro M 2020 Reinforcement learning approach to non-equilibrium
+
+[48] Las Heras U, Alvarez-Rodriguez U, Solano E, and Sanz M Genetic algorithms for digital quantum
+
+simulations Phys. Rev. Lett. 116 230504.
+
+[49] Li R, Alvarez-Rodriguez U, Lamata L, and Solano E 2017 Approximate Quantum Adders with
+
+Genetic Algorithms: An IBM Quantum Experience Quantum Meas. Quantum Metrol. 4 1
+
+[50] Carrasquilla J and Melko R G 2017 Machine learning phases of matter Nat. Phys. 13 431.
+[51] Mehta P, Bukov M, Wang C-H, Day A G R, Richardson C, Fisher C K, and Schwab D J 2019 A
+
+high-bias, low-variance introduction to Machine Learning for physicists Phys. Rep. 810 1.
+
+[52] Liu N and Rebentrost P 2018 Quantum machine learning for quantum anomaly detection Phys.
+
+Rev. A 97 042315.
+
+[53] Carleo G, Cirac I, Cranmer K, Daudet L, Schuld M, Tishby N, Vogt-Maranto L, and Zdeborov´a
+
+L 2019 Machine learning and the physical sciences Rev. Mod. Phys. 91 045002.
+
+[54] F¨osel T, Tighineanu P, Weiss T, and Marquardt F 2018 Reinforcement Learning with Neural
+
+Networks for Quantum Feedback Phys. Rev. X 8, 031084.
+
+[55] Bukov M, Day A G R, Sels D, Weinberg P, Polkovnikov A, and Mehta P 2018 Reinforcement
+
+Learning in Diﬀerent Phases of Quantum Control Phys. Rev. X 8, 031086.
+
+[56] Bukov M 2018 Reinforcement learning for autonomous preparation of Floquet-engineered states:
+
+Inverting the quantum Kapitza oscillator Phys. Rev. B 98 224305.
+
+[57] Melnikov A A, Nautrup H P, Krenn M, Dunjko V, Tiersch M, Zeilinger A, and Briegel H J 2018
+Active learning machine learns to create new quantum experiments PNAS 115 1221.
+[58] Melnikov A A, Sekatski P, and Sangouard N 2020 Setting up experimental Bell test with
+
+[59] Mackeprang J, Dasari D B R, and Wrachtrup J 2019 A Reinforcement Learning approach for
+
+reinforcement learning arXiv:2005.01697.
+
+Quantum State Engineering arXiv:1908.05981.
+
+quantum thermodynamics arXiv:2004.07770.
+
+quantum communication arXiv:1904.10797.
+
+quantum control arXiv:2002.08376.
+
+[61] Walln¨ofer, Melnikov A A, D¨ur W, and Briegel H J 2019 Machine learning for long-distance
+
+[62] Sch¨afer F, Kloc M, Bruder C, and L¨orch N 2002 A diﬀerentiable programming method for
+
+[63] Zhang X-M, Wei Z, Asad R, Yang X-C and Wang X 2019 When does reinforcement learning stand
+out in quantum control? A comparative study on state preparation npj Quantum Information
+5 85.
+
+[64] Xu H, Li J, Liu L, Wang Y, Yuan H, and Wang X 2019 Generalizable control for quantum
+parameter estimation through reinforcement learning npj Quantum Information 5 82.
+[65] Sweke R, Kesselring M S, van Nieuwenburg E P L, and Eisert J 2018 Reinforcement Learning
+
+Decoders for Fault-Tolerant Quantum Computation arXiv:1810.07207.
+
+[66] F¨osel T, Krastanov S, Marquardt F, and Jiang L 2020 Eﬃcient cavity control with SNAP gates
+
+arXiv:2004.14256.
+
+[67] Innocenti L, Banchi L, Ferraro A, Bose S, and Paternostro M Supervised learning of
+time-independent Hamiltonians for gate design New J. Phys. https://doi.org/10.1088/13672630/ab8aaf
+
+[68] Youssry A, Chapman R J, Peruzzo A, Ferrie C, and Tomamichel M 2020 Modeling and control
+of a reconﬁgurable photonic circuit using deep learning Quantum Sci. Technol. 5 025001.
+[69] Shrapnel S, Costa F, and Milburn G 2018 Quantum Markovianity as a supervised learning task
+
+Int. J. Quantum Info. 16 1840010.
+
+[70] Luchnikov I A, Vintskevich S V, Grigoriev D A, and Filippov S N 2020 Machine Learning Non
+Markovian Quantum Dynamics Phys. Rev. Lett. 124 140502.
+
+[71] Melnikov A A, Fedichkin L E, Lee R-K, and Alodjants A 2020 Machine Learning Transfer
+
+Eﬃciencies for Noisy Quantum Walks Adv. Quantum Technol. 3 1900115.
+
+[72] Melnikov A A, Fedichkin L E, and Alodjants A 2019 Predicting quantum advantage by quantum
+
+walk with convolutional neural networks New J. Phys. 21 125002.
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+16
+
+[73] Kalantre S S, Zwolak J P, Ragole S, Wu X, Zimmerman N M, Stewart Jr. M D, and Taylor J M
+2019 Machine learning techniques for state recognition and auto-tuning in quantum dots npj
+Quantum Information 5 6.
+
+[74] Torlai G, Timar B, van Nieuwenburg E P L, Levine H, Omran A, Keesling A, Bernien H, Greiner
+M, Vuleti´c V, Lukin M D, Melko R G, and Endres M 2019 Integrating Neural Networks with
+a Quantum Simulator for State Reconstruction Phys. Rev. Lett. 123 230504.
+
+[75] Torlai G, Mazzola G, Carrasquilla J, Troyer M, Melko R, and Carleo G 2018 Neural-network
+
+quantum state tomography Nat. Phys. 14 447.
+
+[76] Liu G, Chen M, Liu Y-X, Layden D, and Cappellaro P 2020 Repetitive readout enhanced by
+
+machine learning Mach. Learn.: Sci. Technol. 1 015003.
+
+[77] Agresti I, Viggianiello N, Flamini F, Spagnolo N, Crespi A, Osellame R, Wiebe N, and Sciarrino
+F 2019 Pattern Recognition Techniques for Boson Sampling Validation Phys. Rev. X 9 011013.
+
+[78] Carrasquilla, J 2020 Machine Learning for Quantum Matter arXiv:2003.11040.
+[79] Tang E 2019 A quantum-inspired classical algorithm for recommendation systems. In Proceedings
+of the 51st Annual ACM SIGACT Symposium on Theory of Computing, STOC 217, New York,
+NY, USA.
+
+[80] Arrazola J M, Delgado A, Bardhan B R, and Lloyd S 2019 Quantum-inspired algorithms in
+
+practice arXiv:1905.10415.
+
+[81] Langton C G 1997 Artiﬁcial Life: An overview (MIT Press, Cambridge USA).
+[82] Aguilar W, Santamar´ıa-Bonﬁl G, Froese T and Gershenson C 2014 The past, present, and future
+
+[83] Gardner M, 1970 The fantastic combinations of John Conway’s new solitaire game “life”, Sci.
+
+of artiﬁcial life Front. Robot. AI 1 8.
+
+Am. 223 120.
+
+Observables, Sci. Rep. 4 4910.
+
+Technologies Sci. Rep. 6 20956.
+
+Quantum Computer Sci. Rep. 8 14793.
+
+[84] Alvarez-Rodriguez U, Sanz M, Lamata L, and Solano E 2014 Biomimetic Cloning of Quantum
+
+[85] Alvarez-Rodriguez U, Sanz M, Lamata L, and Solano E 2016 Artiﬁcial Life in Quantum
+
+[86] Alvarez-Rodriguez U, Sanz M, Lamata L, and Solano E 2018 Quantum Artiﬁcial Life in an IBM
+
+[87] Wootters W K and Zurek W H 1982 A single quantum cannot be cloned Nature 299 802.
+[88] Eisert J, Wilkens M, and Lewenstein M 1999 Quantum games and quantum strategies Phys. Rev.
+
+[89] Martin-Delgado M A, 2012 On Quantum Eﬀects in a Theory of Biological Evolution Sci. Rep. 2
+
+[90] Abbott D, Davies P C W, and Pati A K 2008 Quantum Aspects of Life (Imperial College Press,
+
+[91] Arrighi P and Grattage J 2010 A Quantum Game of Life. Paper presented at Journ´ees Automates
+
+Cellulaires, Turku, Finland.
+
+[92] Bleh D, Calarco T, and Montangero S 2012 Quantum Game of Life. EPL 97 20012.
+[93] Pfeiﬀer P, Egusquiza I L, Di Ventra M, Sanz M, and Solano E 2016 Quantum Memristors Sci.
+
+Lett. 83 3077.
+
+302.
+
+London).
+
+Rep. 6 29507.
+
+[94] Salmilehto J, Deppe F, Di Ventra M, Sanz M, and Solano E, 2017 Quantum Memristors with
+
+Superconducting Circuits, Sci. Rep. 7 42044.
+
+[95] Sanz M, Lamata L, and Solano E, 2018 Invited article: Quantum memristors in quantum
+
+[96] Shevchenko S N, Pershin Y V, and Nori F 2016 Qubit-based memcapacitors and meminductors
+
+photonics APL Phot. 3 080801.
+
+Phys. Rev. Applied 6, 014006.
+
+[97] Di Ventra M, Pershin Y V, and Chua L O 2009 Circuit elements with memory: memristors,
+
+memcapacitors, and meminductors Proc. IEEE 97 1717
+
+[98] https://www.qutisgroup.com
+[99] Lamata L, Sanz M, and Solano E 2019 Quantum Machine Learning and Bioinspired Quantum
+
+
+Quantum machine learning and quantum biomimetics: A perspective
+
+17
+
+Technologies Adv. Quantum Technol. 2 1900075.
+
+[100] Sutton R S and Barto A G 2018 Reinforcement Learning: An Introduction (MIT Press).
+[101] Silver D, Huang A, Maddison C J, Guez A, Sifre L, van den Driessche G, Schrittwieser J,
+Antonoglou I, Panneershelvam V, Lanctot M, Dieleman S, Grewe D, Nham J, Kalchbrenner N,
+Sutskever I, Lillicrap T, Leach M, Kavukcuoglu K, Graepel T, and Hassabis D 2016 Mastering
+the game of Go with deep neural networks and tree search Nature 529 484.
+
+[102] Silver D, Schrittwieser J, Simonyan K, Antonoglou I, Huang A, Guez A, Hubert T, Baker L,
+Lai M, Bolton A, Chen Y, Lillicrap T, Hui F, Sifre L, van den Driessche G, Graepel T, and
+Hassabis D 2017 Mastering the game of Go without human knowledge Nature 550 354.
+[103] Grover L K 1997 Quantum Mechanics Helps in Searching for a Needle in a Haystack Phys. Rev.
+
+[104] Alvarez-Rodriguez U, Sanz M, Lamata L, and Solano E 2015 The Forbidden Quantum Adder
+
+Lett. 79, 325.
+
+Sci. Rep. 5 11983.
+
+[105] Oszmaniec M, Grudka A, Horodecki M, and W´ojcik A 2016 Creating a Superposition of Unknown
+
+[106] Werfel J, Petersen K, and Nagpal R 2014 Designing collective behavior in a termite-inspired robot
+
+Quantum States Phys. Rev. Lett. 116 110403.
+
+construction team Science 343 754.
+
+[107] Dittrich P, Ziegler J, and Banzhaf W 2001 Artiﬁcial chemistries – a review Artif. Life 7 225.
+[108] Baeck T, Fogel D, and Michalewicz Z. 1997. Handbook of Evolutionary Computation (Taylor &
+
+Francis, London, UK).
+
+[109] Benner S A and Sismour A M 2005 Synthetic biology Nat. Rev. Genet. 6, 533.
+[110] Preskill J 2018 Quantum Computing in the NISQ era and beyond Quantum 2 79.
+
+
 
 ========================================
 ====================COMPLETE TEXT====================

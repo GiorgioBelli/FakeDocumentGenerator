@@ -1,5 +1,19 @@
 PAPER PATH: ../datasets/downloaded/1905.12588v2.Meta_Learning_Representations_for_Continual_Learning.pdf
 
+
+================TABLE OF CONTENTS================
+50:	Abstract
+66:	Introduction
+125:	2 Problem Formulation
+317:	4 Evaluation
+328:	4.1 CLP Benchmarks
+379:	4.2 Meta-Training Details
+428:	4.3 Baselines
+455:	4.4 Meta-Testing
+668:	6 Conclusion and Discussion
+689:	References
+927:	84 x 84
+========================================
 ====================ABSTRACT====================
 Abstract
 

@@ -84,13 +84,13 @@ class RawPaper():
         
         return p
     
-    def dump(self, outPath="", includeSections=False, mode="wb"):
+    def dump(self, outPath="", includeTableOfContents=True, mode="wb"):
         if(not outPath): raise Exception("Empty path is not valid")
         text=""
         with open(outPath,mode) as fout:
             text+= "PAPER PATH: {}\n\n".format(self.path)
 
-            if(includeSections): text += "\n"+"="*16+"TABLE OF CONTENTS"+"="*16+"\n"+"\n".join([str(x[1])+":\t"+x[0] for x in self.contents])+"\n"+"="*40+"\n"
+            if(includeTableOfContents): text += "\n"+"="*16+"TABLE OF CONTENTS"+"="*16+"\n"+"\n".join([str(x[1])+":\t"+x[0] for x in self.contents])+"\n"+"="*40+"\n"
             
             
             for sec in self.sections_dict.keys():
@@ -185,10 +185,26 @@ class RawPaper():
                 
         return "\n".join(lines[intro_start_line:intro_end_line])
 
+    def extract_conclusion(self):
+        conc_start_line = -1
+        conc_found = False
+        
+        lines = self.text.split("\n")
+        
+        for idx,c in enumerate(self.contents):
+            sentence = c[0]
+
+            if(sentence.lower().endswith("conclusion") or sentence.lower().endswith("future work") or sentence.lower().endswith("conclusions")):
+                conc_start_line = c[1]
+                
+                
+        return "\n".join(lines[conc_start_line:])
+
     def extract_sections(self):
         
         self.sections_dict[PaperSections.PAPER_ABSTRACT] = self.extract_abstract()
         self.sections_dict[PaperSections.PAPER_INTRO] = self.extract_introduction()
+        self.sections_dict[PaperSections.PAPER_CONCLUSION] = self.extract_conclusion()
 
         return self.sections_dict
 

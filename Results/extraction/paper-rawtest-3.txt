@@ -1,5 +1,23 @@
 PAPER PATH: ../datasets/downloaded/1909.05504v1.Classifying_Multilingual_User_Feedback_using_Traditional_Machine_Learning_and_Deep_Learning.pdf
 
+
+================TABLE OF CONTENTS================
+68:	I. INTRODUCTION
+133:	II. METHODOLOGY
+140:	A. Research Question
+177:	C. Study Data
+235:	III. MACHINE LEARNING PIPELINES
+242:	A. Traditional Machine Learning
+309:	37 (IT), 60 (EN)
+310:	18 (IT), 16 (EN)
+311:	4 (IT), 2 (EN)
+643:	IV. RESULTS
+687:	V. DISCUSSION
+689:	A. Implications of the Results
+849:	VI. RELATED WORK
+902:	VII. CONCLUSION
+976:	2015 30th IEEE/ACM International Conference on Automated Software
+========================================
 ====================ABSTRACT====================
 
 ========================================
@@ -74,6 +92,195 @@ related work while Section VII concludes the paper.
 
 ========================================
 ====================CONCLUSION====================
+VII. CONCLUSION
+
+In this study, we present a series of classiﬁcation experiments to ﬁnd requirements-relevant information in English
+app reviews as well as in English and Italian tweets. We
+applied supervised machine learning and compared traditional
+machine learning and deep learning approaches. We rely our
+results on a) 10,000 English and 15,000 Italian annotated
+tweets from telecommunication Twitter support accounts, and
+b) on 6,000 annotations of English app reviews. Our results
+show that, within our setting, traditional machine learning
+can achieve comparable results to deep learning, although we
+collected thousands of annotations for each channel.
+
+ACKNOWLEDGEMENT
+
+The work presented in this paper was conducted within
+the scope of the Horizon 2020 project OpenReq, which is
+supported by the European Union under the Grant Nr. 732463.
+The work was also supported by the “Forum4.0” project as
+part of the ahoi.digital funding line. We thank Davide Fucci
+for helping collect and analyze the Italian tweets.
+
+REFERENCES
+
+[1] J. Bergstra and Y. Bengio. Random search for hyper-parameter optimization. Journal of Machine Learning Research, 13(Feb):281–305,
+2012.
+
+[2] J. S. Bergstra, R. Bardenet, Y. Bengio, and B. K´egl. Algorithms
+In Advances in neural information
+
+for hyper-parameter optimization.
+processing systems, pages 2546–2554, 2011.
+
+[3] N. Chen, J. Lin, S. C. Hoi, X. Xiao, and B. Zhang. Ar-miner: mining
+informative reviews for developers from mobile app marketplace. In Proceedings of the 36th International Conference on Software Engineering,
+pages 767–778. ACM, 2014.
+
+[4] F. Chollet. Deep learning with Python. Manning Publications, 2018.
+[5] F. Chollet et al. Keras. https://keras.io, 2015.
+[6] R. Collobert, J. Weston, L. Bottou, M. Karlen, K. Kavukcuoglu, and
+P. Kuksa. Natural language processing (almost) from scratch. Journal
+of Machine Learning Research, 12(Aug):2493–2537, 2011.
+
+[7] J. Davis and M. Goadrich. The relationship between precision-recall
+and roc curves. In Proceedings of the 23rd International Conference on
+Machine Learning, ICML ’06, pages 233–240, New York, NY, USA,
+2006. ACM.
+
+[8] V. T. Dhinakaran, R. Pulle, N. Ajmeri, and P. K. Murukannaiah. App
+review analysis via active learning: Reducing supervision effort without
+compromising classiﬁcation accuracy. 2018 IEEE 26th International
+Requirements Engineering Conference (RE), pages 170–181, 2018.
+[9] S. Fakhoury, V. Arnaoudova, C. Noiseux, F. Khomh, and G. Antoniol.
+Keep it simple: Is deep learning good for linguistic smell detection?
+In 2018 IEEE 25th International Conference on Software Analysis,
+Evolution and Reengineering (SANER), pages 602–611. IEEE, 2018.
+
+[10] W. Fu and T. Menzies. Easy over hard: A case study on deep learning. In
+Proceedings of the 2017 11th Joint Meeting on Foundations of Software
+Engineering, pages 49–60. ACM, 2017.
+
+[11] I. Goodfellow, Y. Bengio, A. Courville, and Y. Bengio. Deep learning,
+
+volume 1. MIT press Cambridge, 2016.
+
+[12] E. Guzman, R. Alkadhi, and N. Seyff. A needle in a haystack: What
+In Requirements Engineering
+do twitter users say about software?
+Conference (RE), 2016 IEEE 24th International, pages 96–105. IEEE,
+2016.
+
+[13] E. Guzman, M. El-Haliby, and B. Bruegge. Ensemble Methods for App
+Review Classiﬁcation: An Approach for Software Evolution (N).
+In
+2015 30th IEEE/ACM International Conference on Automated Software
+Engineering (ASE), pages 771–776, Nov. 2015.
+
+[14] E. Guzman, M. Ibrahim, and M. Glinz. A little bird told me: mining
+In 2017 IEEE 25th
+tweets for requirements and software evolution.
+International Requirements Engineering Conference (RE), pages 11–20.
+IEEE, 2017.
+
+[15] E. Guzman, M. Ibrahim, and M. Glinz. Prioritizing user feedback
+In 2017 IEEE/ACM 4th International
+from twitter: A survey report.
+Workshop on CrowdSourcing in Software Engineering (CSI-SE), pages
+21–24. IEEE, 2017.
+
+[16] E. Guzman and W. Maalej. How do users like this feature? a ﬁne
+grained sentiment analysis of app reviews. In Requirements Engineering
+Conference (RE), 2014 IEEE 22nd International, pages 153–162. IEEE,
+2014.
+
+[17] M. Harman, Y. Jia, and Y. Zhang. App store mining and analysis: Msr
+for app stores. In Proceedings of the 9th IEEE Working Conference on
+Mining Software Repositories, pages 108–111. IEEE Press, 2012.
+[18] M. H¨aring, W. Loosen, and W. Maalej. Who is Addressed in This Comment?: Automatically Classifying Meta-Comments in News Comments.
+Proc. ACM Hum.-Comput. Interact., 2(CSCW):67:1–67:20, Nov. 2018.
+[19] C. Iacob and R. Harrison. Retrieving and analyzing mobile apps feature
+In Proceedings of the 10th Working
+requests from online reviews.
+Conference on Mining Software Repositories, pages 41–44. IEEE Press,
+2013.
+
+[20] T. Johann, C. Stanik, A. M. A. B., and W. Maalej. Safe: A simple
+approach for feature extraction from app descriptions and app reviews.
+In 2017 IEEE 25th International Requirements Engineering Conference
+(RE), pages 21–30, Sep. 2017.
+
+[21] A. Joulin, E. Grave, P. Bojanowski, M. Douze, H. J´egou, and T. Mikolov.
+arXiv preprint
+
+Fasttext.zip: Compressing text classiﬁcation models.
+arXiv:1612.03651, 2016.
+
+[22] Y. Kim. Convolutional neural networks for sentence classiﬁcation. arXiv
+
+preprint arXiv:1408.5882, 2014.
+
+[23] Z. Kurtanovi´c and W. Maalej. Automatically classifying functional and
+non-functional requirements using supervised machine learning. In 2017
+IEEE 25th International Requirements Engineering Conference (RE),
+pages 490–495. IEEE, 2017.
+
+[24] Z. Kurtanovi´c and W. Maalej. Mining user rationale from software
+In 2017 IEEE 25th International Requirements Engineering
+
+reviews.
+Conference (RE), pages 61–70. IEEE, 2017.
+
+[25] Z. Kurtanovi´c and W. Maalej. On user rationale in software engineering.
+
+Requirements Engineering, 23(3):357–379, 2018.
+
+[26] M. M. Lopez and J. Kalita.
+
+Deep Learning applied to NLP.
+
+arXiv:1703.03091 [cs], Mar. 2017. arXiv: 1703.03091.
+
+[27] W. Maalej, Z. Kurtanovi´c, H. Nabil, and C. Stanik. On the automatic
+classiﬁcation of app reviews. Requirements Engineering, 21(3):311–331,
+Sep 2016.
+
+[28] W. Maalej, M. Nayebi, T. Johann, and G. Ruhe. Toward data-driven
+
+requirements engineering. IEEE Software, 33(1):48–54, 2016.
+
+[29] T. Mikolov, K. Chen, G. Corrado, and J. Dean. Efﬁcient estimation of
+word representations in vector space. arXiv preprint arXiv:1301.3781,
+2013.
+
+[30] M. Nayebi, H. Cho, H. Farrahi, and G. Ruhe. App store mining is not
+enough. In 2017 IEEE/ACM 39th International Conference on Software
+Engineering Companion (ICSE-C), pages 152–154, May 2017.
+
+[31] D. Pagano and W. Maalej. User feedback in the appstore: An empirical
+study. In Requirements Engineering Conference (RE), 2013 21st IEEE
+International, pages 125–134. IEEE, 2013.
+
+[32] F. Palomba, M. Linares-Vasquez, G. Bavota, R. Oliveto, M. Di Penta,
+D. Poshyvanyk, and A. De Lucia. User reviews matter! tracking
+crowdsourced reviews to support evolution of successful apps. In 2015
+IEEE international conference on software maintenance and evolution
+(ICSME), pages 291–300. IEEE, 2015.
+
+[33] W. Song and J. Cai. End-to-end deep neural network for automatic
+
+speech recognition. Standford CS224D Reports, 2015.
+
+[34] K. Sparck Jones. A statistical interpretation of term speciﬁcity and its
+application in retrieval. Journal of documentation, 28(1):11–21, 1972.
+[35] M. Thelwall, K. Buckley, G. Paltoglou, D. Cai, and A. Kappas. Sentiment strength detection in short informal text. Journal of the Association
+for Information Science and Technology, 61(12):2544–2558, 2010.
+[36] L. Villarroel, G. Bavota, B. Russo, R. Oliveto, and M. Di Penta. Release
+planning of mobile apps based on user reviews. In 2016 IEEE/ACM 38th
+International Conference on Software Engineering (ICSE). IEEE, 2016.
+[37] G. Williams and A. Mahmoud. Mining twitter feeds for software
+In 2017 IEEE 25th International Requirements
+
+user requirements.
+Engineering Conference (RE), pages 1–10. IEEE, 2017.
+
+[38] T. Young, D. Hazarika, S. Poria, and E. Cambria. Recent Trends in
+Deep Learning Based Natural Language Processing. arXiv:1708.02709
+[cs], Aug. 2017. arXiv: 1708.02709.
+
+
 
 ========================================
 ====================COMPLETE TEXT====================

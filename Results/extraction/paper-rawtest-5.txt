@@ -1,0 +1,4262 @@
+PAPER PATH: ../datasets/downloaded/1606.01487v1.Bounds_for_Vector_Valued_Function_Estimation.pdf
+
+
+================TABLE OF CONTENTS================
+58:	Abstract
+65:	1 Introduction
+156:	1.1 Previous Work
+170:	2 Multi-Category and Multi-Task Learning
+197:	2.1 Multi-Category Learning
+337:	2.2 Multi-Task Learning
+448:	2.3 A Common Expression to Bound
+489:	3 Speciﬁc Bounds
+495:	3.1 Component Classes and Independent Learning
+537:	3.2 Linear Classes
+705:	3.3 Composite Classes and Representation Learning
+926:	4 Conclusion
+2347:	1 x ∪ · · · ∪ W
+2416:	References
+========================================
+====================ABSTRACT====================
+Abstract
+
+We present a framework to derive risk bounds for vector-valued learning with a broad class
+of feature maps and loss functions. Multi-task learning and one-vs-all multi-category learning
+are treated as examples. We discuss in detail vector-valued functions with one hidden layer, and
+demonstrate that the conditions under which shared representations are beneﬁcial for multitask learning are equally applicable to multi-category learning.
+
+========================================
+====================INTRODUCTION====================
+1 Introduction
+
+The main focus of this paper is to study statistical bounds for (shared) representation learning under a general class of feature maps and loss functions. This study is motivated by the development
+of data-dependent generalization bounds for multi-category learning with T classes, and for multitask learning with T tasks. We show that both problems can be treated in parallel under a uniﬁed
+framework.
+
+We give bounds on the Rademacher complexity of composite vector-valued function classes
+
+F ◦ G =
+
+x ∈ H 7→ f (g (x)) ∈ RT : f ∈ F, g ∈ G
+(cid:8)
+
+(cid:9)
+
+,
+
+where the input space H is a ﬁnite or inﬁnite dimensional Hilbert space, G is a class of functions (or
+→ RT .
+feature-maps or representations) g : H → RK, and F is a class of output functions f : RK
+
+1
+
+
+Functions in F ◦ G are chosen on the basis of a ﬁnite number N of independent observations and
+we are interested in uniformly bounding the incurred estimation errors in terms of the parameters
+T , K and N , or alternatively n = N/T , the number of observations per output unit.
+
+There are two main contributions of this work:
+
+• We provide a common method to derive data dependent bounds for multi-task and multicategory learning in terms of the complexity of general vector-valued function classes.
+In
+passing we improve on a recent result in [15] on multi-category learning. Our framework is
+also general enough to be applied to hybrid coding schemes for multi-category classiﬁcation
+such as 1-vs-1 pairwise classiﬁcation.
+
+• We apply this method to a large class of vector-valued functions with shared feature maps to
+demonstrate that the conditions under which shared representations are beneﬁcial for multitask learning are equally applicable to multi-category learning.
+
+Our principal ﬁnding is a data-dependent generalization bound, whose dominant terms have
+
+the form
+
+tr( ˆC)
+nT 
+
+θs
+
+λmax( ˆC)
+
+,
+
+n 
+
+θs
+
++ O 
+
+
+
+
+
+
+O 
+
+
+where ˆC is the empirical covariance operator (see below). When testing multi-task learning we
+are always told which task we are testing and thus the relevant component of our vector-valued
+hypothesis. In the one-vs-all multi-category setting we of course withhold the identity of the correct
+class and thus also of the relevant component. This simple fact is reﬂected in the presence of the
+factor θ, which is one for multi-task learning and √T for multi-category learning.
+
+Bounds of this form are given for a large class of neural networks with one hidden layer and
+rather general nonlinear activation functions, which may involve inter-unit couplings or intermediate maps to inﬁnite-dimensional spaces. A similar bound also holds for linear classes with tracenorm constraints, which can also be interpreted as composite classes, see e.g. [26].
+
+As T increases the second term dominates the above expression. This term however depends
+only on the largest eigenvalue, instead of the trace, of the empirical covariance.
+If T is large
+and the data is high-dimensional the intermediate representation can therefore give a considerable
+advantage. This has been established for multi-task learning in several works and, as we show
+here, holds equally for multi-category learning, in agreement with previous empirical studies of the
+beneﬁt of trace-norm regularization in multi-category learning [1].
+
+In Section 2 we explain how the complexities of multi-category and multi-task learning can be
+reduced to the complexities of vector-valued function classes and bounded by a common expression. We brieﬂy discuss independent and linear classes in Section 3.1 and 3.2. Then in Section 3.3,
+we present our principal result on nonlinear composite classes. The appendix contains statements
+and proofs of our results in their most general form.
+
+2
+
+
+1.1 Previous Work
+
+Bounds for multi-layered networks are given in the now classical work [3] in terms of covering
+numbers. More recently there are bounds using Rademacher averages [24]. These works mainly
+consider scalar outputs and ignore the regularizing effects of intermediate representations.
+
+Early work to consider the potential beneﬁts of shared representations was in the setting of
+multi-task learning and learning to learn [5]. Subsequent work has focused more on learning
+bounds for linear feature learning [7, 16]. Recently [20] presented a general bound for multitask representation learning. Although there has been substantial work on the statistical analysis
+of learning shared representations for multi-task learning, less has been done for multi-category
+learning. This is in contrast with the large body of empirical work on deep networks, which are
+often trained with a multi-class loss [9], such as the soft max or multi-class hinge loss. In this work
+we close this gap.
+
+========================================
+====================CORPUS====================
+
+========================================
+====================CONCLUSION====================
+4 Conclusion
+
+We presented a framework to derive Rademacher bounds for a wide class of vector-valued functions
+combined with Lipschitz losses. We studied in parallel the case of multi-task and multi-category
+learning. To our knowledge our framework allows to derive bounds for more general classes of
+vector-valued function and loss functions than currently possible, while still improving over existing
+bounds [15, 17] in special cases. In particular, we illustrate how bounds can be derived for neural
+networks with one hidden layer and rather general nonlinear activation functions.
+
+In the future, it would be valuable to study more examples of the loss functions included in
+the setting. In addition to one-vs-one classiﬁcation, which we brieﬂy mentioned in the paper, these
+could include multi-label classiﬁcation or hybrid multi-task learning, in which each task is itself
+a multi-category or multi-label problem. Another interesting direction of research is to extend
+our analysis to neural networks with more than one hidden layer. Although the proof technique
+presented in Section 3.3 could naturally be extended to derive such bounds, it seems important to
+study improvement in the large constants appearing in Theorem 3.4 (see [18]) in order to avoid
+explosion of the constants in bounds for deep networks.
+
+11
+
+
+A Appendix
+
+A.1 Mixed Norms
+
+Theorem A.1 We have that:
+
+(i) For p ∈ [2, ∞]
+
+T
+
+B
+√2N
+
+For the convenience of the reader we restate in greater generality the results contained in the main
+body of the paper. The ǫi or ǫti are throughout independent Rademacher variables.
+
+In this section we prove a more general result implying Theorem 3.1.
+
+Xt=1 q|It| tr( ˆCt) ≤ RI (W2,∞, x) ≤ RI (W2,p, x) ≤
+
+B√T
+
+T
+
+N vuut
+
+Xt=1 |It| tr( ˆCt).
+
+(ii) For p ∈ [1, 2] and 1/p + 1/q = 1 if
+
+P
+RI (W2,2, x) ≤ RI (W2,p, x) ≤
+
+2
+
+i∈It kxik
+T 1/pB√q
+N
+
+≥ q−1 then
+Xt q|It|tr( ˆCt)
+
+ 2
+
+1/q
+
+q
+
+,
+
+!
+
+where 1/p + 1/q = 1.
+
+(iii) For 1-vs-all multi-category learning the condition
+
+bound in (ii) can be simpliﬁed to
+
+2
+
+i∈It kxik
+
+≥ q−1 can be omitted and the
+
+P
+
+RI mc (W2,p, x) ≤ Bs
+
+qT tr( ˆC)
+n
+
+.
+
+Proof. (i) We have
+
+B
+
+√2 Xt q|It| tr( ˆCt) = B
+
+2 = B
+
+E
+
+√2 Xt vuut
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+Xi∈It
+E sup
+w,kwk≤B *w,
+
+2
+
+ǫixi(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+√2 Xt sXi∈It kxik
+ǫixi(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xt
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+E
+
+≤ B
+Xi∈It
+= N RI (W2,∞) ≤ N RI (W2,p) ≤ N RI (W2,2)
+
+Xt
+
+Xi∈It
+
+=
+
+ǫixi+
+
+= E sup
+
+W ∈W2,2
+
+≤ B√T
+
+wt,
+
+Xt *
+sXt Xi∈It kxik
+
+ǫixi+
+
+Xi∈It
+2 = B√T
+
+= B√T EvuutXt (cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+|It| tr( ˆCt)
+
+Xi∈It
+
+sXt
+
+2
+
+ǫixi(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+12
+
+
+where we used Szarek’s inequality (Theorem 5.20 [6]) in the ﬁrst inequality. The next inequalities
+follow from W2,∞ ⊆ W2,p ⊆ W2,2. For the last inequality we use Jensen’s.
+(ii) The ﬁrst inequality is W2,2 ⊆ W2,p. Then let Xt =
+i∈It kxik
+
+, so that EXt ≤
+(cid:13)(cid:13)
+
+i∈It ǫixi
+
+2. By the bounded difference inequality (see [6]) for s ≥ 0
+(cid:13)(cid:13)P
+−s2
+i∈It kxik
+
+Pr {Xt > EXt + s} ≤ exp  
+
+2 ! ,
+
+2
+
+qP
+
+so with integration by parts
+
+P
+
+∞
+
+0
+
+Z
+
+∞
+
+0
+
+Z
+
+E [X q
+
+t ] ≤ EXt + q
+
+sq−1 Pr {X > EX + s} dsq
+
+≤ EXt + q
+
+sq−1 exp
+
+= EXt +  Xi∈It kxik
+≤  Xi∈It kxik
+
+1/2
+
+!
+
+2
+
+2
+
+ 
+
+q/2
+
+2
+
+!
+
+∞
+
+P
+q
+
+(cid:18)
+
+0
+
+Z
+
+−s2
+i∈It kxik
+
+ds
+
+2 !
+
+−s2
+2 (cid:19)
+
+(cid:18)
+
+ds
+
+(cid:19)
+
+sq−1 exp
+
+q/2
+
++  q
+
+Xi∈It kxik
+
+2
+
+!
+
+≤ 2  q
+
+Xi∈It kxik
+
+2
+
+!
+
+q/2
+
+,
+
+where the third inequality follows from a comparison of the integral with the moments of the
+standard normal distribution, and the last follows from
+
+2
+
+RI (W2,p) = 1
+N E
+
+sup
+
+kW k2,p≤T 1/pB Xt Xi∈It hwt, xii = T 1/pB
+N E
+
+≤
+
+T 1/pB
+N  Xt
+= 21/qT 1/pB√q
+N
+
+1/q
+
+T 1/pB√q
+N
+
+≤
+
+EX q
+
+t !
+
+ Xt (cid:16)|It| tr( ˆCt)
+
+(cid:17)
+
+q/2
+
+!
+
+.
+
+i∈It kxik
+
+≥ q−1. Thus
+
+P
+
+2
+
+
+
+
+
+1/q
+
+1/q
+
+X q
+
+t !
+
+ Xt
+Xt  Xi∈It kxik
+
+2
+
+!
+
+q/2
+
+1/q
+
+
+
+
+
+(iii) The case of 1-vs-all multi-category learning is simpler because It = {1, . . . , N } and we
+can interchange summation over t and i. Then we can essentially proceed as in[15] and use the
+1/q-strong convexity of 1
+2,p w.r.t. kW k2,p. In Corollary 4 of [11] let λ > 0 and u = W and
+2 = fmax (u) to obtain
+vi = λ (ǫ1ixi, . . . , ǫT ixi) and use 1
+2 kW k
+
+2 kW k
+
+2
+2,p ≤
+
+T 1/pB
+
+1
+2
+
+2
+
+N
+
+Xi=1 hW, λ (ǫ1ixi, ..., ǫT ixi)i2 ≤
+
+N
+
+(cid:0)
+
+(cid:1)
+
+Xi=1 h∇f (v1:i−1) , vii + 1
+2 (cid:16)
+
+T 1/pB
+
+N
+
+2 + qλ2
+2
+(cid:17)
+
+Xi=1 k(ǫ1ixi, ..., ǫT ixi)k
+
+2
+2q ,
+
+13
+
+
+where h·, ·i2 is the Hilbert-Schmidt inner product. Take the supremum in W and then the expectation. The ﬁrst term on the r.h.s. above vanishes. Dividing by λ and optimizing in λ gives
+
+n
+
+E sup
+W
+
+Xi=1 hW, ǫ1ixi, . . . , ǫT ixii ≤ (cid:16)
+
+T 1/pB
+
+E k(ǫ1ixi, . . . , ǫT ixi)k
+
+2
+2q.
+
+n
+
+Xi=1
+
+q
+
+(cid:17) vuut
+
+2/q
+
+E k(ǫ1ixi, . . . , ǫT ixi)k
+
+2
+2q = E
+
+ Xt kǫtixik
+
+q
+
+!
+
+≤ T 2/q
+
+kxik
+
+2
+
+Now
+
+so
+
+RI mc (W2,p) = 1
+N E
+
+N
+
+Xi=1 hW, ǫ1ixi, . . . , ǫT ixii ≤
+
+N
+
+q
+
+Xi=1 kxik
+
+T B
+
+N vuut
+
+2 = Bs
+
+qT tr( ˆC)
+n
+
+.
+
+Note that the (very harmless) condition
+
+2
+
+i∈It kxik
+
+≥ q−1 in part (iii) is automatically satisﬁed
+
+if kxik = 1.
+
+P
+
+A.2 Trace Norm Constraints
+
+Theorem A.2
+
+In this section we prove the following result, which contains Theorem 3.2 as as special case and
+improves over [17] which only applies to the multi-task learning setting.
+
+RI (Wtr, x) ≤
+
+B
+N r
+
+2T maxt
+
+|It| tr( ˆCt) (ln N + 1) + B
+N vuut
+
+T λmax  Xt
+
+|It| ˆCt!
+
+.
+
+For the proof we use k.k∞ to denote the operator norm on H and (cid:23) and (cid:22) to refer to the
+ordering induced by the cone of positive operators. For x ∈ H we deﬁne the rank-1 operator Qx
+on H by Qxv = hv, xi x. We use the following result, the proof of which can be found in [17].
+Theorem A.3 Let M ⊆ H be a subspace of dimension d and suppose that A1, . . . , AN are independent
+random operators satisfying Ak (cid:23) 0, Ran (Ak) ⊆ M a.s. and
+
+EAmk (cid:22) m!Rm−1EAk
+
+for some R ≥ 0, all m ∈ N and all k ∈ {1, . . . , N }. Then
+
+E
+
+E
+
+vuut
+
+Ak(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+∞ ≤ vuut
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xk
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Ak(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xk
+
+∞
+
+p
+
++
+
+R (ln dim (M ) + 1).
+
+14
+
+
+Lemma A.4 Let x1, . . . , xn be in Rd and denote
+
+α =
+
+n
+
+2 .
+
+Xi=1 kxik
+
+Deﬁne a random vector by V =
+
+i ǫixi. Then for p ≥ 1
+
+E
+
+Qp
+V
+
+(cid:22) (2p − 1)!!αp−1E [QV ] ,
+
+P
+
+p
+
+(cid:3)
+
+(cid:2)
+where (2p − 1)!! =
+Proof. Let v ∈ Rd be arbitrary. By the deﬁnition of V and QV we have for any v ∈ Rd that
+
+i=1 (2i − 1) = (2p − 1) (2 (p − 1) − 1) × · · · × 5 × 3 × 1.
+
+Q
+
+E
+
+Qp
+V
+
+v, v
+
+=
+
+n
+
+E
+
+Xj1,...,j2p=1
+
+ǫj1ǫj2 · · · ǫj2p
+
+hv, xj1i hxj1, xj2i · · ·
+
+xj2p, v
+
+.
+
+(cid:3)
+
+(cid:2)
+
+(cid:11)
+
+(cid:10)
+
+(cid:2)
+(cid:10)
+The properties of independent Rademacher variables imply that E
+= 0 unless the
+sequence i = (i1, . . . , i2p) has the property that each index ik occurs in it an even number of times,
+in which case E
+
+= 1. Let us call sequences with this property admissible. Thus
+
+(cid:11)
+ǫi1ǫi2 · · · ǫi2p
+
+(cid:2)
+
+(cid:3)
+
+(cid:3)
+
+ǫi1ǫi2 · · · ǫi2p
+
+(cid:2)
+
+(cid:3)
+
+hE [Qpw] v, vi =
+
+Xi admissible hv, xi1i hxi2, xi3i · · ·
+Xi admissible |hv, xi1i|
+Yk=2 kxik k
+
+2p−1
+
+(cid:10)
+
+(cid:12)(cid:12)(cid:10)
+
+xi2p, v
+
+xi2p, v
+
+,
+
+(cid:11)
+
+(cid:11)(cid:12)(cid:12)
+
+≤
+
+using Cauchy-Schwarz. For every admissible sequence i there exists at least one partition π of
+{1, .., 2p} into p pairs (l, r) with l < r, such that the indices ik1 and ik2 are equal, whenever k1 and k2
+belong to the same pair. Let us denote the latter condition by i ∼ π. It is easy to show by induction
+that there are (2p − 1)!! such partitions into pairs. Given π we can write {1, . . . , 2p} = Lπ ∪ Rπ,
+where Lπ = {l : ∃ (l, r) ∈ π} and Rπ = {r : ∃ (l, r) ∈ π}. We always have 1 ∈ Lπ and 2p ∈ Rπ and
+|Lπ| = |Rπ| = p. Thus
+
+hE [Qpw] v, vi ≤
+
+2p−1
+
+Xπ Xi∼π |hv, xi1i|
+|hv, xi1 i|
+
+
+
+Xπ Xi∼π 
+Xπ Xi∼π hv, xi1i
+
+2p−1
+
+xi2p, v
+
+Yk=2 kxik k
+(cid:12)(cid:12)(cid:10)
+(cid:11)(cid:12)(cid:12)
+Yk=2,ik∈Lπ kxik k
+Yk=2,ik∈Lπ kxik k
+
+2p−1
+
+2 .
+
+
+
+2
+
+=
+
+≤
+
+2p−1
+
+xi2p, v
+
+Yk=2,ik∈Rπ kxik k
+
+
+
+(cid:11)(cid:12)(cid:12)
+
+
+(cid:12)(cid:12)(cid:10)
+
+The last step follows from the Cauchy-Schwarz inequality and realizing that the two resulting
+factors are equal by symmetry. But for i ∼ π we just need to sum over the indices in Lπ, the others
+
+15
+
+
+being constrained to be equal. Thus, writing Lπ = {l1, . . . , lp} such that l1 = 1 the last expression
+above is just
+
+p
+
+2
+
+2
+
+Yk=2 kxik k
+
+p−1
+
+n
+
+= (2p − 1)!!  
+
+n
+
+Xπ Xi1,...,ip hv, xi1i
+Xi=1 kxik
+Xi=1 kxik
+
+ 
+
+n
+
+= (2p − 1)!!
+
+2
+
+2
+
+!
+
+!
+
+p−1
+
+Qxiv, v+
+
+*
+
+Xi=1
+hE [QV ] v, vi .
+
+The conclusion follows since for symmetric matrices (∀v, hAv, vi ≤ hB, v, vi) =⇒ A (cid:22) B.
+Proof of Theorem A.2. We have
+
+RI (Wtr, x) = 1
+
+N E sup
+
+W ∈Wtr
+
+ǫti hwt, xii = 1
+
+N E sup
+
+W ∈Wtr
+
+tr(W ∗D),
+
+Xt Xi∈It
+where the random operator D : H → RT is deﬁned for v ∈ H by (Dv)t =
+inequality gives
+
+v,
+
+i∈It ǫtixi
+
+. H¨older’s
+
+(cid:10)
+
+P
+
+(cid:11)
+
+We proceed to bound E kDk∞. Let Vt be the random vector Vt =
+corresponding rank-one operator QVt is deﬁned by QVtv = hv, Vti Vt =
+P
+T
+Then D∗D =
+t=1 QVt, so by Jensen’s inequality
+
+nti∈It ǫtixi and recall that the
+nti∈It ǫtixi.
+
+nti∈It ǫtixi
+
+v,
+
+(cid:10)
+
+P
+
+(cid:11) P
+
+RI (Wtr, x) ≤
+
+B√T
+N E kDk∞ .
+
+P
+
+E
+
+E kDk∞ ≤ vuut
+
+.
+
+∞
+
+QVt(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xt
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+The range of any of the realizations of QVt lies in the span of the xi which has less than N . By
+Lemma A.4 we have with αt =
+
+2
+
+P
+E [(QV t)m] (cid:22) (2p − 1)!!αm−1
+
+t
+
+2 maxt αt
+
+m−1 E [QVt] ,
+
+(cid:17)
+so Theorem A.3 with R = 2 maxt αt and d = N now gives
+
+(cid:16)
+
+i∈It kxik
+E [QVt] (cid:22) m!
+
+E
+
+vuut
+
+QVt(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xt
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+∞ ≤
+
+2 maxt αt (ln N + 1) + vuut
+
+q
+
+E
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xt
+
+.
+
+∞
+
+QVt(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+16
+
+
+But E [QVt] =
+
+i∈It Qxi = |It| ˆCt, so
+
+P
+
+RI (Wtr, x) ≤
+
+B√T
+N E kDk∞ ≤
+
+B√T
+
+E
+
+Xt
+
+QVt(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+N vuut
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+|It| tr( ˆCt) (ln N + 1) + vuut
+
+∞
+
+B
+N r
+
+≤
+
+2T maxt
+
+T (cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xt
+
+.
+
+∞
+
+|It| ˆCt(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+A.3 Nonlinear Compositions
+
+For the statement of a general version of Theorem 3.3 we extend the deﬁnition of θmc and θmt by
+setting for any map I : {1, . . . , T } → 2{1,...,N }
+
+θI = inf
+
+θ : ∀ (a1, . . . , aN ) , ai ≥ 0,
+(
+
+T
+
+Xt=1 Xi∈It
+
+ai ≤ θ2
+
+N
+
+Xi=1
+
+.
+
+ai)
+
+This deﬁnition coincides with the previous one in the case of multi-task and 1-vs-all multi-category
+learning.
+
+Theorem A.5 There are universal constants c1 and c2 such that under the above conditions
+
+RI (Vφ (W2,∞) , x) ≤ Lφab∞θI 
+
+
+RI (Vφ (W2,2) , x) ≤ Lφab2θI 
+
+RI (Vφ (W2,1) , x) ≤ Lφab1θI 
+
+
+c1Ks
+
+tr( ˆC)
+nT + c2s
+
+Kλmax( ˆC)
+n
+
+K tr( ˆC)
+nT
+
+c1s
+
+λmax
+
+ˆC
+(cid:16)
+n
+
+
+
+(cid:17)
+
++ c2vuut
+
+2tr( ˆC) + 8λmax( ˆC) ln K
+nT
+
+c1s
+
+
+
+
+
+
++ c2s
+
+λmax( ˆC)
+
+.
+
+n 
+
+
+
+The proof uses the following recent result on the expected suprema of Gaussian processes [18].
+
+For a set Y ⊆ Rm the Gaussian width G (Y ) is deﬁned as
+
+G (Y ) = E sup
+
+y∈Y hγ, yi = E sup
+
+y∈Y
+
+γiyi,
+
+m
+
+Xi=1
+
+where γ = (γ1, . . . , γm) is a vector of independent standard normal variables.
+
+17
+
+
+Theorem A.6 Let Y ⊆ Rn have (Euclidean) diameter D (Y ) and let F be a class of functions f : Y →
+Rm, all of which have Lipschitz constant at most L (F). Let F (Y ) = {f (y) : f ∈ F, y ∈ Y }. Then for
+any y0 ∈ Y
+
+G (F (Y )) ≤ c1L (F) G (Y ) + c2W (Y ) Q (F) + G (F (y0)) ,
+
+(7)
+
+where c1 and c2 are universal constants and
+
+Q (F) =
+
+sup
+y,y′∈Y, y6=y′
+
+E sup
+f ∈F
+
+hγ, f (y) − f (y′)i
+ky − y′
+
+k
+
+.
+
+Proof of Theorem 3.3. We will use Theorem A.6 by setting
+
+Y =
+
+W x = (hwk, xii)k≤K, i≤N : W ∈ Wo ⊆ RKN
+
+n
+
+where W will be either W2,∞, W 2,2 or W2,1. For F we take the set of functions
+
+(yki) ∈ RKN
+
+(
+
+7→ (hvt, φ (yi)i)t≤T,i∈It ∈
+
+R|It| : v ∈ V)
+
+T
+
+Yt=1
+
+restricted to Y . By a well known bound on Rademacher averages in terms of Gaussian averages
+[14]
+
+E
+
+sup
+
+W ∈V,W ∈W Xt Xi∈It
+
+ǫtiV φ (W xi) ≤ r
+
+π
+2 E
+
+sup
+
+γtiV φ (W xi)
+
+W ∈V,W ∈W Xt Xi∈It
+
+π
+2 G (F (Y )) .
+
+=
+
+r
+
+(8)
+
+To bound G (F (Y )) we then just need to bound the terms in the right hand side of equation (7)
+Since φ (0) = 0, we can at once set G (F (y0)) = 0, by setting 0 = y0, so f (0) = 0 for all f ∈ F.
+
+Bounding the Lipschitz constant. For any v ∈ V and y, y′
+
+∈ Y ⊆ RKN ,
+
+hvt, φ (yi)i −
+
+vt, φ
+
+y′i
+
+2
+
+(cid:10)
+
+(cid:0)
+
+(cid:1)(cid:11)(cid:1)
+
+Xt,i∈It (cid:0)
+
+2
+
+Xt kvtk
+≤
+≤ a2L2φ
+
+Xi∈It (cid:13)(cid:13)
+Xt Xi∈It (cid:13)(cid:13)
+
+φ (yi) − φ
+yi − y′i
+
+2
+
+2
+
+y′i
+
+(cid:1)(cid:13)(cid:13)
+(cid:0)
+≤ a2L2φθ2I
+
+(cid:13)(cid:13)
+
+2 ,
+
+y − y′
+(cid:13)(cid:13)
+
+(cid:13)(cid:13)
+
+so L (F) ≤ aLφθI .
+
+18
+
+
+Bounding Q (F). Again with y, y′
+γ, f (y) − f
+
+E sup
+f ∈F
+
+y′
+
+∈ Y
+
+(cid:10)
+= E sup
+
+v∈V Xti
+
+γti
+
+(cid:0)
+
+(cid:1)(cid:11)
+hvt, φ (yi)i −
+(cid:0)
+
+vt, φ
+
+y′i
+
+= E sup
+
+vt,
+
+γti
+
+φ (yi) − φ
+
+v∈V Xt *
+
+Xi∈It
+
+(cid:0)
+
+(cid:0)
+
+(cid:1)(cid:11)(cid:1)
+
+y′i
+
+(cid:0)
+2
+
+(cid:1)(cid:1)+
+
+1/2
+
+(cid:10)
+
+y′i
+
+(cid:1)(cid:1)(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+1/2
+
+(cid:0)
+
+2
+
+≤ aE
+
+Xt (cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+≤ aLφ√T
+
+γti
+
+φ (yi) − φ
+(cid:0)
+
+Xi∈It
+
+yi − y′i
+
+ Xt Xi∈It (cid:13)(cid:13)
+
+!
+
+(cid:13)(cid:13)
+
+≤ √T a 
+
+Xt
+≤ aLφθI √T
+
+E (cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+,
+
+y − y′
+(cid:13)(cid:13)
+
+(cid:13)(cid:13)
+
+γti
+
+φ (yi) − φ
+
+Xi∈It
+
+(cid:0)
+
+y′i
+
+(cid:0)
+
+
+
+
+
+(cid:1)(cid:1)(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+so Q (F) ≤ aLφθI √T .
+Bounding the diameters. We have
+
+2
+
+s
+
+sup
+
+sup
+
+D (Wx) ≤ 2
+
+W Xki hwk, xii
+W Xk kwkk
+From kW k2,2 ≤ kW k2,1 and kW k2,2 ≤ √K kW k2,∞ we obtain
+
+2 = vuut
+W Xk kwkk
+2 N λmax( ˆC) = kW k2,2
+
+≤ s
+
+sup
+
+q
+
+2
+
+, xi
+
+(cid:29)
+
+wk
+kwkk
+Xi (cid:28)
+N λmax( ˆC).
+
+D (W2,∞) ≤ b∞
+
+KN λmax( ˆC), and both D (W2,2) , D (W2,1) ≤ b2
+
+N λmax( ˆC).
+
+q
+
+Bounding the Gaussian width.
+
+G (W2,∞x) = E sup
+
+W ∈W∞
+
+wk,
+
+Xk *
+
+Xi≤N
+
+γkixi+
+
+= b∞
+
+Xk
+
+Xi≤N
+
+N tr( ˆC).
+
+≤ b∞K
+
+q
+
+similarly
+
+q
+
+γkixi(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+2
+
+E (cid:13)(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+E (cid:13)(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+W ∈W2
+
+G (W2,2x) = E sup
+
+Xk *wk,
+The Gaussian width of W1x is a little more complicated. Let W
+mations W
+
+γkixi+ = b2vuuutXk
+
+be the class of linear transfor1 = {x 7→ (0, . . . , hw, xi , . . . , 0) : kwk ≤ b1}, where only the k-th coordinate is different
+
+γkixi(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+KN tr( ˆC).
+
+≤ b∞
+
+Xi≤N
+
+Xi≤N
+
+(k)
+1
+
+q
+
+(k)
+
+19
+
+
+from zero. Then W1x is the convex hull of W
+that
+
+(1)
+
+1 x ∪ · · · ∪ W
+
+(K)
+1 x. It follows from Lemma 2 in [19]
+
+G (W2,1x) ≤ maxk G
+
+2 ln K
+
+(k)
+1 x
+(cid:17)
+
++ 2
+
+sXk,i hwk, xii
+
+(cid:16)W
+N tr( ˆC) + 2vuutXk kwkk
+
+N tr( ˆC) + 2b1
+
+2
+
+Xi (cid:28)
+N λmax( ˆC) ln K
+
+q
+
+2N
+
+tr( ˆC) + 8λmax
+(cid:16)
+
+ˆC
+(cid:16)
+
+(cid:17)
+
+ln K
+
+.
+
+(cid:17)
+
+≤ b1
+
+≤ b1
+≤ b1
+
+q
+
+q
+
+r
+
+wk
+kwkk
+
+2
+
+(cid:29)
+
+, xi
+
+ln K
+
+Collecting these bounds in Theorem A.6 and using (8) gives the three inequalities of Theorem 3.3.
+
+References
+
+[1] Y. Amit, M. Fink, N. Srebro, and S. Ullman. Uncovering shared structures in multiclass classiﬁcation. In Proceedings of the 24th international conference on Machine learning, pages 17–24,
+2007.
+
+[2] R. K. Ando and T. Zhang. A framework for learning predictive structures from multiple tasks
+
+and unlabeled data. Journal of Machine Learning Research, 6, 1817–1853, 2005.
+
+[3] M. Anthony and P. L. Bartlett. Neural network learning: Theoretical foundations. Cambridge
+
+University Press, 1999.
+
+[4] P. L. Bartlett and S. Mendelson. Rademacher and Gaussian Complexities: Risk bounds and
+
+structural results. Journal of Machine Learning Research, 3:463–482, 2002.
+
+[5] J. Baxter. A model of inductive bias learning. Journal of Artiﬁcial Intelligence Research, 12:149–
+
+[6] S. Boucheron, G. Lugosi, and P. Massart. Concentration Inequalities, Oxford University Press,
+
+198, 2000.
+
+2013
+
+[7] G. Cavallanti, N. Cesa-Bianchi, and C. Gentile. Linear algorithms for online multitask classiﬁ
+cation. Journal of Machine Learning Research, 11:2597–2630, 2010.
+
+[8] K. Crammer and Y. Singer. On the algorithmic implementation of multiclass kernel-based
+
+vector machines. Journal of Machine Learning Research, 2, 265–292, 2002
+
+20
+
+
+[9] R. Girshick, J. Donahue, T. Darrell, and J. Malik. Rich feature hierarchies for accurate object
+detection and semantic segmentation. In Proceedings of the 2014 Conference on Computer
+Vision and Pattern Recognition, pages 580–587, 2014.
+
+[10] S. Haykin. Neural Networks: A Comprehensive Foundation. Prentice-Hall, 1999.
+
+[11] S. M. Kakade, S. Shalev-Shwartz, A. Tewari. Regularization techniques for learning with ma
+trices. Journal of Machine Learning Research 13:1865–1890, 2012.
+
+[12] V. Koltchinskii and D. Panchenko. Empirical margin distributions and bounding the general
+ization error of combined classiﬁers. Annals of Statistics, 30(1):1–50, 2002.
+
+[13] Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. Gradient-based learning applied to document
+
+recognition. Proceedings of the IEEE, 86(11):2278–2324, 1998
+
+[14] M. Ledoux, M. Talagrand. Probability in Banach Spaces: Isoperimetry and Processes. Springer,
+
+Berlin, 1991.
+
+[15] Y. Lei, U., Dogan, A. Binder, and M. Kloft. Multi-class SVMs: From tighter data-dependent
+generalization bounds to novel algorithms. In Advances in Neural Information Processing Systems, pages 2026–2034, 2015.
+
+[16] A. Maurer. Bounds for linear multi-task learning. Journal of Machine Learning Research,
+
+7:117–139, 2006.
+
+[17] A. Maurer, and M. Pontil. Excess risk bounds for multitask learning with trace norm regularization. In Proceeding of the 26th Annual Conference on Learning Theory, pages 55–76, 2013.
+
+[18] A. Maurer. A chain rule for the expected suprema of Gaussian processes. In Proceedings of the
+
+25th International Conference on Algorithmic Learning Theory, pages 245–259, 2014
+
+[19] A. Maurer, M. Pontil, and B. Romera-Paredes. An inequality with applications to structured
+sparsity and multitask dictionary learning. In Proceedings of the 27th Conference on Learning
+Theory, pages 440–460, 2014.
+
+[20] A. Maurer, M. Pontil, and B. Romera-Paredes. The beneﬁt of multitask representation learning.
+
+arXiv preprint arXiv:1505.06279.
+
+[21] A. Maurer. A vector-contraction inequality for Rademacher complexities. arXiv preprint
+
+arXiv:1605.00251.
+
+[22] R. Meir and T. Zhang. Generalization error bounds for Bayesian mixture algorithms. Journal
+
+of Machine Learning Research, 4:839–860, 2003.
+
+[23] Y. Mroueh, T., Poggio, R. Rosasco, and J. Slotine. Multiclass learning with simplex coding. In
+
+Advances in Neural Information Processing Systems, pages 2789–2797, 2012.
+
+[24] B. Neyshabur, R. Tomioka, and N. Srebro. Norm-based capacity control in neural networks.
+
+In Proceedings of the 28th Conference on Learning Theory, pages 1376–1401, 2015.
+
+21
+
+
+[25] D. Slepian. The one-sided barrier problem for Gaussian noise. Bell System Tech. J., 41:463–
+
+501, 1962.
+
+[26] N. Srebro and A. Shraibman. Rank, trace-norm and max-norm.
+Annual Conference on Learning Theory, pages 545–560, 2005.
+
+In Proceedings of the 18th
+
+22
+
+
+
+========================================
+====================COMPLETE TEXT====================
+6
+1
+0
+2
+ 
+n
+u
+J
+ 
+
+5
+
+ 
+ 
+]
+L
+M
+t.
+a
+t
+[s
+
+ 
+ 
+1
+v
+7
+8
+4
+1
+0
+.
+6
+0
+6
+1
+:
+v
+i
+X
+r
+a
+
+Bounds for Vector-Valued Function Estimation
+
+Andreas Maurer
+Adalbertstrasse 55, D-80799 Munchen, Germany
+Email: am@andreas-maurer.eu
+
+Massimiliano Pontil
+Istituto Italiano di Tecnologia, 16163 Genoa, Italy
+Email: massimiliano.pontil@iit.it
+and
+University College London
+Department of Computer Science, London WC1E 6BT, UK
+
+October 15, 2018
+
+Abstract
+
+We present a framework to derive risk bounds for vector-valued learning with a broad class
+of feature maps and loss functions. Multi-task learning and one-vs-all multi-category learning
+are treated as examples. We discuss in detail vector-valued functions with one hidden layer, and
+demonstrate that the conditions under which shared representations are beneﬁcial for multitask learning are equally applicable to multi-category learning.
+
+1 Introduction
+
+The main focus of this paper is to study statistical bounds for (shared) representation learning under a general class of feature maps and loss functions. This study is motivated by the development
+of data-dependent generalization bounds for multi-category learning with T classes, and for multitask learning with T tasks. We show that both problems can be treated in parallel under a uniﬁed
+framework.
+
+We give bounds on the Rademacher complexity of composite vector-valued function classes
+
+F ◦ G =
+
+x ∈ H 7→ f (g (x)) ∈ RT : f ∈ F, g ∈ G
+(cid:8)
+
+(cid:9)
+
+,
+
+where the input space H is a ﬁnite or inﬁnite dimensional Hilbert space, G is a class of functions (or
+→ RT .
+feature-maps or representations) g : H → RK, and F is a class of output functions f : RK
+
+1
+
+
+Functions in F ◦ G are chosen on the basis of a ﬁnite number N of independent observations and
+we are interested in uniformly bounding the incurred estimation errors in terms of the parameters
+T , K and N , or alternatively n = N/T , the number of observations per output unit.
+
+There are two main contributions of this work:
+
+• We provide a common method to derive data dependent bounds for multi-task and multicategory learning in terms of the complexity of general vector-valued function classes.
+In
+passing we improve on a recent result in [15] on multi-category learning. Our framework is
+also general enough to be applied to hybrid coding schemes for multi-category classiﬁcation
+such as 1-vs-1 pairwise classiﬁcation.
+
+• We apply this method to a large class of vector-valued functions with shared feature maps to
+demonstrate that the conditions under which shared representations are beneﬁcial for multitask learning are equally applicable to multi-category learning.
+
+Our principal ﬁnding is a data-dependent generalization bound, whose dominant terms have
+
+the form
+
+tr( ˆC)
+nT 
+
+θs
+
+λmax( ˆC)
+
+,
+
+n 
+
+θs
+
++ O 
+
+
+
+
+
+
+O 
+
+
+where ˆC is the empirical covariance operator (see below). When testing multi-task learning we
+are always told which task we are testing and thus the relevant component of our vector-valued
+hypothesis. In the one-vs-all multi-category setting we of course withhold the identity of the correct
+class and thus also of the relevant component. This simple fact is reﬂected in the presence of the
+factor θ, which is one for multi-task learning and √T for multi-category learning.
+
+Bounds of this form are given for a large class of neural networks with one hidden layer and
+rather general nonlinear activation functions, which may involve inter-unit couplings or intermediate maps to inﬁnite-dimensional spaces. A similar bound also holds for linear classes with tracenorm constraints, which can also be interpreted as composite classes, see e.g. [26].
+
+As T increases the second term dominates the above expression. This term however depends
+only on the largest eigenvalue, instead of the trace, of the empirical covariance.
+If T is large
+and the data is high-dimensional the intermediate representation can therefore give a considerable
+advantage. This has been established for multi-task learning in several works and, as we show
+here, holds equally for multi-category learning, in agreement with previous empirical studies of the
+beneﬁt of trace-norm regularization in multi-category learning [1].
+
+In Section 2 we explain how the complexities of multi-category and multi-task learning can be
+reduced to the complexities of vector-valued function classes and bounded by a common expression. We brieﬂy discuss independent and linear classes in Section 3.1 and 3.2. Then in Section 3.3,
+we present our principal result on nonlinear composite classes. The appendix contains statements
+and proofs of our results in their most general form.
+
+2
+
+
+1.1 Previous Work
+
+Bounds for multi-layered networks are given in the now classical work [3] in terms of covering
+numbers. More recently there are bounds using Rademacher averages [24]. These works mainly
+consider scalar outputs and ignore the regularizing effects of intermediate representations.
+
+Early work to consider the potential beneﬁts of shared representations was in the setting of
+multi-task learning and learning to learn [5]. Subsequent work has focused more on learning
+bounds for linear feature learning [7, 16]. Recently [20] presented a general bound for multitask representation learning. Although there has been substantial work on the statistical analysis
+of learning shared representations for multi-task learning, less has been done for multi-category
+learning. This is in contrast with the large body of empirical work on deep networks, which are
+often trained with a multi-class loss [9], such as the soft max or multi-class hinge loss. In this work
+we close this gap.
+
+2 Multi-Category and Multi-Task Learning
+
+We extend the notion of Rademacher complexity to the vector-valued setting.
+
+Deﬁnition 2.1 Let T, N ∈ N, let X be any set, F a class of functions f : X → RT , x = (x1, . . . , xN ) ∈
+N , and let I : {1, . . . , T } → 2{1,...,N } be a function which assigns to every t ∈ {1, . . . , T } a subset
+X
+It ⊂ {1, . . . , N }. We deﬁne
+RI (F, x) = 1
+
+N E sup
+
+ǫtift (xi) ,
+
+T
+
+f ∈F
+
+independent Rademacher variables (uniformly distributed on
+
+Xt=1 Xi∈It
+where the ǫti are doubly indexed,
+{−1, 1}).
+
+In this section we show that the estimation problem for both multi-category and multi-task
+learning can be reduced to the problem of bounding RI (F, x) for appropriate choices of the function I.
+
+2.1 Multi-Category Learning
+
+Let C ∈ N be the number of categories. There is an unknown distribution µ on H × {1, . . . , C}, a
+classiﬁcation rule cl : RT
+→ {1, . . . , C}, and for each label y ∈ {1, . . . , C} a surrogate loss function
+ℓy : RT
+→ R+. The loss function ℓy is designed so as to upper bound or approximate the indicator
+function of the set
+. Here we consider the simple case, where T = C. For the
+construction of appropriate loss functions see [8, 15, 23]. These loss functions are Lipschitz on RT
+relative to the Euclidean norm, with some Lipschitz constant Lmc, often interpretable as an inverse
+margin.
+
+z ∈ RT : cl (z) 6= y
+
+(cid:8)
+
+(cid:9)
+
+3
+
+
+Given a class F of functions f : H → RT we want to ﬁnd f ∈ F so as to approximately minimize
+
+the surrogate risk
+
+E(x,y)∼µℓy (f (x)) .
+
+Since we do not know the distribution µ, this is done on the basis of a sample of N = nT observations (x, y) = ((x1, y1) , . . . , (xN , yN )) ∈ (H × {1, . . . , C})N , drawn i.i.d. from the distribution µ.
+We then solve the problem
+
+To give a performance guarantee for ˆf we would like to know how far the empirical minimum
+above is from the true surrogate risk of ˆf . This difference is upper bounded by
+
+ˆf = arg minf ∈F
+
+ℓyi (f (xi)) .
+
+1
+N
+
+N
+
+Xi=1
+
+sup
+f ∈F "
+
+E(x,y)∼µℓy (f (x)) −
+
+ℓyi (f (xi))
+
+.
+
+#
+
+1
+N
+
+N
+
+Xi=1
+
+2
+N E sup
+
+f ∈F
+
+N
+
+Xi=1
+
+ǫiℓyi (f (xi)) ,
+
+It is by now well known (see e.g. [4]) that the above expression has, with high probability in the
+sample, a bound, whose dominant term is given by
+
+where the ǫi are independent Rademacher (uniform {−1, 1}-distributed) variables. We now apply
+the following result [21, Corollary 6].
+
+n, let F be a class of functions f : X → RT and let
+
+Theorem 2.2 Let X be any set, (x1, . . . , xn) ∈ X
+hi : RT
+
+→ R have Lipschitz norm bounded by L. Then
+E sup
+ǫtift (xi) ,
+f ∈F
+
+ǫihi (f (xi)) ≤ √2LE sup
+
+n
+
+Xi=1
+
+f ∈F Xt,i
+
+where ǫti is an independent doubly indexed Rademacher sequence and ft is the t-th component of f .
+
+Using this theorem and the Lipschitz property of the loss functions ℓyi, we upper bound (1) by
+
+2√2
+N Lmc E sup
+
+f ∈F
+
+T
+
+N
+
+Xt=1
+
+Xi=1
+
+ǫtift (xi) .
+
+A similar argument can be based on Slepian’s inequality with a passage to Gaussian complexities
+[15]. In this case the ǫti have to be replaced by independent standard normal variables γti, and √2
+π/2. The approach chosen here is simpler and allows us to improve some results of
+replaced by
+[15] in the linear case. For our ﬁnal result (Theorem 3.3 below) however we also need Gaussian
+complexities.
+
+p
+
+We deﬁne I mc : {1, . . . , T } → 2{1,...,N } by I mct = {1, . . . , N } for all t . With Deﬁnition 2.1 the
+
+quantity (2) then becomes
+2√2LmcRI mc (F, x) .
+
+4
+
+(1)
+
+(2)
+
+(3)
+
+
+2.2 Multi-Task Learning
+
+In this setting there is an output space Y, and for each task t ∈ {1, . . . , T } a distribution µt on H ×Y
+and a loss function ℓt : R × Y → [0, 1], which is assumed to be Lipschitz with constant at most Lmt
+in the ﬁrst argument for every value of the second. Given a class F of functions f : H → RT we
+want to ﬁnd f ∈ F so as to approximately minimize the task-average risk
+
+1
+T
+
+T
+
+Xt=1
+
+E(x,y)∼µtℓt (ft (x) , y) ,
+
+where ft is the t-th component of the function f . For each task t there is a sample (xt, yt) =
+((xt1, yt1) , . . . , (xtn, ytn)) drawn i.i.d. from µt. One solves the problem
+
+ˆf = arg minf ∈F
+
+1
+nT
+
+T
+
+n
+
+Xt=1
+
+Xi=1
+
+ℓt (ft (xti) , yi) .
+
+As before we are interested in the supremum of the estimation difference
+
+1
+T
+
+sup
+f ∈F
+
+T
+
+Xt=1 "
+
+E(x,y)∼µt ℓt (ft (x) , y) −
+
+ℓt (ft (xti) , yi)
+
+.
+
+#
+
+1
+n
+
+n
+
+Xi=1
+
+As shown in [2] or [16] there is again a high probability bound, whose dominant term is given by
+the vector-valued Rademacher complexity
+
+2
+nT E sup
+
+f ∈F
+
+T
+
+n
+
+Xt=1
+
+Xi=1
+
+ǫtiℓt (ft (xti) , yi) ≤
+
+2
+nT Lmt E sup
+
+f ∈F
+
+T
+
+n
+
+Xt=1
+
+Xi=1
+
+ǫtift (xti) ,
+
+where we eliminated the Lipschitz functions with a standard contraction inequality as in [22]. We
+now collect all the tasks input samples xt in a big sample x = (x1, . . . , xN ) ∈ H N with N = nT ,
+and deﬁne I mt : {1, . . . , T } → 2{1,...,N } so that I mtt
+is the set of all indices of the examples for task
+t. Thus xt = (xi)i∈It and n =
+2LmtRI mt (F, x) .
+
+. The right hand side above again becomes
+
+I mtt
+
+(4)
+
+(cid:12)(cid:12)
+
+(cid:12)(cid:12)
+
+2.3 A Common Expression to Bound
+
+Comparing (3) and (4) we can summarize: Let F be a class of functions with values in RT .
+The empirical Rademacher complexity of F as used in multi-category learning and the empirical Rademacher complexity of F as used in multi-task learning are up to (Lipschitz-) constants,
+bounded by RI (F, x), where the function I is either I mc in the multi-category case or I mt in the
+multi-task case and I mct = {1, . . . , N } while I mtt ⊆ {1, . . . , N } is the set of indices of examples for
+task t.
+
+With appropriate deﬁnitions of the function I, bounds on RI (F, x) also lead to learning bounds
+in hybrid situations where there are several multi-category tasks, potentially with classes occurring
+
+5
+
+
+in more than one task.
+In the case of 1-vs-1 voting schemes T = C (C − 1) /2, so there is a
+component for every unordered pair of distinct classes (c1, c2). Then we deﬁne a I(c1,c2) to be the
+set of indices of all examples for the classes c1 and c2.
+
+In general It should be the set indices of those examples, which occur as arguments of ft in
+the expression of the empirical error. For reasons of space however we will stay with the cases of
+multi-task and 1-vs-all multi-category learning as explained above. We refer to the appendix for
+the most general statements of our results.
+
+To lighten notation we write RI mc = Rmc and RI mt = Rmt. We also use the notation Rα, where
+the variable α can be either “mc” or “mt”. It will also be useful to observe that for (a1, . . . , aN ) ∈ RN
+
+T
+
+Xt=1 Xi∈I αt
+
+ai = θ2α
+
+ai,
+
+N
+
+Xi=1
+
+where θmc = √T and θmt = 1.
+
+3 Speciﬁc Bounds
+
+We show how the quantity Rα (F, x) may be bounded, ﬁrst by a simple and general method of
+reduction to the Rademacher complexities of scalar function classes, then for certain linear classes,
+and ﬁnally we state and prove our main results for composite classes.
+
+3.1 Component Classes and Independent Learning
+
+Given a class F of functions with values in RT we can deﬁne for each t ∈ {1, . . . , T } the scalar
+valued component class Ft = {ft : f ∈ F}. By bringing the supremum inside the ﬁrst sum in ( 4)
+we obtain the bound
+
+RI (F, x) ≤
+
+T
+
+1
+N
+
+E sup
+f ∈Ft Xi∈It
+
+Xt=1
+
+ǫif (xi) ,
+
+which is just a sum of standard, scalar case, empirical Rademacher averages.
+
+In the case of independent learning the components of the members of F are chosen indepen
+dently, so that
+
+F =
+
+Yt Ft = {(f1, . . . , fT ) : ∀t, ft ∈ Ft} ,
+
+and the above bound becomes an identity and unimprovable. In most cases E supf ∈Ft
+|It| so the above implies a bound of the order θα/√N .
+is of the order
+
+P
+
+i∈It ǫif (xi)
+
+p
+
+6
+
+
+3.2 Linear Classes
+
+Before proceeding we require some more notation. Given a sequence of input vectors, (x1, . . . , xN ) ∈
+H N we deﬁne the empirical covariance operator ˆC by
+
+N
+
+h ˆC v, wi = 1
+
+N
+
+Xi=1hv, xiihxi, wi for every v, w ∈ H .
+
+Furthermore, given a function I : {1, . . . , T } → 2{1,...,N }, we deﬁne the empirical covariance operator ˆCt by
+
+h ˆCtv, wi = 1
+
+|It| Xi∈Ithv, xiihxi, wi.
+
+We consider linear transformations W : H → RT of the form
+x 7→ (hw1, xi , . . . , hwT , xi)
+
+with weight-vectors wt ∈ H. Corresponding function classes will be deﬁned by constraints on the
+norms of such transformations. We use the mixed (2, p)-norms which are deﬁned as
+
+kW k2,p =
+
+(kw1k, . . . , kwT k)
+(cid:13)(cid:13)
+√W ∗W
+
+p
+
+(cid:13)(cid:13)
+
+and the trace norm k·ktr = tr
+or, for ﬁnite-dimensional H, as the Frobenius norm kW k2,2 =
+(cid:0)
+the classes,
+
+. The norm k·k2,2 is also known as the Hilbert-Schmidt norm
+2. For B > 0 we consider
+t kwtk
+(cid:1)
+
+pP
+
+W2,p =
+
+W : kW k2 ≤ BT 1/p
+n
+
+o
+
+and
+
+Wtr =
+
+W : kW ktr ≤ B√T
+
+.
+
+n
+
+o
+The class Wtr can be deﬁned alternatively as Wtr = {V W : W ∈ W, V ∈ V}, where W ={W : H →
+→ RT , kV k2,2 ≤ B√T }, see for example [26] and references
+RT , kW k2,2 ≤ 1} and V ={V : RT
+therein. This exhibits Wtr as a composite vector-valued function class.
+
+The factor T 1/p in the deﬁnition of W2,p is essential when discussing the dependence on T . If it
+were absent then by Jensen’s inequality the average norm allowed to the weight vectors would be
+bounded by B/T 1/p, so the class is regularized to death as T increases. This applies in particular
+to the case of multi-category learning, where each component needs to be able to win over all the
+others by some margin. The same argument applies to the √T in the constraint of the trace-norm
+class. In this sense it is not quite correct to speak of rates in T if the constraint on the norm is held
+constant as in [15].
+
+7
+
+
+For simplicity we assume that kxik = 1 for all i (as with a Gaussian RBF-kernel) for the rest
+of this subsection. Note that this implies tr( ˆC) = tr( ˆCt) = 1. We also consider only the cases of
+multi-category and multi-task learning. Statements and proofs for general index sets It and general
+values of the kxik are given in the appendix. We ﬁrst give some lower and upper bounds for W2,∞
+and W2,p.
+Theorem 3.1 For p ∈ [2, ∞]
+1
+2n ≤ Rα (W2,∞, x) ≤ Rα (W2,p, x) ≤ B θα
+
+B θα
+
+1
+n
+
+r
+
+r
+
+and for p ∈ [1, 2] and 1/p + 1/q = 1
+
+Rα (W2,2, x) ≤ Rα (W2,p, x) ≤ 21/qB θα
+
+q
+n .
+
+r
+
+The lower bound in the [2, ∞]-regime is simply 1/√2 times the upper bound. If we set Λ =
+T 1/pB, then the multi-category bound for the [1, 2]-regime can be compared to the one given in
+[15], which is larger by a factor of O√q. This improvement is however exclusively due to our trick
+of staying with Rademacher variables when eliminating the loss functions.
+
+The norms in the lemma above are not very useful for multi-task learning, as the bounds show
+no improvement as the number of tasks increases. This is different for the trace-norm constrained
+class Wtr, for which we have the following result, which already exhibits a typical behaviour of
+composite classes. The proof of a more general version is given in the appendix.
+
+Theorem 3.2
+
+Rα (Wtr, x) ≤ B θα 
+
+
+r
+
+2 (ln (nT ) + 1)
+nT
+
++ s
+
+λmax( ˆC)
+
+.
+
+n 
+
+
+
+If we divide this bound by the above lower bound for regularization with the Hilbert Schmidt
+
+norm, we obtain
+
+Rα (Wtr, x)
+Rα (W2,2, x) ≤ 2
+
+r
+
+ln (nT ) + 1
+T
+
+2λmax( ˆC)
+tr( ˆC)
+
+,
+
++ s
+
+a quotient, which highlights the potential beneﬁts of composite classes. As T increases the second
+term becomes dominant. The quotient λmax( ˆC)/tr( ˆC) can be seen as the inverse of an effective
+Indeed for whitened data tr( ˆC) = d λmax( ˆC), if d is the number of nonzero
+data-dimension.
+eigenvalues of ˆC. The relative estimation beneﬁt of the intermediate representation increases with
+the number T of classes or tasks and with the effective dimensionality of the data. This appears to
+be a rather general feature of composite vector-valued classes, also in the nonlinear case.
+
+8
+
+
+3.3 Composite Classes and Representation Learning
+
+We now consider function classes V ◦ φ ◦ W of the form
+
+W
+x ∈ H −→ RK
+
+φ
+−→ H ′
+
+V
+→ RT .
+
+Here inputs x ∈ H are ﬁrst mapped to RK by a linear function W from a class W. The vector W x
+→ H ′. Finally
+
+is then mapped to another Hilbert-space H ′ by a ﬁxed Lipschitz feature map φ : RK
+φ (W x) is mapped to the T -dimensional vector V φ (W x) by the linear map V chosen from V.
+
+For W ∈ W we consider the constraints kW k2,∞ ≤ b∞, kW k2,2 ≤ b2 and kW k2,1 ≤ b1, denoting
+the respective classes by W2,∞, W2,2, and W2,1. For V we take the constraint kV k2,∞ ≤ a. This
+choice allows us to vary T and keep a ﬁxed at the same time. For the “activation function” φ we
+assume a Lipschitz constant Lφ. We make the simplifying assumption that φ (0) = 0.
+
+The function φ makes the model quite general. Suppose ﬁrst that H ′ = RK. If φ is the identity
+function we obtain a linear class, deﬁned through its factorization, much like the case of trace-norm
+regularization discussed earlier.
+If the components of φ are sigmoids or the popular rectilinear
+activation functions, we obtain a rather standard neural network with hidden layer, but φ could
+also include inter-unit interactions, such as poolings or lateral inhibitions (see, e.g. [10, 13]) as
+long as it observes the Lipschitz condition.
+
+However, the dimension of H ′ need not be K and φ could be deﬁned by a radial basis function
+network with ﬁxed centers or it could also be the feature-map induced by some kernel on RT , say
+a Gaussian kernel of width ∆, in which case Lφ = 2/∆. To enforce φ (0) = 0 we need to translate
+the original feature map ψ of the Gaussian kernel as φ (x) = ψ (x) − ψ (0).
+
+Here the underlying assumption is, that there is a common K-dimensional representation of
+the data in which the data has sufﬁcient separation properties, but the separating functions may be
+highly nonlinear.
+
+Theorem 3.3 There are universal constants c1 and c2 such that under the above conditions
+
+Rα (Vφ (W2,∞) , x) ≤ Lφab∞θα 
+
+
+Rα (Vφ (W2,2) , x) ≤ Lφab2θα 
+c1s
+
+Rα (Vφ (W2,1) , x) ≤ Lφab1θα 
+c1s
+
+
+c1Ks
+
+tr( ˆC)
+nT + c2s
+
+Kλmax( ˆC)
+n
+
+K tr( ˆC)
+nT
+
++ c2vuut
+
+λmax
+
+ˆC
+
+(cid:16)
+n
+
+
+
+(cid:17)
+
+2tr( ˆC) + 8λmax( ˆC) ln K
+nT
+
+
+
+
+
+
++ c2s
+
+9
+
+λmax( ˆC)
+
+.
+
+n 
+
+
+
+
+We highlight some implications of the above theorem.
+
+1. The bounds differ in their dependence on the dimension K of the hidden layer which is linear,
+radical and logarithmic respectively. For W2,1 the dependence on K is logarithmic and scales
+only with λmax( ˆC).
+
+2. In the case of multi-task learning with W2,2 and W2,1 the dependence on K vanishes in the
+limit T → ∞. In this limit the ﬁrst term in parenthesis vanishes in all three cases, leaving
+only the second term.
+
+3. Multi-category learning requires more data with θ = √T , but if we take a simultaneous limit
+in T and n such that T /n remains bounded, then the behaviour is the same as for multi-task
+learning with T → ∞.
+
+4. In both cases the second term becomes dominant for large T . For the ﬁrst bound crudely
+setting λmax( ˆC) = 1/d this term scales with
+K/d and exhibits the beneﬁt of the shared
+representation as that of dimensional reduction. A similar interpretation holds for the other
+bounds with some implicit dependence of b2 and b1 on the dimension of the representation.
+
+p
+
+The proof uses the following recent result on the expected suprema of Gaussian processes [18].
+
+For a set Y ⊆ Rm the Gaussian width G (Y ) is deﬁned as
+
+G (Y ) = E sup
+
+y∈Y hγ, yi = E sup
+
+y∈Y
+
+γiyi,
+
+m
+
+Xi=1
+
+where γ = (γ1, . . . , γm) is a vector of independent standard normal variables.
+Theorem 3.4 Let Y ⊆ Rn have (Euclidean) diameter D (Y ) and let F be a class of functions f : Y →
+Rm, all of which have Lipschitz constant at most L (F). Let F (Y ) = {f (y) : f ∈ F, y ∈ Y }. Then for
+any y0 ∈ Y
+
+(5)
+
+G (F (Y )) ≤ c1L (F) G (Y ) + c2D (Y ) Q (F) + G (F (y0)) ,
+
+where c1 and c2 are universal constants and
+
+Q (F) =
+
+sup
+y,y′∈Y, y6=y′
+
+E sup
+f ∈F
+
+hγ, f (y) − f (y′)i
+ky − y′
+
+k
+
+.
+
+We refer to the appendix for statement and proof of a more general version going beyond
+
+1-vs-all multi-category and multi-task learning.
+
+Idea of proof for Theorem 3.3. We use Theorem 3.4 by setting
+
+Y =
+
+W x = (hwk, xii)k≤K, i≤N : W ∈ Wo ⊆ RKN
+
+n
+
+10
+
+
+(yki) ∈ RKN
+
+where W will be either W2,∞, W 2,2 or W2,1. Note that the cardinality |It| is either N or n in the
+cases considered here. For F we take the set of functions
+7→ (hvt, φ (yi)i)t≤T,i∈It ∈ RT |It| : v ∈ Vo
+
+restricted to Y , so F (Y ) is a subset of RT 2n for multi-category and RT n for multi-task learning.
+This again accounts for the additional factor of √T for the complexity of multi-category learning.
+By a well known bound on Rademacher averages in terms of Gaussian averages [14]
+
+n
+
+E
+
+sup
+
+W ∈V,W ∈W Xt Xi∈It
+
+ǫtiV φ (W xi) ≤ r
+
+π
+2 E
+
+sup
+
+γtiV φ (W xi)
+
+W ∈V,W ∈W Xt Xi∈It
+
+π
+2 G (F (Y )) .
+
+=
+
+r
+
+(6)
+
+To bound G (F (Y )) we then just need to bound the individual components of the right hand side
+of equation (7), namely the largest Lipschitz constant L (F), the differential Gaussian width Q (F),
+the diameter D (Y ) and the Gaussian width G (Y ). We needn’t worry about G (F (y0)), because we
+are free to choose y0, so we can set it to 0. Then f (0) = 0 for all f ∈ F, whence G (F (y0)) = 0.
+For the bounds on L (F), Q (F), D (Y ) and G (Y ) we refer to the appendix.
+
+4 Conclusion
+
+We presented a framework to derive Rademacher bounds for a wide class of vector-valued functions
+combined with Lipschitz losses. We studied in parallel the case of multi-task and multi-category
+learning. To our knowledge our framework allows to derive bounds for more general classes of
+vector-valued function and loss functions than currently possible, while still improving over existing
+bounds [15, 17] in special cases. In particular, we illustrate how bounds can be derived for neural
+networks with one hidden layer and rather general nonlinear activation functions.
+
+In the future, it would be valuable to study more examples of the loss functions included in
+the setting. In addition to one-vs-one classiﬁcation, which we brieﬂy mentioned in the paper, these
+could include multi-label classiﬁcation or hybrid multi-task learning, in which each task is itself
+a multi-category or multi-label problem. Another interesting direction of research is to extend
+our analysis to neural networks with more than one hidden layer. Although the proof technique
+presented in Section 3.3 could naturally be extended to derive such bounds, it seems important to
+study improvement in the large constants appearing in Theorem 3.4 (see [18]) in order to avoid
+explosion of the constants in bounds for deep networks.
+
+11
+
+
+A Appendix
+
+A.1 Mixed Norms
+
+Theorem A.1 We have that:
+
+(i) For p ∈ [2, ∞]
+
+T
+
+B
+√2N
+
+For the convenience of the reader we restate in greater generality the results contained in the main
+body of the paper. The ǫi or ǫti are throughout independent Rademacher variables.
+
+In this section we prove a more general result implying Theorem 3.1.
+
+Xt=1 q|It| tr( ˆCt) ≤ RI (W2,∞, x) ≤ RI (W2,p, x) ≤
+
+B√T
+
+T
+
+N vuut
+
+Xt=1 |It| tr( ˆCt).
+
+(ii) For p ∈ [1, 2] and 1/p + 1/q = 1 if
+
+P
+RI (W2,2, x) ≤ RI (W2,p, x) ≤
+
+2
+
+i∈It kxik
+T 1/pB√q
+N
+
+≥ q−1 then
+Xt q|It|tr( ˆCt)
+
+ 2
+
+1/q
+
+q
+
+,
+
+!
+
+where 1/p + 1/q = 1.
+
+(iii) For 1-vs-all multi-category learning the condition
+
+bound in (ii) can be simpliﬁed to
+
+2
+
+i∈It kxik
+
+≥ q−1 can be omitted and the
+
+P
+
+RI mc (W2,p, x) ≤ Bs
+
+qT tr( ˆC)
+n
+
+.
+
+Proof. (i) We have
+
+B
+
+√2 Xt q|It| tr( ˆCt) = B
+
+2 = B
+
+E
+
+√2 Xt vuut
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+Xi∈It
+E sup
+w,kwk≤B *w,
+
+2
+
+ǫixi(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+√2 Xt sXi∈It kxik
+ǫixi(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xt
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+E
+
+≤ B
+Xi∈It
+= N RI (W2,∞) ≤ N RI (W2,p) ≤ N RI (W2,2)
+
+Xt
+
+Xi∈It
+
+=
+
+ǫixi+
+
+= E sup
+
+W ∈W2,2
+
+≤ B√T
+
+wt,
+
+Xt *
+sXt Xi∈It kxik
+
+ǫixi+
+
+Xi∈It
+2 = B√T
+
+= B√T EvuutXt (cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+|It| tr( ˆCt)
+
+Xi∈It
+
+sXt
+
+2
+
+ǫixi(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+12
+
+
+where we used Szarek’s inequality (Theorem 5.20 [6]) in the ﬁrst inequality. The next inequalities
+follow from W2,∞ ⊆ W2,p ⊆ W2,2. For the last inequality we use Jensen’s.
+(ii) The ﬁrst inequality is W2,2 ⊆ W2,p. Then let Xt =
+i∈It kxik
+
+, so that EXt ≤
+(cid:13)(cid:13)
+
+i∈It ǫixi
+
+2. By the bounded difference inequality (see [6]) for s ≥ 0
+(cid:13)(cid:13)P
+−s2
+i∈It kxik
+
+Pr {Xt > EXt + s} ≤ exp  
+
+2 ! ,
+
+2
+
+qP
+
+so with integration by parts
+
+P
+
+∞
+
+0
+
+Z
+
+∞
+
+0
+
+Z
+
+E [X q
+
+t ] ≤ EXt + q
+
+sq−1 Pr {X > EX + s} dsq
+
+≤ EXt + q
+
+sq−1 exp
+
+= EXt +  Xi∈It kxik
+≤  Xi∈It kxik
+
+1/2
+
+!
+
+2
+
+2
+
+ 
+
+q/2
+
+2
+
+!
+
+∞
+
+P
+q
+
+(cid:18)
+
+0
+
+Z
+
+−s2
+i∈It kxik
+
+ds
+
+2 !
+
+−s2
+2 (cid:19)
+
+(cid:18)
+
+ds
+
+(cid:19)
+
+sq−1 exp
+
+q/2
+
++  q
+
+Xi∈It kxik
+
+2
+
+!
+
+≤ 2  q
+
+Xi∈It kxik
+
+2
+
+!
+
+q/2
+
+,
+
+where the third inequality follows from a comparison of the integral with the moments of the
+standard normal distribution, and the last follows from
+
+2
+
+RI (W2,p) = 1
+N E
+
+sup
+
+kW k2,p≤T 1/pB Xt Xi∈It hwt, xii = T 1/pB
+N E
+
+≤
+
+T 1/pB
+N  Xt
+= 21/qT 1/pB√q
+N
+
+1/q
+
+T 1/pB√q
+N
+
+≤
+
+EX q
+
+t !
+
+ Xt (cid:16)|It| tr( ˆCt)
+
+(cid:17)
+
+q/2
+
+!
+
+.
+
+i∈It kxik
+
+≥ q−1. Thus
+
+P
+
+2
+
+
+
+
+
+1/q
+
+1/q
+
+X q
+
+t !
+
+ Xt
+Xt  Xi∈It kxik
+
+2
+
+!
+
+q/2
+
+1/q
+
+
+
+
+
+(iii) The case of 1-vs-all multi-category learning is simpler because It = {1, . . . , N } and we
+can interchange summation over t and i. Then we can essentially proceed as in[15] and use the
+1/q-strong convexity of 1
+2,p w.r.t. kW k2,p. In Corollary 4 of [11] let λ > 0 and u = W and
+2 = fmax (u) to obtain
+vi = λ (ǫ1ixi, . . . , ǫT ixi) and use 1
+2 kW k
+
+2 kW k
+
+2
+2,p ≤
+
+T 1/pB
+
+1
+2
+
+2
+
+N
+
+Xi=1 hW, λ (ǫ1ixi, ..., ǫT ixi)i2 ≤
+
+N
+
+(cid:0)
+
+(cid:1)
+
+Xi=1 h∇f (v1:i−1) , vii + 1
+2 (cid:16)
+
+T 1/pB
+
+N
+
+2 + qλ2
+2
+(cid:17)
+
+Xi=1 k(ǫ1ixi, ..., ǫT ixi)k
+
+2
+2q ,
+
+13
+
+
+where h·, ·i2 is the Hilbert-Schmidt inner product. Take the supremum in W and then the expectation. The ﬁrst term on the r.h.s. above vanishes. Dividing by λ and optimizing in λ gives
+
+n
+
+E sup
+W
+
+Xi=1 hW, ǫ1ixi, . . . , ǫT ixii ≤ (cid:16)
+
+T 1/pB
+
+E k(ǫ1ixi, . . . , ǫT ixi)k
+
+2
+2q.
+
+n
+
+Xi=1
+
+q
+
+(cid:17) vuut
+
+2/q
+
+E k(ǫ1ixi, . . . , ǫT ixi)k
+
+2
+2q = E
+
+ Xt kǫtixik
+
+q
+
+!
+
+≤ T 2/q
+
+kxik
+
+2
+
+Now
+
+so
+
+RI mc (W2,p) = 1
+N E
+
+N
+
+Xi=1 hW, ǫ1ixi, . . . , ǫT ixii ≤
+
+N
+
+q
+
+Xi=1 kxik
+
+T B
+
+N vuut
+
+2 = Bs
+
+qT tr( ˆC)
+n
+
+.
+
+Note that the (very harmless) condition
+
+2
+
+i∈It kxik
+
+≥ q−1 in part (iii) is automatically satisﬁed
+
+if kxik = 1.
+
+P
+
+A.2 Trace Norm Constraints
+
+Theorem A.2
+
+In this section we prove the following result, which contains Theorem 3.2 as as special case and
+improves over [17] which only applies to the multi-task learning setting.
+
+RI (Wtr, x) ≤
+
+B
+N r
+
+2T maxt
+
+|It| tr( ˆCt) (ln N + 1) + B
+N vuut
+
+T λmax  Xt
+
+|It| ˆCt!
+
+.
+
+For the proof we use k.k∞ to denote the operator norm on H and (cid:23) and (cid:22) to refer to the
+ordering induced by the cone of positive operators. For x ∈ H we deﬁne the rank-1 operator Qx
+on H by Qxv = hv, xi x. We use the following result, the proof of which can be found in [17].
+Theorem A.3 Let M ⊆ H be a subspace of dimension d and suppose that A1, . . . , AN are independent
+random operators satisfying Ak (cid:23) 0, Ran (Ak) ⊆ M a.s. and
+
+EAmk (cid:22) m!Rm−1EAk
+
+for some R ≥ 0, all m ∈ N and all k ∈ {1, . . . , N }. Then
+
+E
+
+E
+
+vuut
+
+Ak(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+∞ ≤ vuut
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xk
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Ak(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xk
+
+∞
+
+p
+
++
+
+R (ln dim (M ) + 1).
+
+14
+
+
+Lemma A.4 Let x1, . . . , xn be in Rd and denote
+
+α =
+
+n
+
+2 .
+
+Xi=1 kxik
+
+Deﬁne a random vector by V =
+
+i ǫixi. Then for p ≥ 1
+
+E
+
+Qp
+V
+
+(cid:22) (2p − 1)!!αp−1E [QV ] ,
+
+P
+
+p
+
+(cid:3)
+
+(cid:2)
+where (2p − 1)!! =
+Proof. Let v ∈ Rd be arbitrary. By the deﬁnition of V and QV we have for any v ∈ Rd that
+
+i=1 (2i − 1) = (2p − 1) (2 (p − 1) − 1) × · · · × 5 × 3 × 1.
+
+Q
+
+E
+
+Qp
+V
+
+v, v
+
+=
+
+n
+
+E
+
+Xj1,...,j2p=1
+
+ǫj1ǫj2 · · · ǫj2p
+
+hv, xj1i hxj1, xj2i · · ·
+
+xj2p, v
+
+.
+
+(cid:3)
+
+(cid:2)
+
+(cid:11)
+
+(cid:10)
+
+(cid:2)
+(cid:10)
+The properties of independent Rademacher variables imply that E
+= 0 unless the
+sequence i = (i1, . . . , i2p) has the property that each index ik occurs in it an even number of times,
+in which case E
+
+= 1. Let us call sequences with this property admissible. Thus
+
+(cid:11)
+ǫi1ǫi2 · · · ǫi2p
+
+(cid:2)
+
+(cid:3)
+
+(cid:3)
+
+ǫi1ǫi2 · · · ǫi2p
+
+(cid:2)
+
+(cid:3)
+
+hE [Qpw] v, vi =
+
+Xi admissible hv, xi1i hxi2, xi3i · · ·
+Xi admissible |hv, xi1i|
+Yk=2 kxik k
+
+2p−1
+
+(cid:10)
+
+(cid:12)(cid:12)(cid:10)
+
+xi2p, v
+
+xi2p, v
+
+,
+
+(cid:11)
+
+(cid:11)(cid:12)(cid:12)
+
+≤
+
+using Cauchy-Schwarz. For every admissible sequence i there exists at least one partition π of
+{1, .., 2p} into p pairs (l, r) with l < r, such that the indices ik1 and ik2 are equal, whenever k1 and k2
+belong to the same pair. Let us denote the latter condition by i ∼ π. It is easy to show by induction
+that there are (2p − 1)!! such partitions into pairs. Given π we can write {1, . . . , 2p} = Lπ ∪ Rπ,
+where Lπ = {l : ∃ (l, r) ∈ π} and Rπ = {r : ∃ (l, r) ∈ π}. We always have 1 ∈ Lπ and 2p ∈ Rπ and
+|Lπ| = |Rπ| = p. Thus
+
+hE [Qpw] v, vi ≤
+
+2p−1
+
+Xπ Xi∼π |hv, xi1i|
+|hv, xi1 i|
+
+
+
+Xπ Xi∼π 
+Xπ Xi∼π hv, xi1i
+
+2p−1
+
+xi2p, v
+
+Yk=2 kxik k
+(cid:12)(cid:12)(cid:10)
+(cid:11)(cid:12)(cid:12)
+Yk=2,ik∈Lπ kxik k
+Yk=2,ik∈Lπ kxik k
+
+2p−1
+
+2 .
+
+
+
+2
+
+=
+
+≤
+
+2p−1
+
+xi2p, v
+
+Yk=2,ik∈Rπ kxik k
+
+
+
+(cid:11)(cid:12)(cid:12)
+
+
+(cid:12)(cid:12)(cid:10)
+
+The last step follows from the Cauchy-Schwarz inequality and realizing that the two resulting
+factors are equal by symmetry. But for i ∼ π we just need to sum over the indices in Lπ, the others
+
+15
+
+
+being constrained to be equal. Thus, writing Lπ = {l1, . . . , lp} such that l1 = 1 the last expression
+above is just
+
+p
+
+2
+
+2
+
+Yk=2 kxik k
+
+p−1
+
+n
+
+= (2p − 1)!!  
+
+n
+
+Xπ Xi1,...,ip hv, xi1i
+Xi=1 kxik
+Xi=1 kxik
+
+ 
+
+n
+
+= (2p − 1)!!
+
+2
+
+2
+
+!
+
+!
+
+p−1
+
+Qxiv, v+
+
+*
+
+Xi=1
+hE [QV ] v, vi .
+
+The conclusion follows since for symmetric matrices (∀v, hAv, vi ≤ hB, v, vi) =⇒ A (cid:22) B.
+Proof of Theorem A.2. We have
+
+RI (Wtr, x) = 1
+
+N E sup
+
+W ∈Wtr
+
+ǫti hwt, xii = 1
+
+N E sup
+
+W ∈Wtr
+
+tr(W ∗D),
+
+Xt Xi∈It
+where the random operator D : H → RT is deﬁned for v ∈ H by (Dv)t =
+inequality gives
+
+v,
+
+i∈It ǫtixi
+
+. H¨older’s
+
+(cid:10)
+
+P
+
+(cid:11)
+
+We proceed to bound E kDk∞. Let Vt be the random vector Vt =
+corresponding rank-one operator QVt is deﬁned by QVtv = hv, Vti Vt =
+P
+T
+Then D∗D =
+t=1 QVt, so by Jensen’s inequality
+
+nti∈It ǫtixi and recall that the
+nti∈It ǫtixi.
+
+nti∈It ǫtixi
+
+v,
+
+(cid:10)
+
+P
+
+(cid:11) P
+
+RI (Wtr, x) ≤
+
+B√T
+N E kDk∞ .
+
+P
+
+E
+
+E kDk∞ ≤ vuut
+
+.
+
+∞
+
+QVt(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xt
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+The range of any of the realizations of QVt lies in the span of the xi which has less than N . By
+Lemma A.4 we have with αt =
+
+2
+
+P
+E [(QV t)m] (cid:22) (2p − 1)!!αm−1
+
+t
+
+2 maxt αt
+
+m−1 E [QVt] ,
+
+(cid:17)
+so Theorem A.3 with R = 2 maxt αt and d = N now gives
+
+(cid:16)
+
+i∈It kxik
+E [QVt] (cid:22) m!
+
+E
+
+vuut
+
+QVt(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xt
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+∞ ≤
+
+2 maxt αt (ln N + 1) + vuut
+
+q
+
+E
+
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xt
+
+.
+
+∞
+
+QVt(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+16
+
+
+But E [QVt] =
+
+i∈It Qxi = |It| ˆCt, so
+
+P
+
+RI (Wtr, x) ≤
+
+B√T
+N E kDk∞ ≤
+
+B√T
+
+E
+
+Xt
+
+QVt(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+N vuut
+(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+|It| tr( ˆCt) (ln N + 1) + vuut
+
+∞
+
+B
+N r
+
+≤
+
+2T maxt
+
+T (cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+Xt
+
+.
+
+∞
+
+|It| ˆCt(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+A.3 Nonlinear Compositions
+
+For the statement of a general version of Theorem 3.3 we extend the deﬁnition of θmc and θmt by
+setting for any map I : {1, . . . , T } → 2{1,...,N }
+
+θI = inf
+
+θ : ∀ (a1, . . . , aN ) , ai ≥ 0,
+(
+
+T
+
+Xt=1 Xi∈It
+
+ai ≤ θ2
+
+N
+
+Xi=1
+
+.
+
+ai)
+
+This deﬁnition coincides with the previous one in the case of multi-task and 1-vs-all multi-category
+learning.
+
+Theorem A.5 There are universal constants c1 and c2 such that under the above conditions
+
+RI (Vφ (W2,∞) , x) ≤ Lφab∞θI 
+
+
+RI (Vφ (W2,2) , x) ≤ Lφab2θI 
+
+RI (Vφ (W2,1) , x) ≤ Lφab1θI 
+
+
+c1Ks
+
+tr( ˆC)
+nT + c2s
+
+Kλmax( ˆC)
+n
+
+K tr( ˆC)
+nT
+
+c1s
+
+λmax
+
+ˆC
+(cid:16)
+n
+
+
+
+(cid:17)
+
++ c2vuut
+
+2tr( ˆC) + 8λmax( ˆC) ln K
+nT
+
+c1s
+
+
+
+
+
+
++ c2s
+
+λmax( ˆC)
+
+.
+
+n 
+
+
+
+The proof uses the following recent result on the expected suprema of Gaussian processes [18].
+
+For a set Y ⊆ Rm the Gaussian width G (Y ) is deﬁned as
+
+G (Y ) = E sup
+
+y∈Y hγ, yi = E sup
+
+y∈Y
+
+γiyi,
+
+m
+
+Xi=1
+
+where γ = (γ1, . . . , γm) is a vector of independent standard normal variables.
+
+17
+
+
+Theorem A.6 Let Y ⊆ Rn have (Euclidean) diameter D (Y ) and let F be a class of functions f : Y →
+Rm, all of which have Lipschitz constant at most L (F). Let F (Y ) = {f (y) : f ∈ F, y ∈ Y }. Then for
+any y0 ∈ Y
+
+G (F (Y )) ≤ c1L (F) G (Y ) + c2W (Y ) Q (F) + G (F (y0)) ,
+
+(7)
+
+where c1 and c2 are universal constants and
+
+Q (F) =
+
+sup
+y,y′∈Y, y6=y′
+
+E sup
+f ∈F
+
+hγ, f (y) − f (y′)i
+ky − y′
+
+k
+
+.
+
+Proof of Theorem 3.3. We will use Theorem A.6 by setting
+
+Y =
+
+W x = (hwk, xii)k≤K, i≤N : W ∈ Wo ⊆ RKN
+
+n
+
+where W will be either W2,∞, W 2,2 or W2,1. For F we take the set of functions
+
+(yki) ∈ RKN
+
+(
+
+7→ (hvt, φ (yi)i)t≤T,i∈It ∈
+
+R|It| : v ∈ V)
+
+T
+
+Yt=1
+
+restricted to Y . By a well known bound on Rademacher averages in terms of Gaussian averages
+[14]
+
+E
+
+sup
+
+W ∈V,W ∈W Xt Xi∈It
+
+ǫtiV φ (W xi) ≤ r
+
+π
+2 E
+
+sup
+
+γtiV φ (W xi)
+
+W ∈V,W ∈W Xt Xi∈It
+
+π
+2 G (F (Y )) .
+
+=
+
+r
+
+(8)
+
+To bound G (F (Y )) we then just need to bound the terms in the right hand side of equation (7)
+Since φ (0) = 0, we can at once set G (F (y0)) = 0, by setting 0 = y0, so f (0) = 0 for all f ∈ F.
+
+Bounding the Lipschitz constant. For any v ∈ V and y, y′
+
+∈ Y ⊆ RKN ,
+
+hvt, φ (yi)i −
+
+vt, φ
+
+y′i
+
+2
+
+(cid:10)
+
+(cid:0)
+
+(cid:1)(cid:11)(cid:1)
+
+Xt,i∈It (cid:0)
+
+2
+
+Xt kvtk
+≤
+≤ a2L2φ
+
+Xi∈It (cid:13)(cid:13)
+Xt Xi∈It (cid:13)(cid:13)
+
+φ (yi) − φ
+yi − y′i
+
+2
+
+2
+
+y′i
+
+(cid:1)(cid:13)(cid:13)
+(cid:0)
+≤ a2L2φθ2I
+
+(cid:13)(cid:13)
+
+2 ,
+
+y − y′
+(cid:13)(cid:13)
+
+(cid:13)(cid:13)
+
+so L (F) ≤ aLφθI .
+
+18
+
+
+Bounding Q (F). Again with y, y′
+γ, f (y) − f
+
+E sup
+f ∈F
+
+y′
+
+∈ Y
+
+(cid:10)
+= E sup
+
+v∈V Xti
+
+γti
+
+(cid:0)
+
+(cid:1)(cid:11)
+hvt, φ (yi)i −
+(cid:0)
+
+vt, φ
+
+y′i
+
+= E sup
+
+vt,
+
+γti
+
+φ (yi) − φ
+
+v∈V Xt *
+
+Xi∈It
+
+(cid:0)
+
+(cid:0)
+
+(cid:1)(cid:11)(cid:1)
+
+y′i
+
+(cid:0)
+2
+
+(cid:1)(cid:1)+
+
+1/2
+
+(cid:10)
+
+y′i
+
+(cid:1)(cid:1)(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+1/2
+
+(cid:0)
+
+2
+
+≤ aE
+
+Xt (cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+≤ aLφ√T
+
+γti
+
+φ (yi) − φ
+(cid:0)
+
+Xi∈It
+
+yi − y′i
+
+ Xt Xi∈It (cid:13)(cid:13)
+
+!
+
+(cid:13)(cid:13)
+
+≤ √T a 
+
+Xt
+≤ aLφθI √T
+
+E (cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+,
+
+y − y′
+(cid:13)(cid:13)
+
+(cid:13)(cid:13)
+
+γti
+
+φ (yi) − φ
+
+Xi∈It
+
+(cid:0)
+
+y′i
+
+(cid:0)
+
+
+
+
+
+(cid:1)(cid:1)(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+so Q (F) ≤ aLφθI √T .
+Bounding the diameters. We have
+
+2
+
+s
+
+sup
+
+sup
+
+D (Wx) ≤ 2
+
+W Xki hwk, xii
+W Xk kwkk
+From kW k2,2 ≤ kW k2,1 and kW k2,2 ≤ √K kW k2,∞ we obtain
+
+2 = vuut
+W Xk kwkk
+2 N λmax( ˆC) = kW k2,2
+
+≤ s
+
+sup
+
+q
+
+2
+
+, xi
+
+(cid:29)
+
+wk
+kwkk
+Xi (cid:28)
+N λmax( ˆC).
+
+D (W2,∞) ≤ b∞
+
+KN λmax( ˆC), and both D (W2,2) , D (W2,1) ≤ b2
+
+N λmax( ˆC).
+
+q
+
+Bounding the Gaussian width.
+
+G (W2,∞x) = E sup
+
+W ∈W∞
+
+wk,
+
+Xk *
+
+Xi≤N
+
+γkixi+
+
+= b∞
+
+Xk
+
+Xi≤N
+
+N tr( ˆC).
+
+≤ b∞K
+
+q
+
+similarly
+
+q
+
+γkixi(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+2
+
+E (cid:13)(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+E (cid:13)(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+W ∈W2
+
+G (W2,2x) = E sup
+
+Xk *wk,
+The Gaussian width of W1x is a little more complicated. Let W
+mations W
+
+γkixi+ = b2vuuutXk
+
+be the class of linear transfor1 = {x 7→ (0, . . . , hw, xi , . . . , 0) : kwk ≤ b1}, where only the k-th coordinate is different
+
+γkixi(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)(cid:13)
+
+KN tr( ˆC).
+
+≤ b∞
+
+Xi≤N
+
+Xi≤N
+
+(k)
+1
+
+q
+
+(k)
+
+19
+
+
+from zero. Then W1x is the convex hull of W
+that
+
+(1)
+
+1 x ∪ · · · ∪ W
+
+(K)
+1 x. It follows from Lemma 2 in [19]
+
+G (W2,1x) ≤ maxk G
+
+2 ln K
+
+(k)
+1 x
+(cid:17)
+
++ 2
+
+sXk,i hwk, xii
+
+(cid:16)W
+N tr( ˆC) + 2vuutXk kwkk
+
+N tr( ˆC) + 2b1
+
+2
+
+Xi (cid:28)
+N λmax( ˆC) ln K
+
+q
+
+2N
+
+tr( ˆC) + 8λmax
+(cid:16)
+
+ˆC
+(cid:16)
+
+(cid:17)
+
+ln K
+
+.
+
+(cid:17)
+
+≤ b1
+
+≤ b1
+≤ b1
+
+q
+
+q
+
+r
+
+wk
+kwkk
+
+2
+
+(cid:29)
+
+, xi
+
+ln K
+
+Collecting these bounds in Theorem A.6 and using (8) gives the three inequalities of Theorem 3.3.
+
+References
+
+[1] Y. Amit, M. Fink, N. Srebro, and S. Ullman. Uncovering shared structures in multiclass classiﬁcation. In Proceedings of the 24th international conference on Machine learning, pages 17–24,
+2007.
+
+[2] R. K. Ando and T. Zhang. A framework for learning predictive structures from multiple tasks
+
+and unlabeled data. Journal of Machine Learning Research, 6, 1817–1853, 2005.
+
+[3] M. Anthony and P. L. Bartlett. Neural network learning: Theoretical foundations. Cambridge
+
+University Press, 1999.
+
+[4] P. L. Bartlett and S. Mendelson. Rademacher and Gaussian Complexities: Risk bounds and
+
+structural results. Journal of Machine Learning Research, 3:463–482, 2002.
+
+[5] J. Baxter. A model of inductive bias learning. Journal of Artiﬁcial Intelligence Research, 12:149–
+
+[6] S. Boucheron, G. Lugosi, and P. Massart. Concentration Inequalities, Oxford University Press,
+
+198, 2000.
+
+2013
+
+[7] G. Cavallanti, N. Cesa-Bianchi, and C. Gentile. Linear algorithms for online multitask classiﬁ
+cation. Journal of Machine Learning Research, 11:2597–2630, 2010.
+
+[8] K. Crammer and Y. Singer. On the algorithmic implementation of multiclass kernel-based
+
+vector machines. Journal of Machine Learning Research, 2, 265–292, 2002
+
+20
+
+
+[9] R. Girshick, J. Donahue, T. Darrell, and J. Malik. Rich feature hierarchies for accurate object
+detection and semantic segmentation. In Proceedings of the 2014 Conference on Computer
+Vision and Pattern Recognition, pages 580–587, 2014.
+
+[10] S. Haykin. Neural Networks: A Comprehensive Foundation. Prentice-Hall, 1999.
+
+[11] S. M. Kakade, S. Shalev-Shwartz, A. Tewari. Regularization techniques for learning with ma
+trices. Journal of Machine Learning Research 13:1865–1890, 2012.
+
+[12] V. Koltchinskii and D. Panchenko. Empirical margin distributions and bounding the general
+ization error of combined classiﬁers. Annals of Statistics, 30(1):1–50, 2002.
+
+[13] Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner. Gradient-based learning applied to document
+
+recognition. Proceedings of the IEEE, 86(11):2278–2324, 1998
+
+[14] M. Ledoux, M. Talagrand. Probability in Banach Spaces: Isoperimetry and Processes. Springer,
+
+Berlin, 1991.
+
+[15] Y. Lei, U., Dogan, A. Binder, and M. Kloft. Multi-class SVMs: From tighter data-dependent
+generalization bounds to novel algorithms. In Advances in Neural Information Processing Systems, pages 2026–2034, 2015.
+
+[16] A. Maurer. Bounds for linear multi-task learning. Journal of Machine Learning Research,
+
+7:117–139, 2006.
+
+[17] A. Maurer, and M. Pontil. Excess risk bounds for multitask learning with trace norm regularization. In Proceeding of the 26th Annual Conference on Learning Theory, pages 55–76, 2013.
+
+[18] A. Maurer. A chain rule for the expected suprema of Gaussian processes. In Proceedings of the
+
+25th International Conference on Algorithmic Learning Theory, pages 245–259, 2014
+
+[19] A. Maurer, M. Pontil, and B. Romera-Paredes. An inequality with applications to structured
+sparsity and multitask dictionary learning. In Proceedings of the 27th Conference on Learning
+Theory, pages 440–460, 2014.
+
+[20] A. Maurer, M. Pontil, and B. Romera-Paredes. The beneﬁt of multitask representation learning.
+
+arXiv preprint arXiv:1505.06279.
+
+[21] A. Maurer. A vector-contraction inequality for Rademacher complexities. arXiv preprint
+
+arXiv:1605.00251.
+
+[22] R. Meir and T. Zhang. Generalization error bounds for Bayesian mixture algorithms. Journal
+
+of Machine Learning Research, 4:839–860, 2003.
+
+[23] Y. Mroueh, T., Poggio, R. Rosasco, and J. Slotine. Multiclass learning with simplex coding. In
+
+Advances in Neural Information Processing Systems, pages 2789–2797, 2012.
+
+[24] B. Neyshabur, R. Tomioka, and N. Srebro. Norm-based capacity control in neural networks.
+
+In Proceedings of the 28th Conference on Learning Theory, pages 1376–1401, 2015.
+
+21
+
+
+[25] D. Slepian. The one-sided barrier problem for Gaussian noise. Bell System Tech. J., 41:463–
+
+501, 1962.
+
+[26] N. Srebro and A. Shraibman. Rank, trace-norm and max-norm.
+Annual Conference on Learning Theory, pages 545–560, 2005.
+
+In Proceedings of the 18th
+
+22
+
+

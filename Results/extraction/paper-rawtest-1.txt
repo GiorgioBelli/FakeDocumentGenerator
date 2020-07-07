@@ -1,5 +1,18 @@
 PAPER PATH: ../datasets/downloaded/1803.10311v2.How_Developers_Iterate_on_Machine_Learning_Workflows_A_Survey_of_the_Applied_Machine_Learning_Literature.pdf
 
+
+================TABLE OF CONTENTS================
+65:	1 INTRODUCTION
+145:	2.2 Brief Overview of ML Workflows
+169:	2.3 Statistics Collection
+197:	2 DATA & METHODOLOGY
+201:	2.1 Corpus
+310:	3 RESULTS AND INSIGHTS
+314:	3.1 Iteration Count
+354:	3.5 System Desiderata
+563:	4 CONCLUSION AND FUTURE WORK
+613:	2017. The Trials and Tribulations of Working with Structured Data:-a Study on
+========================================
 ====================ABSTRACT====================
 
 ========================================
@@ -89,6 +102,89 @@ order of operations, to be elaborated in Section 2.4.
 
 ========================================
 ====================CONCLUSION====================
+4 CONCLUSION AND FUTURE WORK
+We conduct a statistical study on the iterative development process
+for ML applications in multiple domains. Our approach involves
+collecting carefully designed statistics from applied machine learning literature in order to reconstruct the iterative process that led to
+the results reported. We present our survey findings across domains
+and discuss desired ML system properties as suggested by the trends
+discovered from our survey data. The statistics and estimators described in our work can be further developed into a benchmark
+for systems specifically designed to address human-in-the-loop ML
+needs.
+
+
+REFERENCES
+[1] 2017. Machine Learning: The New Proving Ground for Competitive Advantage.
+https://s3.amazonaws.com/files.technologyreview.com/whitepapers/
+
+(2017).
+MITTR_GoogleforWork_Survey.pdf
+
+[2] 2017. Machine learning: the power and promise of computers that learn by example. (2017). https://royalsociety.org/~/media/policy/projects/machine-learning/
+publications/machine-learning-report.pdf
+
+[3] 2017. The State of Data Science and Machine Learning. (2017). https://www.
+
+kaggle.com/surveys/2017
+
+[4] Ashraf Abdul, Jo Vermeulen, Danding Wang, Brian Y Lim, and Mohan Kankanhalli. 2018. Trends and Trajectories for Explainable, Accountable and Intelligible
+Systems: An HCI Research Agenda. In Proceedings of the 2018 CHI Conference on
+Human Factors in Computing Systems. ACM, 582.
+
+[5] Ivan Bruha and A Famili. 2000. Postprocessing in machine learning and data
+
+mining. ACM SIGKDD Explorations Newsletter 2, 2, 110–114.
+
+[6] Pedro Domingos. 2012. A few useful things to know about machine learning.
+
+Commun. ACM 55, 10 (2012), 78–87.
+
+[7] M. I. Jordan and T. M. Mitchell. 2015. Machine learning: Trends, perspectives, and
+prospects. Science 349 (2015), 255–260. http://science.sciencemag.org/content/
+349/6245/255
+
+[8] Mary Beth Kery, Amber Horvath, and Brad Myers. 2017. Variolite: Supporting
+Exploratory Programming by Data Scientists. In Proceedings of the 2017 CHI
+Conference on Human Factors in Computing Systems. ACM, 1265–1276.
+
+[9] John King and Roger Magoulas. 2016. Data science salary survey: tools, trends,
+
+what pays (and what doesn’t) for data professionals. (2016).
+
+[10] Laura M Koesten, Emilia Kacprzak, Jenifer FA Tennison, and Elena Simperl.
+2017. The Trials and Tribulations of Working with Structured Data:-a Study on
+Information Seeking Behaviour. In Proceedings of the 2017 CHI Conference on
+Human Factors in Computing Systems. ACM, 1277–1289.
+
+[11] Yong Liu, Jorge Goncalves, Denzil Ferreira, Bei Xiao, Simo Hosio, and Vassilis
+Kostakos. 2014. CHI 1994-2013: mapping two decades of intellectual progress
+through co-word analysis. In proceedings of the SIGCHI conference on human
+factors in computing systems. ACM, 3553–3562.
+
+[12] M Arthur Munson. 2012. A study on the importance of and time spent on different
+modeling steps. ACM SIGKDD Explorations Newsletter 13, 2 (2012), 65–71.
+[13] Anton J Nederhof. 1985. Methods of coping with social desirability bias: A review.
+
+European journal of social psychology 15, 3 (1985), 263–280.
+
+[14] Junfei Qiu, Qihui Wu, Guoru Ding, Yuhua Xu, and Shuo Feng. 2016. A survey
+of machine learning for big data processing. EURASIP Journal on Advances in
+Signal Processing 2016, 1 (2016), 67.
+
+[15] Carlton E. Sapp. 2017. Preparing and Architecting for Machine Learning. (2017).
+[16] Manasi Vartak, Pablo Ortiz, Kathryn Siegel, Harihar Subramanyam, Samuel
+Madden, and Matei Zaharia. 2015. Supporting fast iteration in model building. In
+NIPS Workshop LearningSys.
+
+[17] Doris Xin et al. 2018. Helix: Holistic Optimization for Accelerating Iterative
+Machine Learning. Technical Report http://data-people.cs.illinois.edu/helix-tr.pdf
+(2018).
+
+[18] Martin Zinkevich. 2017. Rules of Machine Learning: Best Practices for ML
+
+Engineering. (2017).
+
+
 
 ========================================
 ====================COMPLETE TEXT====================
