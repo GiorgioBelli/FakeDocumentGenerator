@@ -14,10 +14,11 @@ from queue import Queue
 
 import itertools as it
 
-cso_nt_path = "C:\\Users\\GIORGIO-DESKTOP\\Desktop\\CSO.3.1.12.nt"
+cso_nt_path = "..\\datasets\\CSO.3.1.12.nt"
 
-g = Graph()
-g.parse(cso_nt_path, format="nt")
+# g = Graph()
+# g.parse(cso_nt_path, format="nt")
+g = None
 
 CSO_SUPER_TOPIC = URIRef("http://cso.kmi.open.ac.uk/schema/cso#superTopicOf")
 
