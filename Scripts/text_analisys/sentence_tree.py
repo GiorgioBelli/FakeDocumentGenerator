@@ -295,10 +295,21 @@ def main(args):
 
     repo_extr = RepositoryExtractor(path)
 
-    repo_extr.extract(limit=5)
-    
+
+    if(args.mp):
+        print("starting extraction... ",end="")
+        workers = None if args.mp == "all" else int(args.mp)
+        failed = repo_extr.extractMP(processes=workers)
+        print("\t[done] [{} fails]".format(failed))
+    else: 
+        repo_extr.extract()
+
+
     if(csv_dir):
+        print("starting csv creation... ",end="")
         repo_extr.exportSections(csv_dir,sections=PaperSections.as_list())
+        print("\t[done]")
+
 
     for i,p in enumerate(repo_extr.papers):
         p.extract_sections()
@@ -491,6 +502,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--csv-dir",
         help="specify repository where export extracted csv",
+        default=None,
+    )
+
+    parser.add_argument(
+        "--mp",
+        help="start process on NUM multiple cpus",
         default=None,
     )
     

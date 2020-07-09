@@ -17,6 +17,9 @@ from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfparser import PDFSyntaxError
 
+import multiprocessing as mp
+import psutil
+
 
 knownTitles = ["ABSTRACT","Abstract","introduction","Introduction", "INTRODUCTION","Conclusion","conclusion", "contents","Contents", "CONTENTS","Preliminaries", "Related Works","Related Work", "References"]
 
@@ -262,15 +265,15 @@ class RepositoryExtractor():
         self.repo_path = path 
         self.papers = []
         self.log_path = log_path
-        l = []
+        self.file_num = -1
         
     
     def extract(self,limit=None):
         dir_files = os.listdir(self.repo_path)
-        file_num = len(dir_files)
+        self.file_num = len(dir_files)
         failed_files = []
         failed = 0
-        printProgressBar(0,file_num,prefix="Extracting txt",suffix="---",length=50)
+        printProgressBar(0,self.file_num,prefix="Extracting txt",suffix="---",length=50)
         for idx,file in enumerate(dir_files):
             if(limit and idx > limit): break
             if(not file.endswith(".pdf")): continue
@@ -282,15 +285,43 @@ class RepositoryExtractor():
                 failed += 1
                 pass
             self.papers.append(p)
-            printProgressBar(idx+1,file_num,prefix="Extracting txt [{}/{}]".format(idx+1,file_num),suffix=file[:20]+"[{} failed]".format(failed)+"   ",length=50)
+            printProgressBar(idx+1,self.file_num,prefix="Extracting txt [{}/{}]".format(idx+1,self.file_num),suffix=file[:20]+"[{} failed]".format(failed)+"   ",length=50)
         print()
 
-        if failed_files:
-            with open(self.log_path,"wb") as log_out:
-                log_text = "\n".join(failed_files)
-                log_out.write(log_text.encode("utf-8"))
+    def extractMP(self,limit=None,processes=None):
+        dir_files = [f for f in os.listdir(self.repo_path) if f.endswith(".pdf")]
+        self.file_num = len(dir_files)
+        failed_files = []
+        failed = 0
+
         
-        return (self.papers,failed_files)
+        if(limit): inputs = list(enumerate(dir_files[:limit]))
+        else: inputs = list(enumerate(dir_files))
+
+
+        with mp.Pool(processes=processes) as pool:
+            results = pool.starmap(self.extractSingle,inputs)
+        for paper in results:
+            if(paper): self.papers.append(paper)
+            else: failed+=1
+        return failed
+
+
+    def extractSingle(self,idx,file,print_mod=10):
+        if(not file.endswith(".pdf")): return None
+        full_path = os.path.join(self.repo_path, file)
+
+        try:
+            p = RawPaper.fromPdf(path=full_path)
+        except PDFSyntaxError as e:
+            return None
+        
+        if(psutil.Process().cpu_num() == 0):
+            printProgressBar(idx+1,self.file_num,prefix="Extracting txt ~[{}/{}]".format(idx+1,self.file_num),suffix="",length=50)
+
+
+        return p
+
 
     def export(self,csv_path,section=PaperSections.PAPER_INTRO, type=RepoExportTypes.TYPE_CSV, remove_word_wrap=True):
         with open(csv_path,"wb") as csv_out:
