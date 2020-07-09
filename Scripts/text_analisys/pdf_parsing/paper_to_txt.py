@@ -85,6 +85,13 @@ class RawPaper():
             PaperSections.PAPER_CORPUS : "",
             PaperSections.PAPER_CONCLUSION : ""
         }
+
+    def fromSections(sections):
+        full_text = "\n".join([sections[k] for k in sections.keys()])
+        rp = RawPaper(text=full_text)
+        for section in PaperSections.as_list():
+            rp.sections_dict[section] = sections[section]
+        return rp
     
     def fromPdf(path=""):
         # print("processing",path.split("\\")[-1],end="")
@@ -116,6 +123,9 @@ class RawPaper():
             
             text +="="*20+"COMPLETE TEXT"+"="*20+"\n"
             text += self.full_text
+
+            text = removeEOL(pdf_to_txt(self.path))
+
             fout.write((text).encode('utf-8'))
 
     def extract_content_table(self):
@@ -266,8 +276,7 @@ class RepositoryExtractor():
         self.papers = []
         self.log_path = log_path
         self.file_num = -1
-        
-    
+
     def extract(self,limit=None):
         dir_files = os.listdir(self.repo_path)
         self.file_num = len(dir_files)
@@ -290,7 +299,6 @@ class RepositoryExtractor():
 
     def extractMP(self,limit=None,processes=None):
         dir_files = [f for f in os.listdir(self.repo_path) if f.endswith(".pdf")]
-        self.file_num = len(dir_files)
         failed_files = []
         failed = 0
 
@@ -298,14 +306,16 @@ class RepositoryExtractor():
         if(limit): inputs = list(enumerate(dir_files[:limit]))
         else: inputs = list(enumerate(dir_files))
 
+        self.file_num = len(inputs)
 
         with mp.Pool(processes=processes) as pool:
             results = pool.starmap(self.extractSingle,inputs)
         for paper in results:
             if(paper): self.papers.append(paper)
             else: failed+=1
-        return failed
 
+        printProgressBar(self.file_num,self.file_num,prefix="Extracting txt ~[{}/{}]".format(self.file_num,self.file_num),suffix="completed",length=50)
+        return failed
 
     def extractSingle(self,idx,file,print_mod=10):
         if(not file.endswith(".pdf")): return None
@@ -322,7 +332,6 @@ class RepositoryExtractor():
 
         return p
 
-
     def export(self,csv_path,section=PaperSections.PAPER_INTRO, type=RepoExportTypes.TYPE_CSV, remove_word_wrap=True):
         with open(csv_path,"wb") as csv_out:
             csv_text = "\f\n".join([removeEOL(x.sections_dict[section]) for x in self.papers])
@@ -336,15 +345,15 @@ class RepositoryExtractor():
 
 
 if __name__ == "__main__":
-    path = "C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\Tesi\\datasets\\downloaded_papers\\"
+    path = "../datasets/downloaded_test/"
 
-    csv_path = "C:\\Users\\GIORGIO-DESKTOP\\Desktop\\intros_oop.csv"
+    csv_path = "../Results/extraction/"
 
     repo = RepositoryExtractor(path)
 
     repo.extract()
-    repo.export(csv_path)
+    repo.exportSections(csv_path)
     for i,p in enumerate(repo.papers):
         p.extract_sections()
-        p.dump(outPath="./paper-%s.txt"%i)
+        p.dump(outPath="../Results/extraction/paper-%s.txt"%i)
         

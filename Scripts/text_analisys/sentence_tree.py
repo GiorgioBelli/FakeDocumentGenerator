@@ -262,6 +262,10 @@ class Repository():
                         paper.jcMatrix[tp] = (tpp,jc)
         return paper.jcMatrix
         
+def load_csv(path):
+    with open(path, "r") as f:
+        rows = f.read().split("\f\n")
+    return rows
 
 def main(args):
 
@@ -276,47 +280,66 @@ def main(args):
     
     # csv_path = "C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\FakeDocumentGenerator\\datasets\\arxiv\\4500_summaries_trainingSet.csv"
     # csv_path = "C:\\Users\\GIORGIO-DESKTOP\\Desktop\\intros.csv"
-    csv_path = "../datasets/intros.csv"
-    dataset = pandas.read_csv(csv_path, delimiter = '\f\n', engine="python")
+    csv_datasets_dir = "../Results/extractionMP/"
+    # abstract_csv = pandas.read_csv(os.path.join(csv_datasets_dir,"abstract.csv"), delimiter = '\f\n', engine="python")
+    # intro_csv = pandas.read_csv(os.path.join(csv_datasets_dir,"intro.csv"), delimiter = '\f\n', engine="python")
+    # corpus_csv = pandas.read_csv(os.path.join(csv_datasets_dir,"corpus.csv"), delimiter = '\f\n', engine="python")
+    # conclusion_csv = pandas.read_csv(os.path.join(csv_datasets_dir,"conclusion.csv"), delimiter = '\f\n', engine="python")
 
-    # print(dataset.head(5))
-    
-    # exit(0)
-    
-    
-    
-    # document_text = '''The intelligence community relies on human-machine-based analytic strategies that 1) access and integrate vast amounts of information from disparate sources, 2) continuously process this information, so that, 3) a maximally comprehensive understanding of world actors and their behaviors can be developed and updated. Herein we describe an approach to utilizing outcomes-based learning (OBL) to support these efforts that is based on an ontology of the cognitive processes performed by intelligence analysts.'''
-    # document_text = '''The close connection between reinforcement learning (RL) algorithms and dynamic programming algorithms has fueled research on RL within the machine learning community. Yet, despite increased theoretical understanding, RL algorithms remain applicable to simple tasks only. In this paper I use the abstract framework afforded by the connection to dynamic programming to discuss the scaling issues faced by RL researchers. I focus on learning agents that have to learn to solve multiple structured RL tasks in the same environment. I propose learning abstract environment models where the abstract actions represent “intentions” of achieving a particular state. Such models are variable temporal resolution models because in different parts of the state space the abstract actions span different number of time steps. The operational definitions of abstract actions can be learned incrementally using repeated experience at solving RL tasks. I prove that under certain conditions solutions to new RL tasks can be found by using simulated experience with abstract actions alone.'''
-    # document_text1 = '''A surfactant composition for agricultural chemicals containing fatty acid polyoxyalkylene alkyl ether expressed by the following formula (I): ABCD.'''
+    if csv_datasets_dir:
+        abstract_csv = load_csv(os.path.join(csv_datasets_dir,"abstract.csv"))
+        introduction_csv = load_csv(os.path.join(csv_datasets_dir,"introduction.csv"))
+        corpus_csv = load_csv(os.path.join(csv_datasets_dir,"corpus.csv"))
+        conclusion_csv = load_csv(os.path.join(csv_datasets_dir,"conclusion.csv"))
 
-    path = args.pdf_repo
+        # print(len(abstract_csv))
+        # print(len(introduction_csv))
+        # print(len(corpus_csv))
+        # print(len(conclusion_csv))
 
-    csv_dir = args.csv_dir
+        raw_papers = []
+        for idx in range(min(len(abstract_csv), len(introduction_csv), len(corpus_csv), len(conclusion_csv))):
+            sections = {
+                PaperSections.PAPER_ABSTRACT : abstract_csv[idx],
+                PaperSections.PAPER_INTRO : introduction_csv[idx],
+                PaperSections.PAPER_CORPUS : corpus_csv[idx],
+                PaperSections.PAPER_CONCLUSION : conclusion_csv[idx]
+            }
+            raw_papers.append(RawPaper.fromSections(sections))
 
-    repo_extr = RepositoryExtractor(path)
+    else: # read pdf repo and generate papers
+        path = args.pdf_repo
+
+        csv_dir = args.csv_dir
+
+        repo_extr = RepositoryExtractor(path)
+
+        limit = int(args.repo_limit) if args.repo_limit else None
+
+        if(args.mp):
+            print("starting extraction... ",end="")
+            workers = None if args.mp == "all" else int(args.mp)
+            failed = repo_extr.extractMP(limit=limit,processes=workers)
+            print("\t[done] [{} fails]".format(failed))
+        else: 
+            repo_extr.extract(limit=limit)
 
 
-    if(args.mp):
-        print("starting extraction... ",end="")
-        workers = None if args.mp == "all" else int(args.mp)
-        failed = repo_extr.extractMP(processes=workers)
-        print("\t[done] [{} fails]".format(failed))
-    else: 
-        repo_extr.extract()
+        if(csv_dir):
+            print("starting csv creation... ",end="")
+            repo_extr.exportSections(csv_dir,sections=PaperSections.as_list())
+            print("\t[done]")
 
 
-    if(csv_dir):
-        print("starting csv creation... ",end="")
-        repo_extr.exportSections(csv_dir,sections=PaperSections.as_list())
-        print("\t[done]")
+        for i,p in enumerate(repo_extr.papers):
+            p.extract_sections()
+            if(args.dump_raw_papers):
+                p.dump(outPath=os.path.join(args.dump_raw_papers,"paper-rawtest-%s.txt"%i))
 
+        raw_papers = repo_extr.papers
 
-    for i,p in enumerate(repo_extr.papers):
-        p.extract_sections()
-        if(args.dump_raw_papers):
-            p.dump(outPath=os.path.join(args.dump_raw_papers,"paper-rawtest-%s.txt"%i))
+    ## concepts extraction
 
-    raw_papers = repo_extr.papers
     paper_list = []
     paper_count = len(raw_papers)
     printProgressBar(0,paper_count,prefix="Creating papers [{},{}]".format(0,paper_count),suffix="",length=50)
@@ -328,17 +351,6 @@ def main(args):
     print("\ncreating repo...")
     repo = Repository(paper_list=paper_list)
 
-    
-    # paper_list = []
-    # paper_count = len(dataset['intros'])
-    # printProgressBar(0,paper_count,prefix="Creating papers [{},{}]".format(0,paper_count),suffix="",length=50)
-    # for i,entry in enumerate(dataset['intros']):
-    #     # if(i==100): break
-    #     paper_list.append(StructuredPaper(entry,entry,parser))
-    #     printProgressBar(i+1,paper_count,prefix="Creating papers [{},{}]".format(i+1,paper_count),suffix="",length=50)
-
-    # print("\ncreating repo...")
-    # repo = Repository(paper_list=paper_list)
     print()
 
     fake_paper_dump_file = args.fake_paper_dump
@@ -508,6 +520,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mp",
         help="start process on NUM multiple cpus",
+        default=None,
+    )
+
+    parser.add_argument(
+        "--repo-limit",
+        help="specify max paper from repo",
         default=None,
     )
     
