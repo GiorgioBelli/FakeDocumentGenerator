@@ -18,7 +18,7 @@ from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfparser import PDFSyntaxError
 
 
-knownTitles = ["Abstract","introduction","Introduction", "INTRODUCTION","Conclusion","conclusion", "contents","Contents", "CONTENTS","Preliminaries", "Related Works","Related Work", "References"]
+knownTitles = ["ABSTRACT","Abstract","introduction","Introduction", "INTRODUCTION","Conclusion","conclusion", "contents","Contents", "CONTENTS","Preliminaries", "Related Works","Related Work", "References"]
 
 def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
     """
@@ -60,11 +60,21 @@ class PaperSections():
     PAPER_CORPUS   = "corpus"
     PAPER_CONCLUSION = "conclusion"
 
+    @staticmethod
+    def as_list(): return [PaperSections.PAPER_ABSTRACT, PaperSections.PAPER_INTRO, PaperSections.PAPER_CORPUS, PaperSections.PAPER_CONCLUSION]
+
 class RawPaper():
     def __init__(self,text="",path=""):
         self.full_text = text #complete text
         self.path=path
         self.contents = [] #
+
+        self.sections_indexes= {
+            PaperSections.PAPER_ABSTRACT : (None,None),
+            PaperSections.PAPER_INTRO : (None,None),
+            PaperSections.PAPER_CORPUS : (None,None),
+            PaperSections.PAPER_CONCLUSION : (None,None)
+        }
         
         self.sections_dict = {
             PaperSections.PAPER_ABSTRACT : "",
@@ -77,8 +87,8 @@ class RawPaper():
         # print("processing",path.split("\\")[-1],end="")
         if(not path): raise Exception("Empty path is not valid")
         p = RawPaper(path=path)
-        p.text = re.sub(r'\f',"\n", pdf_to_txt(p.path))
-        p.text = removeWordWrap(p.text)
+        p.full_text = re.sub(r'\f',"\n", pdf_to_txt(p.path))
+        p.full_text = removeWordWrap(p.full_text)
         p.extract_content_table()
         p.extract_sections()
         
@@ -91,7 +101,10 @@ class RawPaper():
             text+= "PAPER PATH: {}\n\n".format(self.path)
 
             if(includeTableOfContents): text += "\n"+"="*16+"TABLE OF CONTENTS"+"="*16+"\n"+"\n".join([str(x[1])+":\t"+x[0] for x in self.contents])+"\n"+"="*40+"\n"
-            
+
+            text +="="*20+"SECTION INDEXES"+"="*20+"\n"
+            text += str(self.sections_indexes)+"\n"
+            text+="="*40+"\n"
             
             for sec in self.sections_dict.keys():
                 text +="="*20+sec.upper()+"="*20+"\n"
@@ -99,13 +112,12 @@ class RawPaper():
                 text+="="*40+"\n"
             
             text +="="*20+"COMPLETE TEXT"+"="*20+"\n"
-            text += self.text
+            text += self.full_text
             fout.write((text).encode('utf-8'))
 
-        
     def extract_content_table(self):
         lines = []
-        for idx,line in enumerate(self.text.split("\n")):
+        for idx,line in enumerate(self.full_text.split("\n")):
             if(RawPaper.isTitle(line,idx,self.contents)): lines.append((line,idx))
 
         hasContentTable = False
@@ -128,7 +140,7 @@ class RawPaper():
         notBeginEndsInPunctualization = bool(re.search(r'^[^,.=]{1}.*[^,.=]{1}$',string))
         hasMinLen = not len(string)<3
         hasMinLetters = bool(re.search(r'[a-zA-Z]{1}',string))
-        isAbstract = bool(re.search(r'^(Abstract|ABSTRACT)\. ',string))
+        isAbstract = bool(re.search(r'^(Abstract|ABSTRACT)(\. |\-|—)',string))
 
         isTitle = (hasMinLen and isTitleCase and hasMinLetters and (not RawPaper.isCitation(sentence)) and notBeginEndsInPunctualization) or isAbstract
         if((hasListEnum and isTitle) or (string in knownTitles) or (isAbstract)): contentsList.append((sentence,idx))
@@ -146,17 +158,19 @@ class RawPaper():
     def extract_abstract(self):
         abs_start_line = None
         abs_end_line = None
-        lines = self.text.split("\n")
+        lines = self.full_text.split("\n")
         
         for idx,c in enumerate(self.contents):
             sentence = c[0]
 
-            if(sentence.lower().endswith("abstract") or sentence.lower().startswith("abstract. ")): 
+            if(sentence.lower().endswith("abstract") or sentence.lower().startswith("abstract. ") or sentence.lower().startswith("abstract—") or sentence.lower().startswith("abstract-")):
                 abs_start_line = c[1]
                 abs_end_line = self.contents[idx+1][1]
                 break
 
         if(not abs_start_line or not abs_end_line): return ""
+
+        self.sections_indexes[PaperSections.PAPER_ABSTRACT] = (abs_start_line,abs_end_line)
 
         return "\n".join(lines[abs_start_line:abs_end_line])
 
@@ -165,7 +179,7 @@ class RawPaper():
         intro_start_line = -1
         intro_found = False
         
-        lines = self.text.split("\n")
+        lines = self.full_text.split("\n")
         
         for idx,c in enumerate(self.contents):
             sentence = c[0]
@@ -182,21 +196,41 @@ class RawPaper():
             elif(intro_found and hasListEnum and (sentence.startswith("I.") or sentence.startswith("1.") and (len(self.contents)-1-idx)>0 )):
                 intro_end_line = self.contents[idx+1][1]
             elif(intro_found): break
+
+        self.sections_indexes[PaperSections.PAPER_INTRO] = (intro_start_line,intro_end_line)
                 
         return "\n".join(lines[intro_start_line:intro_end_line])
+
+    def extract_corpus(self):
+        '''
+            asert that introduction and conclusion are already extracted
+        '''
+
+        if None in self.sections_indexes[PaperSections.PAPER_INTRO] or self.sections_indexes[PaperSections.PAPER_CONCLUSION][0] is None: 
+            raise Exception("Must extract introduction and conclusion before corpus")
+
+        corpus_start_line = self.sections_indexes[PaperSections.PAPER_INTRO][1]
+        corpus_end_line = self.sections_indexes[PaperSections.PAPER_CONCLUSION][0]
+
+        lines = self.full_text.split("\n")
+        
+        self.sections_indexes[PaperSections.PAPER_CORPUS] = (corpus_start_line,corpus_end_line)
+                
+        return "\n".join(lines[corpus_start_line:corpus_end_line])
 
     def extract_conclusion(self):
         conc_start_line = -1
         conc_found = False
         
-        lines = self.text.split("\n")
+        lines = self.full_text.split("\n")
         
         for idx,c in enumerate(self.contents):
             sentence = c[0]
 
             if(sentence.lower().endswith("conclusion") or sentence.lower().endswith("future work") or sentence.lower().endswith("conclusions")):
                 conc_start_line = c[1]
-                
+        
+        self.sections_indexes[PaperSections.PAPER_CONCLUSION] = (conc_start_line,None)     
                 
         return "\n".join(lines[conc_start_line:])
 
@@ -205,6 +239,7 @@ class RawPaper():
         self.sections_dict[PaperSections.PAPER_ABSTRACT] = self.extract_abstract()
         self.sections_dict[PaperSections.PAPER_INTRO] = self.extract_introduction()
         self.sections_dict[PaperSections.PAPER_CONCLUSION] = self.extract_conclusion()
+        self.sections_dict[PaperSections.PAPER_CORPUS] = self.extract_corpus()
 
         return self.sections_dict
 
@@ -248,6 +283,7 @@ class RepositoryExtractor():
                 pass
             self.papers.append(p)
             printProgressBar(idx+1,file_num,prefix="Extracting txt [{}/{}]".format(idx+1,file_num),suffix=file[:20]+"[{} failed]".format(failed)+"   ",length=50)
+        print()
 
         if failed_files:
             with open(self.log_path,"wb") as log_out:
@@ -261,6 +297,11 @@ class RepositoryExtractor():
             csv_text = "\f\n".join([removeEOL(x.sections_dict[section]) for x in self.papers])
             csv_text = removeWordWrap(csv_text)
             csv_out.write(csv_text.encode("utf-8"))
+
+    def exportSections(self,csv_dir,sections=PaperSections.as_list(),type=RepoExportTypes.TYPE_CSV, remove_word_wrap=True):
+        for section in sections:
+            path = os.path.join(csv_dir,section+".csv")
+            self.export(path,section=section)
 
 
 if __name__ == "__main__":

@@ -7,6 +7,9 @@ PAPER PATH: ../datasets/downloaded/2004.12076v2.Quantum_machine_learning_and_qua
 506:	4. Conclusions
 579:	References
 ========================================
+====================SECTION INDEXES====================
+{'abstract': (52, 72), 'introduction': (72, 506), 'corpus': (506, 506), 'conclusion': (506, None)}
+========================================
 ====================ABSTRACT====================
 Abstract. Quantum machine learning has emerged as an exciting and promising
 paradigm inside quantum technologies.

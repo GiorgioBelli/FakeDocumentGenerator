@@ -38,6 +38,9 @@ PAPER PATH: ../datasets/downloaded/2005.04176v1.In_Pursuit_of_Interpretable_Fair
 5396:	11.8 | RiskSLIM Tables
 6188:	11.9 | Features
 ========================================
+====================SECTION INDEXES====================
+{'abstract': (None, None), 'introduction': (207, 315), 'corpus': (315, 2089), 'conclusion': (2089, None)}
+========================================
 ====================ABSTRACT====================
 
 ========================================
@@ -152,6 +155,1779 @@ Section 10, we discuss broader impacts and future lines of inquiry.
 
 ========================================
 ====================CORPUS====================
+2 | CONTRIBUTION
+
+Our main contribution is a set of interpretable, risk-calibrated linear models that perform better than existing actuarial
+
+risk assessments, and predict speciﬁc crime types. Other important aspects of our contribution are as follows:
+
+• We consider multiple types of recidivism (general, violent, drug, property, felony, and misdemeanor) at two
+
+time scales (six-month, two-year) for a total of 12 prediction problems.
+
+• Our analysis was conducted on two criminal history data sets (one from Broward County, Florida, and the other
+from the state of Kentucky), which allowed us to understand variability in model performance across locations. We
+
+found that models do not generalize well between locations, and conclude that models should be trained on data
+
+from the location where they are meant to be used.
+
+• We discuss how our models satisfy fairness and interpretability criteria. To our knowledge, beyond the ﬁelds of fair
+and interpretable machine learning, there are few paper that discuss both fairness and interpretability with the
+
+same attention as predictive performance.
+
+•
+
+The risk models trained as part of this study are interpretable, and could potentially be useful in practice after a
+
+careful, location-speciﬁc evaluation of their accuracy and fairness.
+
+Similar to Zeng et al. [10], we use machine learning techniques optimized for interpretability, and address multiple
+
+prediction problems. This work is an improvement over that of Zeng et al. [10] in the following ways. We use inter
+pretable machine learning techniques to create risk scores representing probabilities of recidivism, rather than making
+
+binary predictions (the tools we use had not been not invented at the time of Zeng et al. [10]’s publication). We compare
+
+with COMPAS and the Arnold Public Safety Assessment (PSA), two models currently used in the justice system, whereas
+
+Zeng et al. [10] compared only with other machine learning methods. We use data obtained at the pretrial stage rather
+
+than at prison-release. Since many jurisdictions utilize prediction instruments to determine pretrial release, this better
+
+aligns with the use cases of risk scores. Our data come from two locations, and include more detailed information than
+
+in Zeng et al. [10], and are more recent than 1994. Finally, models are assessed for multiple deﬁnitions of fairness (in
+
+addition to performance).
+
+
+WANG & HAN ET AL.
+
+3 | BACKGROUND
+
+5
+
+Algorithmic risk assessment dates back to the early 1900s [18], and is used today at various stages of the criminal justice
+
+system, such as at pretrial, parole, probation, or even sentencing. In this work, we focus on forecasting recidivism at the
+
+pretrial stage. Though some states have implemented their own tools (Virginia, Pennsylvania, Kentucky), many utilize
+
+systems produced by companies, non-proﬁts and other organizations [19]. These externally-produced risk assessments
+
+and some of the jurisdictions that utilize them include COMPAS (Florida, Michigan, Wisconsin, Wyoming, New Mexico),
+the Public Safety Assessment (New Jersey, Arizona, Kentucky,2 Phoenix, Chicago, Houston), LSI-R (Delaware, Colorado,
+
+Hawaii), and the Ohio Risk Assessment System [20, 21, 22]. The United States is not alone in using actuarial risk
+
+assessments. Canada uses the Static-2002 to assess risk of violent and sexual recidivism [23]; the Netherlands uses the
+
+Quickscan to assess static and dynamic risks of recidivism [24]; the U.K. uses the Offender Group Reconviction Scale to
+
+predict reoffense while on probation [25].
+
+3.1 | The Debate over Risk Assessments
+
+Since the inception of actuarial risk assessments, there has been debate over whether they should be used in the
+
+criminal justice system at all. Proponents claim that statistical models reduce overall violence levels and ensure the
+
+most efﬁcient use of treatment and rehabilitative resources by helping judges identify the individuals that are truly
+
+dangerous. A large body of evidence appears to support this claim. Various studies have shown that statistical models
+
+are more accurate than human experts [26, 27]. Others have shown that a small percentage of individuals commit the
+
+majority of crimes [28, 29, 30], indicating that correctly identifying dangerous individuals could lead to substantial
+
+decreases in violence levels. Proponents also claim that risk assessments are instrumental to reducing racial/economic
+
+disparity, allocating social services, and reducing mass incarceration [31]. In particular, some jurisdictions have adopted
+
+risk assessments at the pretrial stage to replace cash bail, which is widely viewed as biased against poor defendants
+
+[32, 33].
+
+In practice, reducing overall violence levels, mass incarceration, and racial/economic disparity through actuarial risk
+
+assessment is complex. Critics have argued that as recidivism prediction models always rely on racially-biased features
+
+such as arrest records, actuarial risk assessment will only exacerbate racial and socioeconomic disparity, and should
+
+therefore be abolished [34, 35]. In a well-known incident, ProPublica claimed that COMPAS was biased against African
+Americans because there was a disparity in false positive rates and false negative rates between African-Americans and
+
+Caucasians [36]. Follow-up research showed that this bias was likely a property of the data generation process rather
+
+than the COMPAS model, and that even a model that only relied on age showed a similar disparity in false positives
+
+and false negatives [4]. Actuarial risk assessment might be vulnerable to feature bias, but it is important to remember
+
+that other parts of the court system (such as bail and sentencing guidelines for judges) are not immune to feature bias
+
+either—they also use criminal history and arrest records. Similarly, in one of the ﬁrst large-scale empirical studies,
+
+Stevenson [37] showed that in Kentucky, the use of the Arnold PSA seemingly increased disparity between whites and
+
+blacks at pretrial release. Because the risk scores were applied differently by judges in different counties, it seemed
+
+that white people beneﬁted more than black people in terms of pretrial release numbers—but within the same county,
+
+white and black defendants saw similar increases in release. Thus, rather than eliminating the use of risk scores, using
+
+them uniformly across counties may have made risk assessments more fair across the state.
+
+Others have argued that a fundamental ﬂaw with risk assessments is that their simple labels obscure the true
+
+uncertainty behind their predictions [7]. This may be true for currently used risk assessments, but merely underscores
+
+2Kentucky created and implemented their own tool in 2006 but transitioned to the Arnold PSA in 2013.
+
+
+6
+
+WANG & HAN ET AL.
+
+the necessity for researchers to develop models which do quantify uncertainty. While actuarial risk assessments are not
+
+perfect, we must remember that in the absence of risk assessments, judges can only rely on their intuition—and human
+
+intuition has been shown to be less reliable than statistical models [26, 27, 33, 38].
+
+Another problem is that some of the most widely used risk prediction algorithms are for-proﬁt and secret (e.g.,
+COMPAS 3), yielding concerns over due process rights. In the 2017 Wisconsin Supreme Court case, Loomis v. Wisconsin,
+
+Loomis challenged the use of the proprietary risk prediction software, COMPAS, on the grounds that this violated his
+
+due process and equal protection rights [3]. Yet today, there are plenty of equally accurate, transparent risk prediction
+
+tools that publish their guidelines and full models. See Table 4 in the Appendix for examples. In this article, we compare
+
+against the Arnold PSA, an interpretable and publicly available tool which is used in multiple jurisdictions.
+
+There is also a general fear that the use of risk assessments could lead to situations similar to those depicted in the
+
+movie, “Minority Report”. In Minority Report, individuals were punished before they committed a crime based on oracles’
+
+visions of the future. However, one of the major principles common to American criminal justice texts [40, 41] is that
+
+individuals should be punished based on the crimes they committed in the past. This illustrates why risk assessments
+
+have played only a minor role in sentencing. In reality, risk prediction tools are most heavily used in bail, parole, and
+
+social services decisions.
+
+Risk scores are no “magic bullet,” but abolishing risk assessment without a useful alternative plan will not solve the
+
+problems above either. Reducing feature bias requires generations of community investment; jurisdictions must train
+
+judges on how to use risk scores; and communities must provide treatment resources for those deemed high risk. Risk
+
+assessments and other evidence-driven practices can be an important part of this solution. In the most recent revision
+
+of the Model Penal Code, the American Law Institute has supported giving people shorter prison terms or sending them
+
+to the community through the use of risk assessment tools [42, 43]. By providing simple and transparent risk scores,
+
+we hope to mitigate the possibility that risk assessments are miscomputed, and enable judges and defendants to fully
+
+understand their scores.
+
+3.2 | Black-box and Interpretable Machine Learning for Predicting Criminal Recidivism
+
+There is an abundance of past research on using machine learning methods to predict criminal recidivism. However,
+
+many of these studies utilize black-box, non-interpretable models, and only optimize for predictive performance. For
+
+instance, Neuilly et al. [44] used random forests to predict homicide offender recidivism. Other black-box models
+
+applied to this problem include stochastic gradient boosting [45] and neural networks [46].
+
+In comparison, there is relatively little work using interpretable machine learning techniques to forecast recidivism.
+It is not even clear how interpretability should be deﬁned in this domain4. Berk et al. [47] used classical decision trees to
+
+build a simple screener for forecasting domestic violence for the Los Angeles Sheriff’s Department. In 2016, Goel et al.
+
+[48] created a simple scoring system by rounding logistic regression coefﬁcients, which helped address stop-and-frisk
+
+for the New York Police Department. Zeng et al. [10] was the ﬁrst work using modern machine learning methods that
+
+globally optimized over the space of sparse linear integer models to predict criminal recidivism. Despite the range of
+
+interpretable models that have been applied to the criminal recidivism problem, a common thread among these works is
+
+that simple, interpretable models can do just as well as black-box models, and better than humans. For instance, Angelino
+
+et al. [11] found that COMPAS shows no beneﬁt in accuracy over very simple machine learning models involving age
+
+3While COMPAS’ guidelines are published and validation studies have been performed, the full forms of the models are not available and some of the validation
+studies do not conform to standards of open science (i.e., the validation data is not publicly available [39], or the studies’ authors are afﬁliated with the
+
+corporations that produced the models.
+4See Section 7 for a discussion of what we consider interpretable for the domain of criminal recidivism prediction
+
+
+WANG & HAN ET AL.
+
+7
+
+and criminal history. Skeem et al. [38] showed that algorithms outperformed humans on predicting criminal recidivism
+
+in three data sets, and demonstrated that the performance gap was especially large when abundant risk factors were
+
+considered for risk prediction.
+
+The approaches outlined above achieved interpretability through training models with interpretable forms. Another
+
+major approach is post-hoc explainability, in which a simpler model provides insights into a black-box model. However,
+
+post-hoc explanations are notoriously unreliable, or are not thorough enough to fully explain the black-box model [49].
+
+Additionally, there seems to be no clear beneﬁt of black-box models over inherently interpretable models in terms of
+
+prediction accuracy on the criminal recidivism problem [10, 24]. Thus, for a high-stakes problem such as predicting
+
+criminal recidivism, we choose not to utilize these methods.
+
+In fact, there have been cases in criminal justice where post-hoc explanations led to incorrect conclusions and
+
+pervasive misconceptions about what information some of the most common recidivism models use. The 2016 COMPAS
+
+scandal—where ProPublica reporters accused the proprietary COMPAS risk scores of an explicit dependence on race
+
+[36]—was caused by a ﬂawed, post-hoc explanation of a black-box model. In particular, ProPublica reasoned that if
+
+a post-hoc explanation of COMPAS depended linearly on race, then COMPAS depended on race (controlling for age
+
+and criminal history). However, as Rudin et al. [4] demonstrated, just because an explanation model depends on a
+
+variable does not mean that the black box model depends on that variable. Thus, ProPublica’s reasoning was incorrect.
+
+In particular, this analysis found that COMPAS does not seem to depend linearly on some of its input variables (age),
+
+and does not seem to depend on race after conditioning on age and criminal history variables. Criminologists have also
+
+criticized the ProPublica work for other reasons [5]. Despite the ﬂaws in the ProPublica article, it is widely viewed as
+
+being a landmark paper on fairness in machine learning.
+
+A notable advantage of interpretable modelling for criminal justice is that some interpretable models allow a
+
+decision-maker to incorporate factors not in the database in a way that black-box models cannot. For instance, scoring
+
+systems (linear models with integer coefﬁcients) place all of the model inputs onto the same scale: every input receives
+
+a number of points. The points of each factor in the model provide clarity on how important each input is relative to the
+
+others.
+
+3.3 | Fair Machine Learning
+
+Fairness is a crucial property of risk scores. As such, the recidivism prediction problem is a key motivator for many of
+
+these works. However, recidivism prediction is rarely the primary focus of fairness papers. Many of these papers seek to
+
+make theoretical contributions by proposing deﬁnitions of fairness and creating algorithms to achieve these deﬁnitions,
+
+using recidivism prediction as a case study [50, 51]. Others have proven fairness impossibility theorems, showing
+
+when different fairness constraints cannot be achieved simultaneously. For instance, the two fairness deﬁnitions at the
+
+heart of the debate over COMPAS’ fairness (calibration and balance for positive/negative class) cannot be achieved
+simultaneously in nontrivial cases 5 [52, 53]. These theorems show that many fairness deﬁnitions directly conﬂict,
+
+so there cannot be a single universal deﬁnition of fairness [52, 54, 55]. Moreover, there is often a trade-off between
+
+performance and fairness [56, 57, 58]. The emerging consensus is that any decision about the “best” deﬁnition of
+
+fairness must rely heavily on model characteristics and domain-speciﬁc expertise.
+
+The question of what should count as fair in criminal recidivism prediction can be answered by discussion among
+
+ethicists, judges, legislators, and stakeholders in the criminal justice system. Existing American anti-discrimination law
+
+provides a general legal framework for addressing this question. Under Title VII of the Civil Rights Act of 1964, there are
+
+two theories of liability: disparate impact and disparate treatment [59]. In this article, we use the deﬁnitions of fairness
+
+5However, by placing relaxations on the conditions, the fairness deﬁnitions can be approximately satisﬁed simultaneously.
+
+
+8
+
+WANG & HAN ET AL.
+
+from the ﬁeld of fair machine learning, as they apply directly to machine learning models and are more speciﬁc than the
+
+general legal guidelines of disparate impact and treatment. Moreover, some of the deﬁnitions of fairness proposed by
+
+the ﬁeld of fair machine learning community are inspired by these guidelines. See Corbett-Davies and Goel [60] for a
+
+detailed discussion of the relationship between algorithmic deﬁnitions of fairness and economic/legal deﬁnitions of
+
+discrimination.
+
+4 | DATA
+
+In this study, we used criminal history data sets from Broward County, Florida, and the state of Kentucky, allowing us to
+
+analyze how models perform across regions. The Broward County data set consists of publicly available criminal history
+
+and court data from Broward County, Florida. This data set consists of the full criminal history, probational history,
+
+and demographic data for the 11,757 individuals who received COMPAS scores at the pretrial stage from 2013-2014
+
+(as released by ProPublica [36]). The probational history was computed from public criminal records released by the
+
+Broward Clerk’s Ofﬁce. Though the full data set includes 11,757 individuals, this analysis includes only the 1,954 for
+
+which we could also compute the PSA. We processed the Broward data using the same methods as Rudin et al. [4]. From
+
+the processed data, we computed various features such as number of prior arrests, prior charges, prior felonies, prior
+
+misdemeanors, etc.
+
+The Kentucky pretrial and criminal court data was provided by the Department of Shared Services, Research and
+
+Statistics in Kentucky. The data came from two systems: the Pretrial Services Information Management System (PRIM)
+
+and CourtNet. The PRIM data contain records regarding defendants, interviews, PRIM cases, bonds, etc., that were
+
+connected with the pretrial service interviews conducted between July 1, 2009 and June 30, 2018. The data from
+
+CourtNet provided further information about cases, charges, sentences, dispositions, etc. When constructing features
+
+from the Kentucky data set, we computed features that were as similar as possible to the Broward features (e.g., prior
+
+arrests, prior charges with different types of crimes, age at current charge) in order to compare models between the
+
+two regions. There are several features from Broward data which could not be computed from the Kentucky data, such
+
+as “age at ﬁrst offense” and “prior juvenile charges”. A limitation of the Kentucky data set is that the policies governing
+
+risk assessments changed over the period when the data was gathered, possibly impacting the consistency of the data
+
+collection.
+
+A difference in the data processing between the two data sets is that when constructing prediction features and
+
+predictive labels, we considered non-convicted charges in the Broward data, but considered convicted charges in the
+
+Kentucky data. The reason for this choice is sample size. The processed Broward data contains only 1,954 records, and
+
+limiting the scope to convicted charges would yield only 1,297 records. The use of convicted versus non-convicted
+
+charges between the two regions might explain some discrepancies in the results in Section 8, where we discuss the
+
+generalization of recidivism prediction models between states. Note that many models currently implemented within
+
+the justice system rely on non-convicted charges (for instance, counts of prior arrests), but for the applications such as
+
+bail and parole, the use of non-convicted charges could be problematic—it holds individuals accountable for crimes that
+
+they may not have committed. Please refer to the Appendix (Section 11) for more details on the data processing and a
+
+full list of features for both data sets.
+
+
+WANG & HAN ET AL.
+
+5 | METHODOLOGY
+
+9
+
+Throughout our analysis, we compare with two tools that are currently used to predict recidivism in the U.S. justice
+
+system: COMPAS (Correctional Offender Management Proﬁling for Alternative Sanctions) and the Arnold PSA (Public
+Safety Assessment, created by Arnold Ventures6). Although we would have liked to compare against more assessment
+
+tools, many of them use data that are not publicly available, or are owned by for-proﬁt companies that do not release
+
+their models. For a detailed discussion of the other risk assessments we considered and the features we were missing,
+
+please consult the Appendix (Section 11).
+
+More speciﬁcally, we compared our models against the Arnold PSA’s New Criminal Activity (NCA) and New Violent
+
+Criminal Activity (NVCA) scores on the general and violent recidivism problems, respectively. Note that the timeframes and labels for prediction are important here, and our choices distinguish this study from past works on recidivism
+
+prediction. Let us explain the time-frames next.
+
+It is important that we chose ﬁxed time-frames for prediction, in our case, two years or six months past the current
+
+charge dates. In reality, the scores are used to assess risks during the pretrial period. However, there is a huge amount
+
+of variation in pretrial periods, which can span a few days to a few years: the average pretrial time-span in Kentucky is
+
+109 days, and could last upwards of 3-4 years. Since the pretrial period depends on the jurisdiction, we chose to ﬁx
+
+time-spans (of six months and two years) so that the models do not depend on the policy used for determining how long
+
+the pretrial period would be. That way, the risk calculations we produce depend mainly on the inherent characteristics
+
+of the individual, rather than the length of the pretrial period (potentially a characteristic of the jurisdiction). Also, this
+
+way, individuals with the same propensity to commit a new crime within six months (or two years depending on which
+
+risk score) are given identical risk scores, even if they have different expected time periods until their respective trials.
+
+The six-month time-span represents an approximate length of pretrial period. The two-year time-span provides more
+
+balanced labels, since two years provides more time to commit crimes than six months. Additionally, our evaluation
+
+metric is AUC, which is a rank-statistic, and considers relative risk rather than absolute risk; that is, an individual who
+
+actually commits crimes within two years of their current charge date should be ranked higher than an individual who
+
+does not. The relative risk within the two-year time-frame is related to the relative risk for other (shorter or longer)
+
+time-frames, allowing these models to potentially generalize to varying pretrial time-frames.
+
+Another important aspect of our prediction problems is the deﬁnition of recidivism we chose. We predict the
+
+occurrence of a convicted charge within six months/two years for Kentucky. In other words, we would like to predict
+
+whether someone will be arrested, within six month or two years from their current charge, for another crime that they
+
+were later convicted for. This deﬁnition potentially alleviates a due process concern: if we instead include non-convicted
+
+charges, our models might be more likely to predict who will be arrested than who will be convicted, which is tied to
+
+policing practices. For Broward, where we did not have conviction information for later charges, we predicted any charge
+
+within six months/two years, which is the typical approach to recidivism prediction.
+
+In Broward, we directly computed Arnold PSA scores, as the Arnold PSA is publicly available. The features used
+
+by the Arnold PSA are provided in Tables 16 & 17 in the Appendix. In Kentucky, we used the unscaled Arnold PSA
+scores that came with the data set.7 We compared against COMPAS’ Risk of General Recidivism and Risk of Violent
+
+Recidivism risk scores on the two-year general and two-year violent prediction problems, respectively (both models
+are designed to predict recidivism within two years). The COMPAS suite is proprietary, but COMPAS General and
+
+Violent scores were provided with the Broward County data set (we do not compare against COMPAS on the Kentucky
+
+data set). The COMPAS General and COMPAS Violent scores appear to have been developed for a parole population
+
+6previously named the Laura and John Arnold Foundation
+7In Kentucky, Arnold PSA scores are reported to judges without scaling.
+
+
+WANG & HAN ET AL.
+
+10
+
+decisions).
+
+[15], but have been applied for pretrial decisions in Broward. In this study, we consider the COMPAS scores for the
+
+outcomes they were actually applied for (pretrial decisions), rather than the outcomes they were developed for (parole
+
+In Sections 6 and 7, we compare the performance of black-box and interpretable algorithms on the Broward
+
+and Kentucky data sets. We caution readers against comparing an algorithm’s performance in Broward with its
+
+performance in Kentucky. An algorithm’s differences in performance between the data sets could be attributed to the
+
+many differences between the two regions. For instance, the Broward data set is at the county level while the Kentucky
+
+data set is at the state level. As the Kentucky data is at the state level, it embeds diverse information about 120 counties
+
+(e.g., demographics, legislation, culture, local policing practices). Thus, in Sections 6 and 7, the comparisons between
+
+baseline models and interpretable models are conducted within each data set. In Section 8, we discus in detail the
+
+regional differences between Broward County and Kentucky, and present a set of experiments that illustrate model
+
+performance gaps resulting from these regional differences.
+
+5.1 | Prediction Labels
+
+In addition to two-year general recidivism and two-year violent recidivism—the two types of criminal recidivism
+considered by COMPAS and the PSA—we computed recidivism prediction labels speciﬁc to various crime types, such as
+property, drug related recidivism and recidivism with felony or misdemeanor level charges.8 Note that an individual
+could have multiple positive labels, indicating that the newly committed crime involves multiple charge types. We
+
+deﬁned recidivism as a recorded charge within a certain time frame. Out of all the possible recidivism prediction tasks
+
+we considered, we selected the six most balanced: general, violent, drug, property, felony, and misdemeanor. To
+investigate the effect of temporal scale on predictive performance, we generated these six tasks using the time windows
+
+two-years and six-months after the current charge date (or release date, if the individual went to prison for their
+current charge), for a total of twelve tasks. The summary of prediction tasks and the base rate of recidivism for each
+
+task is provided in Table 1.
+
+Kentucky
+
+Broward
+
+Labels
+
+Two Year P (yi = 1) Six Month P (yi = 1) Two Year P (yi = 1) Six Month P (yi = 1) Explanation
+
+20.4%
+
+5.7 %
+
+45.5%
+
+21.8 %
+
+General
+
+Violent
+
+Drug
+
+Property
+
+Felony
+
+3.4%
+
+8.7%
+
+3.9%
+
+9.6%
+
+21.0%
+
+9.3%
+
+9.0%
+
+17.6%
+
+8.4%
+
+4.0%
+
+5.0 %
+
+8.9 %
+
+0.7%
+
+2.0%
+
+0.9%
+
+2.4%
+
+3.9%
+
+yi = 1 if the defendant had any type of charge within two years (resp. six
+months) from current charge date/release date
+
+yi = 1 if the defendant had a violent charge within two years (resp. six
+months) from current charge date/release date
+
+yi = 1 if the defendant had a drug-related charge within two years (resp.
+six months) from current charge date/release date
+
+yi = 1 if the defendant had a property-related charge within two years
+(resp. six months) from current charge date/release date
+
+yi = 1 if the defendant had a felony-level charge within two years (resp. six
+months) from current charge date/release date
+
+yi = 1 if the defendant had a misdemeanor-level charge within two years
+(resp. six months) from current charge date/release date
+
+Misdemeanor
+
+15.6%
+
+27.2%
+
+12.5 %
+
+TA B L E 1 Label distributions for Broward and Kentucky.
+
+8For clarity, we apply the typewrite font to indicate the prediction tasks.
+
+
+WANG & HAN ET AL.
+
+5.2 | Problem Setup
+
+11
+
+Due to the binary nature of recidivism tasks, we approached these prediction problems as binary classiﬁcation problems,
+
+but do not binarize the ﬁnal predicted probabilities/scores of the machine learning models for the following reasons.
+
+First, existing risk scores are usually nonbinary. For instance, the Arnold PSA’s unscaled New Criminal Activity (NCA)
+
+score takes integer values from 0 through 13, while the COMPAS Risk of Recidivism and Risk of Violent Recidivism
+
+scores take on integer values from 1 through 10 [15, 20]. Second, we want to create more nuanced risk scores both
+
+by predicting highly-speciﬁc types of recidivism, (in addition to coarser categories like general recidivism), and by
+
+presenting non-binary scores which reﬂect a range of risk values.
+
+Since the predictions are nonbinary, we use Area Under the Curve (AUC) as our evaluation metric. This decision
+
+also impacts the fairness metrics we assess, which we discuss in Section 9. We applied nested cross validation process
+
+to train the models. Please refer to the Appendix (Section 11) for the details.
+
+6 | BASELINE MACHINE LEARNING METHODS
+
+To provide a basis of comparison for the interpretable models (presented in Section 7), we evaluated the performance of
+
+six common, non-interpretable machine learning methods in this section. We present the baseline prediction results for
+
+Broward and Kentucky in Tables 7 and 8 respectively. Baseline models and descriptions are provided below. The tuned
+
+hyperparameters and packages used for each problem are provided in the Appendix (Section 11).
+
+•
+
+•
+
+•
+
+•
+
+•
+
+(cid:96)2 Penalized Logistic Regression: To prevent over-ﬁtting, there is an (cid:96)2 penalty term on the sum of squared
+coefﬁcients in the loss function for logistic regression. Although this method produces linear models, we consider
+
+(cid:96)2-penalized logistic regression to be non-interpretable because if the number of input features is large, there could
+be a large number of nonzero terms in the model.
+
+(cid:96)1 Penalized Logistic Regression: To prevent over-ﬁtting, there is an (cid:96)1 penalty term on the sum of absolute values
+of coefﬁcients in the loss function for logistic regression. This algorithm creates sparser models than (cid:96)2 penalized
+logistic regression. Notice that the sparsity of the model depends on the magnitude of the penalty and must be
+
+balanced with consideration of prediction performance. In our experiments, (cid:96)1 models with Broward data were
+sparse yet maintained good predictive performances. However, the best (cid:96)1 models with Kentucky data still had
+too many features, which made it difﬁcult to interpret the results. Therefore, we classiﬁed (cid:96)1-penalized logistic
+regression as a non-interpretable algorithm.
+
+SVM with a Linear Kernel [61]: An algorithm that outputs a hyperplane that separates two classes by maximizing
+
+the sum of margins between the hyperplane and all points. Incorrectly classiﬁed points are penalized. Although
+
+SVM with linear kernel yields a linear model, the concerns with (cid:96)1 and (cid:96)2 penalized logistic regressions apply here
+as well: the number of nonzero terms could be large, making it difﬁcult to interpret the model.
+
+Random Forest [62]: An ensemble method that combines the predictions of multiple decision trees, each of which
+
+is trained on a bootstrap sample of the data. The implementation we use combines individual trees by averaging
+
+the probabilistic prediction of each tree. Random Forest is usually considered a black-box classiﬁer because it is
+
+difﬁcult to understand the individual contribution of each feature (which can be found in many trees), and the joint
+
+relationship between features.
+
+Boosted Decision Trees [63]: An ensemble method where a sequence of weak classiﬁers (decision trees) are ﬁt to
+
+weighted versions of the data. Similar to random forest, boosted decision trees produce black-box models because
+
+it is difﬁcult to understand the joint relationships of the features. We use the XGBoost implementation [64].
+
+
+12
+
+WANG & HAN ET AL.
+
+Major Findings: We found that all baseline machine learning algorithms performed similarly across recidivism
+
+problems for the Kentucky data set. We also found that models performed better on the six-month prediction problems
+
+than on the two-year problems on Kentucky data, but not on Broward data. These ﬁndings will be discussed throughout
+
+the following subsections.
+
+6.1 | Broward Baseline Results
+
+Table 7 in the Appendix contains the performance of baseline algorithms on the Broward data; the results are visualized
+
+in Figure 1 (presented below). We noticed that no algorithm consistently performs better than the others. Simple linear
+
+models can even outperform black-box models in some prediction problems. For instance, in the two-year prediction
+
+problems, (cid:96)2-penalized logistic regression and LinearSVM tie in performance for the general recidivism prediction.
+XGBoost performs the best in violent and property prediction problems. (cid:96)1-penalized logistic regression has the best
+performance in drug and felony prediction tasks, while (cid:96)2-penalized logistic regression has the best performance in
+misdemeanor recidivism prediction. The largest performance gap is 5.1%, from property recidivism prediction.
+
+In the six month prediction problems, we see the same phenomenon that no single model dominates the others
+
+in performance. Overall, the performance gaps across baseline models for the general, felony, and misdemeanor
+prediction tasks are small, while other prediction problems have larger gaps.
+
+F I G U R E 1 Visualizations of Broward baseline results from Table 7 in the Appendix. Within each prediction problem,
+all algorithms performed similarly. No single algorithm consistently outperformed others.
+
+6.2 | Kentucky Baseline Results
+
+In Kentucky, complex and nonlinear baselines perform slightly better than linear models (see Table 8 in the Appendix
+
+and Figure 4, which is presented below), potentially due to the larger size of the Kentucky data set (1,956 records in
+
+Broward county versus 250K records in Kentucky). In particular, Random Forest and XGBoost uniformly perform
+
+slightly better than all the other algorithms on all prediction tasks, over both time periods we examined. XGBoost
+
+performs the best on all tasks. However, performance gaps, across all prediction problems and in both time frames, are
+
+very small. Thus, we conclude that all the baseline algorithms perform similarly over the Kentucky data set . One thing
+
+we noticed from the Kentucky results is that all algorithms perform slightly better on the six-month recidivism period
+
+
+WANG & HAN ET AL.
+
+than on the two-year period.
+
+13
+
+F I G U R E 2 Visualizations of Kentucky baseline results from Table 8 in the Appendix. Random Forest and XGBoost
+consistently perform better than other models, but the results are similar across all models.
+
+7 |
+
+INTERPRETABLE MACHINE LEARNING METHODS
+
+For recidivism prediction, we considered several different types of interpretable machine learning methods with
+
+different levels of interpretability, ranging from scoring systems to decision trees, to additive models. Since the Burgess
+
+model in 1928 [65], recidivism risk assessments have traditionally been scoring systems, which are sparse linear models
+
+with positive integer coefﬁcients. A scoring system can be visualized as a simple scoring table or set of ﬁgures. There
+
+have only recently been algorithms designed to optimally learn scoring systems directly from data, without manual
+
+feature selection or rounding. Scoring systems have several advantages: they allow an understanding of how variables
+
+act jointly to form the prediction; they are understandable by non-experts; risks can be computed without a calculator;
+
+and they are consistent with the form of model that criminologists have built over the last century, where “points” are
+
+given to the individual, and the total points are transformed into a risk of recidivism. Further, outside information (such
+
+as risk factors that are not in any database) can be more easily incorporated into the risk score: it is much easier to
+
+determine how many points to assign to a new factor if the points are integer-valued for the known risk factors (e.g., we
+
+could choose to subtract three points for drug treatment, to counteract four points of past drug-related arrests).
+
+While scoring systems appear to be the accepted standard for interpretability in the domain of criminal justice,
+
+imposing the constraints of linearity, sparsity, and integrality of coefﬁcients could potentially be strong enough to reduce
+
+accuracy. Thus, we also consider modern algorithms that satisfy a subset of the conditions of interpretability (sparsity in
+
+features, ability to visualize/explain any variable interactions, linearity, integer coefﬁcients). Speciﬁcally, we tested four
+
+interpretable machine learning algorithms: Classiﬁcation and Regression Trees (CART), Explainable Boosting Machine
+
+(EBM), Additive Stumps, and RiskSLIM (Risk-Calibrated Supersparse Linear Integer Models). Algorithm speciﬁcs are
+
+articulated below and the tested hyperparameters are provided in the Appendix (Section 11). We also tested two
+
+existing risk assessments—the Arnold PSA and COMPAS—and compared their performances to both baseline and
+
+interpretable machine learning models.
+
+•
+
+Classiﬁcation and Regression Trees (CART) [62]: A method to create decision trees by continuously splitting input
+
+
+WANG & HAN ET AL.
+
+14
+
+•
+
+•
+
+features on certain values until a stopping criterion is satisﬁed. CART constructs binary trees using the feature
+
+and threshold that yields the largest information gain at each node. We constrain the maximum depth of the tree
+
+to ensure that it does not use too many features. CART models are nonlinear. They cannot be written as scoring
+
+systems, but can be written as logical models.
+
+Explainable Boosting Machine (EBM) [12]: An algorithm that uses boosting to train Generalized Additive Models
+with a few interaction terms (GA2Ms). The contribution by each feature and feature interaction pair can be
+
+visualized. The models are interpretable and modular, thus editable by experts. The models are generally not sparse,
+
+and cannot be written as scoring systems.
+
+RiskSLIM [66]: An algorithm that generates sparse linear models with integer coefﬁcients that have risk-calibrated
+
+probabilities. The models generated by RiskSLIM have form similar to that of models used in criminal justice over
+
+the last century.
+
+• Additive Stumps: An interpretable variation on (cid:96)1-penalized logistic regression: for each feature, we generate
+multiple binary stumps (this pre-processing technique is discussed further in the next section), and apply (cid:96)1penalized logistic regression to these stumps. Ideally, the features will have monotonically increasing (or decreasing)
+
+contributions to the estimated probability of recidivism. Models constructed using this method generally use
+
+fewer features than those constructed with vanilla (cid:96)1-penalized logistic regression. These models are ﬂexible and
+nonlinear. These models also cannot be written as scoring systems because they are not sparse in the number of
+
+nonlinearities.
+
+• Arnold PSA [20]: A widely-used, publicly available, interpretable risk assessment system that consists of three
+scores: New Criminal Activity (NCA), New Violent Criminal Activity (NVCA), and Failure to Appear (FTA). We
+
+compare against the NCA for the general recidivism problem, and against the NVCA for the violent recidivism
+problem, on both two-year and six-month time scales. The NCA has 7 factors, while the NVCA has 5 factors.
+
+•
+
+COMPAS [15]: A widely-used risk assessment system that consists of several scores, including the three that we
+
+study: Risk of General Recidivism (COMPAS General), Risk of Violent Recidivism (COMPAS Violent), and Risk of
+
+Failure to Appear. We compare against the COMPAS General score for the two-year general recidivism problem,
+and compare against the COMPAS Violent score for the two-year violent problem.
+
+Major Findings: Overall, the best interpretable models performed approximately as well as the best black-box models
+
+on both regions and both prediction time periods we considered.
+
+7.1 | Pre-processing Features into Binary Stumps
+
+We performed a data pre-processing technique for two of the interpretable machine learning algorithms: RiskSLIM and
+
+Additive Stumps. This technique consists of transforming all original features into binary stumps (dummy variables)
+
+using Equation 1. Pre-processing the features into stumps allows us to include nonlinear interactions between the
+
+features (e.g. age, criminal history) and labels. It also allows us to visualize each Additive Stumps model as a set of
+
+monotonically increasing (or decreasing) curves.
+
+Formally, stumps are binary indicators, which are created by splitting features at pre-speciﬁed thresholds. For a
+
+feature X (j ), and a set of threshold values K ∈ (cid:210), we generate decreasing stumps S (j )
+k
+
+for all k ∈ K as follows:
+
+k = 
+S (j )
+
+
+1,
+
+for X (j ) ≤ k
+
+0, else
+
+(1)
+
+
+WANG & HAN ET AL.
+
+15
+
+We can generate increasing stumps analogously by substituting ≥ for ≤ in the deﬁnition above. The rationale behind
+the naming convention is as follows. Linear models constructed from increasing (respectively, decreasing) stumps
+
+have the nice property that if one sums the contribution from all stumps corresponding to a ﬁxed original feature
+for the feature X (j )), and the coefﬁcients ck are mostly non-negative 9, the resulting function
+(i.e., f (X (j )) = (cid:205)
+k ∈K
+
+ck S (j )
+k
+
+f (X (j )) is monotonically increasing (respectively decreasing), which is desirable for interpretability.
+
+More concretely, the “age_at_current_charge” feature ranges from 18 to 70 in our data. For all age-related features,
+
+we construct decreasing stumps for k = {18, 19, ..., , 60}. We chose decreasing stumps for age features because based
+on past studies [e.g., 4, 67] and criminological theory [16, 68, 69] , the probability of recidivism decreases with age. On
+
+the other hand, intuitively, the probability of recidivism should increase as criminal history increases. Thus, we construct
+
+increasing stumps for the remaining features (which relate to criminal history).
+
+To select a collection of stumps for the RiskSLIM and Additive Stumps model, we selected threshold values for all
+
+features by examining each feature visualization from EBM and choosing the threshold values that correspond to sharp
+
+drops in the predicted scores.
+
+7.2 | Broward Prediction Results for Interpretable Models
+
+Table 9 in the Appendix and Figure 3 show the results of interpretable models on the Broward data set. For all prediction
+
+problems in both two-year and six-month prediction periods that we examined, we observed that CART consistently
+
+performed worse than other algorithms. Additive Stumps and EBM performed similarly on all the prediction tasks and
+
+outperformed other models, including the Arnold PSA and COMPAS, on most of the prediction tasks.
+
+The performances of the best interpretable models are very similar to that of the best baseline models—this is true
+
+for each of the prediction problems we considered. The AUC gaps between the best interpretable models and best
+
+baseline models for all two-year prediction tasks range from 0.3% to 1.7% in absolute value, and range from 0.2% to
+
+2.6% for six-month prediction tasks. The two maximum prediction gaps, 1.7% and 2.6%, both come from drug recidivism
+prediction tasks. Prediction gaps from all other problems are smaller than 1%.
+
+F I G U R E 3 Broward interpretable model results.
+
+9For decreasing (respectively increasing) stumps, if the coefﬁcient for the largest (respectively smallest) stump is negative, the function f will still be monotonic
+because the negative value will be subtracted from all values of the remaining stumps
+
+
+16
+
+WANG & HAN ET AL.
+
+7.3 | Kentucky Prediction Results for Interpretable Models
+
+The Kentucky prediction results are provided in Table 10 in the Appendix, and visualized in Figure 4. For all prediction
+
+problems in both time frames we considered, CART, EBM, and Additive Stumps all had similar performances. RiskSLIM
+
+had relatively lower results compared to other interpretable models. All interpretable models performed better than
+
+the Arnold PSA, with the exception that the Arnold PSA performed slightly better (0.3%) than RiskSLIM on two-year
+
+general recidivism. Once more, we observed that the best interpretable models can perform approximately as well as
+the best black-box models (XGBoost). For the two-year prediction tasks, the differences in performance between the
+
+best interpretable and the best black-box models ranged from 0.7% to 0.9% in absolute value; for six-month problems,
+
+the difference ranged from 0.4% to 1.5%.
+
+F I G U R E 4 Kentucky interpretable model results.
+
+Summary of Interpretable Models’ Results: We found that the best interpretable models performed approxi
+mately as well as the best black-box models, on both data sets and both time periods we considered, which is consistent
+
+with previous studies on other data sets [10]. The best interpretable models possess the advantage of being transparent
+
+and interpretable, allowing judges and defendants a better understanding of the predictions that the model outputs.
+
+7.4 | Tables and Visualizations of Interpretable Models
+
+Each of the interpretable machine learning methods produces models that can be visualized, either as a decision tree
+
+(CART), scoring table (RiskSLIM), or as a set of visualizations (EBM, Additive Stumps). In this section, we present these
+
+tables and visualizations for EBM, Additive Stumps and RiskSLIM, to give a clearer understanding of each model’s
+
+interpretability. Here we used the two-year general recidivism prediction problem on Kentucky data as an example.
+
+7.4.1 | EBM Models
+
+The EBM package provides visualizations for each feature in the data set along with a bar chart of feature importance,
+
+both of which are displayed in an interactive dashboard. The dashboard allows users (potentially judges) to see the
+
+scores corresponding to each bar or line by hovering the mouse over it. EBM models are not sparse in the number of
+
+features, so there could be visualizations for all features. Here, we show screenshots of the bar chart and visualizations
+
+
+WANG & HAN ET AL.
+
+17
+
+for the three most important features. EBM visualizations are similar to those from Additive Stumps, in that each
+
+feature’s contribution to the score can be displayed separately. However, EBM scores do not tend to be monotonically
+
+increasing or decreasing in each feature.
+
+F I G U R E 5 Visualizations from EBM on two-year general recidivism. Top left: overall importance of each feature,
+ranked from the most important variable to least important. Remaining three: visualization for the contribution of the
+feature to the overall score (top) and histograms of feature values to show the distribution (bottom). Features
+contributions are visualized as bar charts if the feature takes binary value. The shaded grey area represents the
+conﬁdence region. We see that as values get larger, there is more uncertainty in the predictions, which may be because
+we have fewer data points for such large feature values.
+
+7.4.2 | Additive Stumps
+
+Additive Stumps models are constructed by thresholding the original features, such as age or criminal history, into binary
+
+stumps, followed by running (cid:96)1-penalized logistic regression on the stumps. Choosing an appropriate regularization
+value for (cid:96)1-penalized logistic regression can give us a model that is sparse in the number of original features—despite
+the fact that the regularization is directly on the stumps, not on the original features. For the Kentucky two-year
+
+general recidivism problem, the ﬁnal model contains 28 stumps plus an intercept. These stumps are rooted under
+only 14 original features. Visualizations of the contributions for these 14 features are presented in Figure 6. Table 11,
+
+containing a scoring table that includes all 28 stumps plus an intercept, is provided in the Appendix (Section 11).
+
+
+18
+
+WANG & HAN ET AL.
+
+F I G U R E 6 Visualizations of the total contribution for each of the original features in the Additive Stumps model on
+two-year general recidivism. The contribution from each stump feature is the estimated coefﬁcient from (cid:96)1-penalized
+logistic regression.
+
+7.4.3 | RiskSLIM
+
+RiskSLIM produces scoring tables with coefﬁcients optimized to be integers (“points”), which makes the predictions
+
+easier to calculate and interpret for users, such as judges. The total points are translated into probabilities using the
+
+logistic function provided at the top of the table. By examining a RiskSLIM model, users can easily identify which
+
+features contribute to the ﬁnal score and by how much. We provide scoring tables in Table 2 for two-year general
+recidivism prediction on both Broward and Kentucky data sets. More tables are provided in the Appendix (Section 11).
+
+We noticed that for each prediction problem, almost all ﬁve of the cross validation folds for the RiskSLIM algorithm
+
+yielded the same model on the (larger) Kentucky data set. In more detail, for Kentucky two-year drug and violent
+recidivism prediction problems, all ﬁve RiskSLIM models produced during cross validation were identical. For the rest of
+
+the prediction labels, four out of ﬁve cross validation models were the same. For the six-month recidivism prediction
+
+problems, the misdemeanor prediction problem resulted in ﬁve identical RiskSLIM models, and the violent recidivism
+
+
+WANG & HAN ET AL.
+
+19
+
+prediction problem had four models that were the same. The fact that the Kentucky RiskSLIM models are often the
+
+same, despite being trained on different (albeit overlapping) subsets of data, suggests that they are robust to the exact
+
+subsample used for training.
+
+TA B L E 2 Two-year general recidivism RiskSLIM models for Broward (left) and Kentucky (right). Each feature is
+given an integer point. The ﬁnal predicted probability is calculated by inputting the total score to the logistic function
+provided on the top of the tables.
+
+Broward
+
+Kentucky
+
+Pr(Y = +1) = 1 / (1 + exp(-(-2 + score)))
+
+Pr(Y = +1) = 1 / (1 + exp(-(-2 + score)))
+
+age at current charge ≤31
+
+1 points
+
++...
+
+number of prior arrest≥ 2
+
+number of prior misdemeanor charges ≥4
+
+1 points
+
+number of prior arrest≥ 3
+
+had charge(s) within last three years = Yes
+
+1 points
+
+number of prior arrest≥ 5
+
+...
+
+...
+
+1 points
+
+1 points
+
+1 points
+
++...
+
++...
+
++...
+
+ADD POINTS FROM ROWS 1 TO 3
+
+SCORE
+
+= ....
+
+ADD POINTS FROM ROWS 1 TO 3
+
+SCORE
+
+= .....
+
+8 | RECIDIVISM PREDICTION MODELS DO NOT GENERALIZE WELL ACROSS
+
+REGIONS
+
+It is common practice for recidivism prediction systems to be applied across states, or even countries, with only minor
+
+tuning on local populations. Implicit in this practice is the assumption that models trained on data from one collection of
+
+locations will perform well when used in another collection of locations—i.e., that models generalize across locations. For
+
+instance, the Arnold PSA, which was developed on 1.5 million cases from approximately 300 U.S. jurisdictions, has been
+
+adopted in the states of Arizona, Kentucky, New Jersey, and many large cities including Chicago, Houston, Phoenix, etc.
+
+[20]. These systems have remained in place for years without any updates.
+
+However, based on our experimental results, we conjecture that different locations would beneﬁt from specialized
+
+models that conform to the speciﬁc aspects of each location. For instance, let us brieﬂy compare the state of Kentucky
+
+and Broward County in Florida. The demographics are completely different: Kentucky is not a diverse state (87.8%
+
+white, 7.8% black, and 4.4% other groups in 2019 [70]), whereas Broward County is more racially diverse (62.3%, white;
+
+17.1% Hispanic or Latino; 12.2% black or African American; 5.07% Asian and other groups [71]. The geographies of
+
+the locations are drastically different as well: Kentucky is an interior state located in the Upland South with a humid
+
+subtropical climate, whereas Broward County is at the eastern edge of Florida with a tropical climate. Several studies
+
+have indicated an association between climate (temperature, humidity, and precipitation) and crime [72, 73, 74]. There
+
+are many other factors that differ between the locations that might affect the generalization of the recidivism prediction
+
+models, such as different local prosecution practices, laws and the way they are administered, social service programs,
+
+local cultures, educational systems, and judges’ views.
+
+Because models tend to be used broadly across locations, in this section we aim to investigate how well predictive
+
+models generalize between the two locations for which we have data. We trained models on Kentucky and tested on
+
+Broward (and vice versa). We looked more closely at age, and examined how the joint probability distribution of age
+
+and recidivism differs between Broward and Kentucky. We focused on age because of its important relationship to
+
+recidivism [67, 69, 75].
+
+Major Findings: Our analysis shows that models do not generalize well across regions, and the joint probability
+
+distribution of age and recidivism varies across states. Therefore, we suggest that different models be constructed in
+
+
+20
+
+WANG & HAN ET AL.
+
+different regions, and be updated periodically.
+
+8.1 | Training on One Region and Testing on the Other
+
+In order to construct models on one region and test them on the other, we only used the shared features from both
+
+data sets. Nested cross validation was used to train both the models that were trained in one region and tested in the
+
+other, and the models that were trained and tested in the same region. More details about this procedure can be found
+
+in Section 11.7 in the Appendix. Table 12 and Table 14 in the Appendix respectively show the performance of models
+
+trained on Kentucky and tested on Broward, and models trained on Broward and tested on Kentucky. Table 13 and
+
+Table 15 respectively show the performance of models trained and tested on Broward, and models trained and tested
+
+on Kentucky.
+
+Comparing Table 12 with Table 13, we observed that there is an overall decrease in model performance when
+
+models were trained in Kentucky and tested on Broward. For instance, for the two-year general recidivism problem,
+the performances drop between 3.5% to 6.0% on the baseline models. A similar pattern can be observed for the
+
+interpretable models. Conversely, when we trained models on Broward and tested on Kentucky, we observed even
+
+larger performance decreases from the models trained and tested on only Kentucky (compare Table 14 to Table 15). For
+
+the two-year general prediction task, performance gaps from baseline models range between 5.1% and 8.6%, while the
+gaps range from 4.6% to 12.0% for interpretable models.
+
+Through this experimentation, we concluded that for at least the twelve prediction problems in our setup, models
+
+do not generalize across states. This could be attributable to differences in the joint probability distribution of features
+
+and outcomes between locations. To understand the difference in these distributions more closely, we examine the age
+
+feature.
+
+8.2 | Age-Recidivism Probability Distributions by Region
+
+Age has traditionally been a highly predictive factor for recidivism [67, 69, 75]. Therefore, differences in the age
+
+distributions between two regions could signiﬁcantly impact a model’s ability to generalize between regions.
+
+Consider the general recidivism problem as an example. In Kentucky, the probability of general recidivism for
+both six-month and two-year prediction periods peaks for individuals aged around the early to mid 30s and then
+
+decreases as age increases. In Broward County, the age distribution for the corresponding general recidivism problem
+is substantially different. From Figure 7, the probabilities seem to peak around ages 18-29, and then decrease after
+
+age 29. There are less data for higher ages, causing greater variance in the probabilities. For the violent recidivism
+problem, please refer to Figure 11 in the Appendix (Section 11).
+
+Additionally, there is a large gap in the probability magnitudes between the two regions. For instance, the probabili
+ties of general recidivism from the Broward data set can exceed 0.5, while the probabilities of general recidivism from
+Kentucky data are all less than 0.4. Thus, the populations of individuals from Broward and Kentucky who recidivate are
+
+different with respect to age.
+
+This difference is directly manifested in the interpretable models presented in Section 7.4. We found that the
+
+selection of features differs between interpretable models trained on Broward and Kentucky data. For instance,
+
+referring to the simple RiskSLIM models listed in Section 11.8 in the Appendix, which show the most important features
+
+in each prediction problem, we noticed that with Broward data, almost all prediction problems contain at least one
+
+age feature, either “age at current charge” or “age at ﬁrst offense.” This suggests that age is important in predicting
+
+recidivism across different problems trained on the Broward data. However, none of the RiskSLIM models trained
+
+
+WANG & HAN ET AL.
+
+21
+
+F I G U R E 7 Probability of recidivism v. age at current charge—general recidivism
+
+on the Kentucky data set use age features. Almost all the models use “prior arrest” features, reﬂecting the fact that
+
+Kentucky recidivism prediction problems rely more on prior criminal history information than on age.
+
+9 | FAIRNESS
+
+In this section, we conduct a technical discussion of a small fraction of the various fairness deﬁnitions that have emerged
+
+recently, and an evaluation of how well the interpretable models satisfy them on the Kentucky data set. We ﬁrst describe
+
+our rationale for selecting fairness deﬁnitions (calibration, balance for positive/negative class, and balanced group AUC).
+
+Next, we evaluate how well the Arnold PSA, COMPAS, EBM (the best-performing interpretable models) and RiskSLIM
+
+(the most interpretable and most constrained models) satisfy these deﬁnitions on the two-year general recidivism and
+two-year violent recidivism problems in Kentucky. Finally, we discuss how current fairness-enforcement procedures
+interact with interpretability.
+
+Major Findings: Empirically, we found no egregious violations of the three fairness deﬁnitions (group calibration,
+
+BPC/BNC, and BG-AUC) for both interpretable machine learning models we assessed (EBM and RiskSLIM) for the
+
+two-year general recidivism problem on the Kentucky data set. We found that the Arnold NCA raw score violated one
+of the fairness deﬁnitions (BPC/BNC). Overall, we observed a larger gap in fairness (for all three fairness measures we
+
+examined) between the largest and smallest sensitive groups, than between black and white sensitive groups. We also
+
+note that existing techniques to enforce fairness generally require non-interpretable transformations, and therefore do
+
+not work well with interpretable models.
+
+                      S U R E D E L O L W \ O R F D W L R Q     . < W Z R B \ H D U V L [ B P R Q W K                                                                                               D J H B D W B F X U U H Q W B F K D U J H                      S U R E D E L O L W \ O R F D W L R Q     ) / * H Q H U D O  5 H F L G L Y L V P
+9.1 | Selection of Fairness Metrics: Calibration, Balance for Positive/Negative Class, Bal
+anced Group AUC
+
+As discussed in Section 5.2, we do not wish to consider binary risk scores in this study. This decision limits us to a much
+
+smaller class of fairness deﬁnitions (e.g., statistical parity would not be relevant). Below, we summarize the deﬁnitions
+
+that apply to regression that we do not consider and the reasons why:
+
+WANG & HAN ET AL.
+
+Fairness through unawareness states that a model should not use any sensitive features [55]. However, if there
+
+are proxies for sensitive features present in the data set, the model can still learn an association between a sensitive
+
+group and the outcome. Fairness through unawareness could be used if one decides that a proxy feature is
+
+permissible to use (e.g., if one decided that age could be used, despite its correlation with race), but we do not
+
+presume that this is what is desired for this application. Of course, if fairness through unawareness is desired, it is
+
+easy to construct models that satisfy this deﬁnition.
+
+Individual fairness intuitively requires that “similar” individuals are treated “similarly” by the model—individuals
+
+with similar features should be given similar model scores. This type of fairness requires manually (and thus
+
+subjectively) deﬁning a notion of similarity between individuals [76]. This type of subjective choice goes beyond the
+
+scope of this paper.
+
+Once we limited ourselves to real-valued outcomes and eliminated the above deﬁnitions, only a few deﬁnitions
+
+remained. In a literature search for non-binary fairness deﬁnitions, we found the following: calibration, balance for
+
+positive class/balance for negative class (BPC/BNC) and balanced group AUC (BG-AUC).
+
+Below, G denotes a (categorical) sensitive attribute such as race, and gi denotes one of the sensitive groups in G (e.g.
+African-American, Caucasian, and Hispanic, for the sensitive attribute of race). Y ∈ {0, 1} denotes the ground-truth
+label (recidivism status) and S denotes the predicted score from a model.
+
+Calibration: We consider two notions of calibration. The ﬁrst, group calibration, requires that for all predicted
+
+scores, the fraction of positive labels is the same across all groups. Mathematically, group calibration over the
+
+sensitive attribute G requires:
+
+P (Y = 1|S = s, G = gi ) = P (Y = 1|S = s, G = gj ), (cid:91)i , j
+
+where s is the given value of a risk score.10 In practice, it is common to bin the score S if there are many possible
+values. The second, monotonic calibration, requires that if s1 < s2, then P (Y = 1|S = s1) < P (Y = 1|S = s2). 11
+These types of calibration are of particular concern to designers of current recidivism risk models. Group calibration
+
+means that a risk score holds the same “meaning” for each race. Monotonic calibration means that if the score
+
+increases, the risk also increases. These notions are important because human decision-makers expect risk scores
+
+to have these intuitive properties (but not all algorithms produce calibrated models) [77].
+
+Balance for Positive Class (BPC) requires that for all individuals with a positive label, the expected values of the
+
+22
+
+•
+
+•
+
+•
+
+•
+
+10In the case where scores are binary, group calibration is equivalent to requiring conditional use accuracy equality.
+11We note that a real-valued score S between 0 and 1 is well-calibrated if P (Y = 1|S = s) = s . Well-calibration says that the predicted probability of recidivism should be the same as the true probability of recidivism [55]. Although well-calibration is the deﬁnition of calibration that is standard in the statistics
+
+community, we consider monotonic-calibration here because any score that is monotonically-calibrated can be transformed to be well-calibrated.
+
+
+WANG & HAN ET AL.
+
+23
+
+predicted scores are the same across groups. Mathematically, a risk score S satisﬁes BPC if:
+
+E [S |Y = 1, G = gi ] = E [S |Y = 1, G = gj ], (cid:91)i , j .
+
+Similarly, a risk score S satisﬁes Balance for Negative Class (BNC) if:
+
+E [S |Y = 0, G = gi ] = E [S |Y = 0, G = gj ], (cid:91)i , j .
+
+BPC and BNC differ only in the labelY .12 Intuitively, BPC means that the average score for recidivists is the same in
+each group, while BNC means that the average score for non-recidivists is the same in each sensitive group.
+
+BPC/BNC is an intuitive notion of fairness, which says that it is permissible to give consistently higher (respectively
+
+lower) scores to individuals who truly belong to the positive (respectively negative) class. However, BPC/BNC
+
+limits the set of attributes where it is permissible to “discriminate” between individuals, to the label Y . Suppose
+the count of prior offenses is an important feature for a recidivism prediction model—higher prior counts lead
+
+to higher scores. This is a reasonable model assumption because a higher prior count is correlated with higher
+
+recidivism rates. If on average, African-Americans have higher prior counts than Caucasians, the model will not
+
+satisfy BPC/BNC. For a model to satisfy BPC/BNC, it must give the same average score to individuals from a certain
+
+race and with a certain recidivism label, regardless of distributional differences in prior counts. Those who believe
+
+that prior counts and arrests are racially biased against African-Americans might ﬁnd this a desirable property of
+
+a fairness deﬁnition. On the other hand, those who ﬁnd this undesirable can ﬁx this by conditioning on the prior
+
+counts attribute as well.
+
+•
+
+Balanced Group AUC (BG-AUC) requires that the AUC of the risk score is the same for each sensitive group. This
+
+deﬁnition is our adaptation of overall accuracy equality [56], which asks that the score’s accuracy is the same for
+
+each sensitive group. Our risk scores are not binary so we do not assess accuracy in this work, but assessing the
+
+AUC for each group is the natural analog.
+
+Sensitive attributes: The two sensitive attributes that are available in the Kentucky data sets are race and gender.
+
+In the Kentucky data set, all individuals are partitioned into Caucasian, African-American, Indian, Asian, and
+Other, but we group the Indian and Asian attributes into Other because there are very few individuals with these
+attributes. See Table 19 for the distribution of sensitive attributes in Kentucky. The Kentucky data set also partitions
+
+individuals into the genders Female and Male. To summarize,
+
+races in Kentucky = {Caucasian, African-American, Other}
+
+sexes in Kentucky = {Female, Male}.
+
+We remark that the binary versions of calibration and BPC/BNC deﬁnitions conﬂicted during the COMPAS scandal.
+
+Investigative journalists from ProPublica found that COMPAS had a higher false negative rate for Caucasians and a
+higher false positive rate for African-Americans.13 In response, however, Northpointe claimed that COMPAS scores
+
+were calibrated.
+
+Kleinberg et al.’s [52] impossibility theorem demonstrated that the conﬂict between calibration and BPC/BNC holds
+
+in general. In particular, they show that if a model does not satisfy either of the two trivial cases—a model that always
+
+12In the binary case, BPC/BNC is equivalent to equalized odds [50], which requires that false positive rates and false negative rates are equal for each group.
+13To determine false negative/positive rates, ProPublica binned COMPAS scores into binary scores,
+
+
+24
+
+WANG & HAN ET AL.
+
+makes perfect predictions, or a data set where the base rates of recidivism are equal for each sensitive group—then the
+
+model cannot satisfy all three fairness deﬁnitions simultaneously. However, a relaxed version of the theorem states
+
+that, if either of the two conditions approximately hold (approximately perfect predictions, or approximately equal base
+
+rates), then the three fairness deﬁnitions can be approximately satisﬁed at the same time.
+
+Figure 10 in the Appendix shows that the base rates for all sensitive attributes under each prediction problem on
+
+the Kentucky data. We noticed that for the two-year general and violent recidivism problems, the base rates are
+similar to each other (less than 3% in differences) across gender and race categories (except for “Other”). Given the
+
+relaxed version of the impossibility theorem, together with the relaxed criteria of the 3% difference we considered, we
+
+expect that the three fairness deﬁnitions can all be approximately satisﬁed.
+
+9.2 | Fairness Results
+
+We assessed model fairness only on the Kentucky data because the Broward data has a limited sample size, potentially
+
+making the fairness results unreliable. (We attempted the evaluation on Broward data, but conditioning on race/gender
+
+and the true label/score in the Broward data led to subgroups that were too small, and therefore noisy results.) We
+
+compared the interpretable models, EBM and RiskSLIM, to the Arnold PSA on Kentucky. EBM has the best performance
+
+on most of the prediction problems on the Kentucky data set. RiskSLIM performs relatively worse, but is considerably
+
+simpler as there are no more than ﬁve features in each model, coefﬁcients are integers, and the model is linear.
+
+We evaluated the two-year general and two-year violent problems, as they are the primary problems that the
+Arnold PSA is used for. For the two-year general problem, we evaluated the unscaled Arnold New Criminal Activity
+(NCA) score; for the two-year violent problem, we assessed the unscaled Arnold New Violent Criminal Activity (NVCA)
+score. Although Arnold Ventures provides a table to scale the Arnold scores, in Kentucky, judges are presented with the
+
+unscaled scores along with a categorization of the scores as low, medium, and high risk. Results for two-year general
+recidivism are presented directly in this section; results for two-year violent recidivism can be found in the Appendix.
+
+Note that each of the fairness conditions implicitly has a threshold parameter. For instance, the fairness condition
+
+BPC is strictly satisﬁed if the mean scores between multiple groups are “equal” to each other. However, whether two
+
+numbers are approximately equal is subjective and requires a threshold. So one must always issue a disclaimer when
+
+stating that any of these fairness conditions are satisﬁed. Hence we remark that subjective thresholds were used to
+
+determine whether fairness conditions were approximately satisﬁed in what follows.
+
+| Calibration
+
+As Figure 8 shows, the Arnold NCA raw score does not satisfy monotonic calibration for race or gender groups. The
+
+score approximately satisﬁes group calibration for race (excluding the “Other” group) for all score values except for
+
+13, and approximately satisﬁes group calibration for gender for all score values less than 11. The reason why higher
+
+Arnold NCA raw scores fail the calibration deﬁnitions may be that there are few individuals with higher scores in
+
+the data set , thus making the results less stable. Interestingly, we found that the scaled version of Arnold NCA fully
+
+satisﬁed monotonic and group calibration, but had slightly worse predictive performance. EBM and RiskSLIM both
+
+satisfy monotonic calibration and group calibration for all gender and race groups (excluding the “Other” group).
+
+
+WANG & HAN ET AL.
+
+25
+
+(a) For the Arnold NCA raw score, none of the curves are mono
+tonically increasing—violating monotonic calibration. Cali
+bration curves for the Caucasian and African-American race
+
+groups lie close to each other (except for the score 13), ap
+proximately satisfying group calibration. Curves for the male
+
+and female groups lie close to each other, but diverge for
+
+scores greater than 10, indicating that the score satisﬁes
+
+group calibration for gender for scores less than or equal to
+
+10.
+
+(b) For EBM, except for the “Other” group, the calibration
+
+curves are monotonically increasing and approximately
+
+equal to each other (satisfying monotonic calibration and
+
+group calibration).
+
+(c) For RiskSLIM, the domain of the graph goes up to only 0.3 −
+0.4 (unlike the other graphs). The curves are monotonically
+increasing and overlap with each other with the “Other” cat
+egory being lower than all the other ones. Thus, RiskSLIM
+
+is approximately group calibrated and monotonically cali
+brated.
+
+F I G U R E 8 Calibration results for the Arnold NCA raw, EBM and RiskSLIM for two-year general recidivism on
+Kentucky.
+
+0.02.55.07.510.012.5Arnold NCA Raw Score0.00.20.40.60.81.0P(Y = 1 | Score = score, Attr = attr)Calib. of Arnold NCA Raw on general_two_year in KentuckyAll individualsAfrican-AmericanCaucasianOtherfemalemale0.0-0.10.1-0.20.2-0.30.3-0.40.4-0.50.5-0.60.6-0.70.7-0.80.8-0.90.9-1.0EBM Score0.00.20.40.60.81.0P(Y = 1 | Score = score, Attr = attr)Calib. of EBM on general_two_year in Kentucky0.0-0.10.1-0.20.2-0.30.3-0.40.4-0.50.5-0.60.6-0.70.7-0.80.8-0.90.9-1.0RiskSLIM Score0.00.20.40.60.81.0P(Y = 1 | Score = score, Attr = attr)Calib. of RiskSLIM on general_two_year in Kentucky
+26
+
+WANG & HAN ET AL.
+
+| Balance for Positive/Negative Class (BPC/BNC)
+
+For models that provide risk probabilities as output (namely EBM and RiskSLIM models), we apply a 3% rule to determine
+
+whether BPC and BNC conditions are satisﬁed. The unscaled Arnold NCA produces scores between 0 and 13 rather
+
+than probabilities, so we use a 0.4 difference threshold to determine whether BPC and BNC are satisﬁed. That is, if the
+
+difference in scores between the two groups is greater than the threshold, then we conclude that the model violates
+
+BPC/BNC. All conclusions we present below exclude the “Other” race group, because of its small sample size.
+
+Figure 9(a) displays the BPC/BNC results for the Arnold NCA raw, and shows that Arnold NCA satisﬁes neither
+
+BNC nor BPC on gender or race groups. Figures 9(b) shows that EBM satisﬁes both BPC and BNC on race groups. EBM
+
+also satisﬁes BNC, but not BPC, on gender groups. Figure 9(c) displays the results for RiskSLIM, which satisﬁes both
+
+BPC and BNC on race and gender groups.
+
+| Balanced Group AUC (BG-AUC)
+
+We determine whether the models satisfy BG-AUC using a 3% rule. In Kentucky, AUC values are stable across sensitive
+
+attributes for all models, satisfying BG-AUC for both gender and race. The discrepancies in AUC between African
+Americans and Caucasians range from 0.3% (RiskSLIM) to 2.1% (Arnold NCA raw). The range gets smaller for gender
+
+groups, lying between 0.5% (Arnold NCA) to 1.3% (RiskSLIM). Hence, we found that the Arnold NCA raw, EBM and
+
+RiskSLIM all satisfy Balanced Group AUC for the race (excluding the “Other” group) and gender groups.
+
+TA B L E 3 AUCs of the Arnold NCA Raw, EBM and RiskSLIM on Kentucky, conditioned on sensitive attributes. AUC
+ranges are given for each sensitive attribute.
+
+Kentucky
+
+Race
+
+Sex
+
+Model
+
+Label
+
+Afr-Am.
+
+Cauc.
+
+Other Race
+
+race_range
+
+Female
+
+Male
+
+sex_range
+
+Arnold NCA Raw
+
+general_two_year
+
+0.692
+
+0.713
+
+0.653
+
+0.059
+
+0.714
+
+0.709
+
+0.005
+
+EBM
+
+general_two_year
+
+0.742
+
+0.751
+
+0.696
+
+0.055
+
+0.745
+
+0.753
+
+0.008
+
+RiskSLIM
+
+general_two_year
+
+0.705
+
+0.708
+
+0.620
+
+0.088
+
+0.699
+
+0.712
+
+0.013
+
+Summary of Fairness Results: For the two-year general recidivism problem on the Kentucky data set, we found
+no egregious violations of the three fairness deﬁnitions (group calibration, BPC/BNC, and BG-AUC) for either of the
+
+interpretable machine learning models we assessed (EBM and RiskSLIM), but we did ﬁnd small violations. We found the
+
+Arnold NCA raw score violated one of the fairness deﬁnitions (BPC/BNC).
+
+In more detail, we found that balanced group AUC were approximately satisﬁed for all three models with respect
+
+to both gender and race groups (except for “Other”). With respect to calibration, both EBM and RiskSLIM satisﬁed
+
+monotonic and group calibration on both gender and race groups (except for the “Other”). Arnold PSA approximately
+
+satisﬁed group calibration on race (excluding risk score 13) and gender groups for scores less than 11. Additionally, EBM
+
+satisﬁed both BPC and BNC on race categories, while it only satisﬁed BNC on gender categories. RiskSLIM satisﬁed
+
+both deﬁnitions on both sensitive attributes. The Arnold NCA satisﬁed neither BPC nor BNC on race and gender groups.
+
+A caveat is that we limited the discussion of the race groups to Caucasians and African-Americans—otherwise the
+
+“Other” group would have caused all models to fail all deﬁnitions of fairness (calibration curves for the “Other” group are
+
+signiﬁcantly beneath curves for other groups, average predicted scores vary substantially from the other groups, and
+
+prediction AUC is signiﬁcantly lower for the “Other” group). This may be because we have the least data for the “Other”
+
+
+WANG & HAN ET AL.
+
+27
+
+(a) Differences in expected scores for African-Americans
+
+and Caucasians are greater than the threshold (0.4):
+
+0.79 (race, negative class), 0.61 (race, positive class).
+
+Differences in expected scores for gender are also
+
+greater than the threshold: 0.7 (gender, negative
+
+class) and 0.84 (gender, positive class).
+
+(b) Differences in expected scores for African-Americans
+
+(c) Difference in expected scores for African-Americans and
+
+and Caucasians are less than 0.03: 0.01 (race, negative
+
+Caucasians are less than .03: 0.01 (race, negative class),
+
+class), 0.01 (race, positive class). Differences in expected
+
+0 (race, positive class). Differences in expected prob
+scores for gender satisfy the threshold in negative class
+
+abilities for the male and female groups are less than
+
+but not positive class: 0.01 (gender, negative class), 0.04
+
+0.03: 0.00 (gender, negative class), 0.02 (gender, positive
+
+(gender, positive class).
+
+class).
+
+F I G U R E 9 Balance for Positive and Negative Class for the Arnold NCA raw score, EBM and RiskSLIM on the
+two-year general prediction problem in Kentucky. Red line indicates the maximum value output by models.
+
+general_bncgeneral_bpc0.02.55.07.510.012.5E(Arnold | Attr = attr, Y = i)3.745.682.955.071.833.392.574.573.275.41BPC/BNC for Arnold on general_two_year in KentuckyAfr-Am.Cauc.Other RaceFemaleMalegeneral_bncgeneral_bpc0.00.20.40.60.81.0E(EBM | Attr = attr, Y = i)0.090.280.080.270.030.120.070.240.080.28BPC/BNC for EBM on general_two_year in KentuckyAfr-Am.Cauc.Other RaceFemaleMalegeneral_bncgeneral_bpc0.00.20.40.60.81.0E(RiskSLIM | Attr = attr, Y = i)0.20.350.190.350.140.220.190.330.190.35BPC/BNC for RiskSLIM on general_two_year in KentuckyAfr-Am.Cauc.Other RaceFemaleMale
+28
+
+WANG & HAN ET AL.
+
+race group, which is only 2.49% of the total sample. To ensure fairness, it is important that comparable amounts of data
+
+are gathered for each sensitive group when possible. However, in non-diverse states such as Kentucky, there may not
+
+be enough individuals in minority groups to create a large enough statistical sample.
+
+9.3 | A Discussion on the Interaction between Fairness and Interpretability
+
+There are signiﬁcant hurdles to using current fairness techniques with interpretable models. Moreover, the vast
+
+majority of the work on fairness has focused on the binary classiﬁcation case. Thus, few deﬁnitions of fairness (let alone
+
+algorithms) work for problems where predictions are nonbinary.
+
+We did not attempt to use fairness-enforcement techniques because many fairness techniques require a non
+interpretable transformation (further discussed below). Once these transformations are made, there is no way to correct
+
+them to produce an interpretable model afterwards. There are generally three approaches to fairness algorithms: pre
+processing of features [78], altering the training loss function [79, 80], and post-processing of predictions [50, 51, 53].
+
+The pre-processing steps are generally complicated transformations of the input features, which shreds the data’s
+
+natural meaning. Similarly, post-processing approaches either transform the predictions in some way, performing
+
+“fairness corrections” [53] (which are non-interpretable), or require threshold selection, which is contrary to our goals of
+
+providing non-binary risk assessments [50]. The approaches to modify training loss functions are the most promising,
+
+but model optimization for both fairness and interpretability constraints would require new algorithms and is beyond
+
+the scope of this work.
+
+probability estimation.
+
+In problems where fairness is a signiﬁcant concern, machine learning outputs are likely to be used as decision tools
+
+rather than decision-makers, so it is surprising that so little work has thoroughly examined fairness for regression or
 
 ========================================
 ====================CONCLUSION====================
