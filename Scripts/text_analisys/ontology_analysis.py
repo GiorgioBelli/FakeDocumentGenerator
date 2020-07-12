@@ -141,6 +141,7 @@ def sentence_similarity(sentence1, sentence2):
             count += 1
  
     # Average the values
+    if(count==0): return 0
     score /= count
     return score
 

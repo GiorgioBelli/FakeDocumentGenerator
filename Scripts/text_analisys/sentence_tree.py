@@ -111,8 +111,8 @@ class StructuredPaper():
             self.rake_extractTopics(self.sections[section])
 
     @staticmethod
-    def from_raw(rawPaper,parser):
-        return StructuredPaper(None,rawPaper.sections,rawPaper.fulltext,parser)
+    def from_raw(rawPaper,parser=None):
+        return StructuredPaper(rawPaper.sections_dict,rawPaper.full_text,parser)
 
 
     def createTree(self,text,parser):
@@ -211,15 +211,9 @@ class Repository():
         print("\tinitTopics...",end="")
         self.initTopics()
         print("\t[done]")
-        # print("\treplacePapersTopics...",end="")
-        # self.replacePapersTopics()
-        # print("\t[done]")
-        # print("\tcomputePapersContext...",end="")
-        # self.computePapersContext()
-        # print("\t[done]")
-        # print("\tinitGeneralContexts...",end="")
-        # self.initGeneralContexts()
-        # print("\t[done]")
+        
+
+        # self.prepareForJC()
         # print("\tcomputeJC...",end="")
         # self.computeJC()
         # print("\t[done]")
@@ -243,6 +237,17 @@ class Repository():
     def computePapersContext(self):
         for paper in self.papers:
             paper.computeContextAndFrequencies(extraTransformedTopics=self.generalTransformedTopics)
+
+    def prepareForJC():
+        print("\treplacePapersTopics...",end="")
+        self.replacePapersTopics()
+        print("\t[done]")
+        print("\tcomputePapersContext...",end="")
+        self.computePapersContext()
+        print("\t[done]")
+        print("\tinitGeneralContexts...",end="")
+        self.initGeneralContexts()
+        print("\t[done]")
 
     # compute repo jaccard [slow]
     def computeJC(self):
@@ -280,7 +285,8 @@ def main(args):
     
     # csv_path = "C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\FakeDocumentGenerator\\datasets\\arxiv\\4500_summaries_trainingSet.csv"
     # csv_path = "C:\\Users\\GIORGIO-DESKTOP\\Desktop\\intros.csv"
-    csv_datasets_dir = "../Results/extractionMP/"
+    csv_datasets_dir = args.csv_datasets_dir
+
     # abstract_csv = pandas.read_csv(os.path.join(csv_datasets_dir,"abstract.csv"), delimiter = '\f\n', engine="python")
     # intro_csv = pandas.read_csv(os.path.join(csv_datasets_dir,"intro.csv"), delimiter = '\f\n', engine="python")
     # corpus_csv = pandas.read_csv(os.path.join(csv_datasets_dir,"corpus.csv"), delimiter = '\f\n', engine="python")
@@ -298,7 +304,11 @@ def main(args):
         # print(len(conclusion_csv))
 
         raw_papers = []
-        for idx in range(min(len(abstract_csv), len(introduction_csv), len(corpus_csv), len(conclusion_csv))):
+
+        limit = int(args.limit) if args.limit else 0
+        dataset_len = min(limit,min(len(abstract_csv), len(introduction_csv), len(corpus_csv), len(conclusion_csv)))
+        
+        for idx in range(dataset_len):
             sections = {
                 PaperSections.PAPER_ABSTRACT : abstract_csv[idx],
                 PaperSections.PAPER_INTRO : introduction_csv[idx],
@@ -307,14 +317,14 @@ def main(args):
             }
             raw_papers.append(RawPaper.fromSections(sections))
 
-    else: # read pdf repo and generate papers
+    else: # read pdf repo and generates papers
         path = args.pdf_repo
 
         csv_dir = args.csv_dir
 
         repo_extr = RepositoryExtractor(path)
 
-        limit = int(args.repo_limit) if args.repo_limit else None
+        limit = int(args.limit) if args.limit else None
 
         if(args.mp):
             print("starting extraction... ",end="")
@@ -355,31 +365,27 @@ def main(args):
 
     fake_paper_dump_file = args.fake_paper_dump
 
-    # text = '''1 Introduction  Despite their proven ability to tackle a large class of complex problems [1], neural networks are still poorly understood from a theoretical point of view. While general theorems prove them to be universal approximators [2], their ability to obtain generalizing solutions given a finite set of examples remains largely unexplained. This behavior has been observed in multiple settings. The huge number of parameters and the optimization algorithms employed to optimize them (gradient descent and its variations) are thought to play key roles in it [3–5]. In consequence, a large research effort has been devoted in recent years to understanding the training dynamics of neural networks with a very large number of nodes [6–8]. Much theoretical insight has been gained in the training dynamics of linear [9, 10] and nonlinear networks for regression problems, often with quadratic loss and in a teacher-student setting [11–14], highlighting the evolution of correlations between data and network outputs. More generally, the input-output correlation and its effect on the landscape has been used to show the effectiveness of gradient descent [15, 16]. Other approaches have focused on infinitely wide networks to perform a mean-field analysis of the weights dynamics [17–22], or study its neural tangent kernel (NTK, or “lazy”) limit [23–26]. In this work, we investigate the learning dynamics for binary classification problems, by considering one of the most common cost functions employed in this setting: the linear hinge loss. The idea behind the hinge loss is that examples should contribute to the cost function if misclassified, but also if classified with a certainty lower than a given threshold. In our case this cost is linear in the distance from the threshold, and zero for examples classified above threshold, that we shall call satisfied henceforth. This specific choice leads to an interesting consequence: the instantaneous gradient for each node due to unsatisfied examples depends on the activation of the other nodes only through their population, while that due to satisfied examples is just zero. Describing the learning dynamics in the mean-field limit amounts to computing the effective example distribution for a given distribution of parameters: each node then evolves “independently” with a time-dependent dataset determined self-consistently from the average nodes population. Contribution. We provide an analytical theory for the dynamics of a single hidden layer neural network trained for binary classification with linear hinge loss. In Sec. 2 we obtain the mean-field theory equations for the training dynamics. Those equations are a generalizations of the ones obtained for mean-square loss in [17–22]. In Sec. 3 we focus on linearly separable data with spherical symmetry and present an explicit analytical solution of the dynamics of the nodes parameters. In this setting we provide a detailed study of the cross-over between the lazy [23] and rich [27] learning regimes (Sec. 3.2). Finally, we asses the limitations of mean-field theory by studying the case of large but finite number of nodes and finite number of training samples (Sec. 3.3). The most important new effect is overfitting, which we are able to describe by analyzing corrections to mean-field theory. In Sec. 3.4 we show that introducing a small fraction of mislabeled examples induces a slowing down of the dynamics and hastens the onset of the overfitting phase. Finally in Sec. 4 we present numerical experiments on a realistic case, and show that the associated nodes dynamics in the first stage of training is in good agreement with our results. The merit of the model we focused on is that, thanks to its simplicity, several effects happening in real networks can be studied analytically. Our analytical theory is derived using reasoning common in theoretical physics, which we expect can be made rigorous following the lines of [17–22]. All our results are tested throughout the paper by numerical simulations which confirm their validity.'''
-    # text = '''Consider the task of finding your way to the bathroom while at a new restaurant. As humans, we can efficiently solve such tasks in novel environments in a zero-shot manner. We leverage common sense patterns in the layout of environments, which we have built from our past experience of similar environments. For finding a bathroom, such cues will be that they are typically towards the back of the restaurant, away from the main seating area, behind a corner, and might have signs pointing to their locations (see Figure 1). Building computational systems that can similarly leverage such semantic regularities for navigation has been a long-standing goal. Hand-specifying what these semantic cues are, and how they should be used by a navigation policy is challenging. Thus, the dominant paradigm is to directly learn what these cues are, and how to use them for navigation tasks, in an end-to-end manner via reinforcement learning. While this is a promising approach to this problem, it is sample inefficient, and requires many million interaction samples with dense reward signals to learn reasonable policies. But, is this the most direct and efficient way of learning about such semantic cues? At the end of the day, these semantic cues are just based upon spatial consistency in co-occurrence of visual patterns next to one another. That is, if there is always a bathroom around the corner towards the back of the restaurant, then we can learn to find this bathroom, by simply finding corners towards the back of the restaurant. This observation motivates our work, where we pursue an alternate paradigm to learn semantic cues for navigation: learning about this spatial co-occurrence in indoor environments through video tours of indoor spaces. People upload such videos to YouTube (see project video) to showcase real estate for renting and selling. We develop techniques that leverage such YouTube videos to learn semantic cues for effective navigation to semantic targets in indoor home environments (such as finding a bed or a toilet). Such use of videos presents three unique and novel challenges, that don’t arise in standard learning from demonstration. Unlike robotic demonstrations, videos on the Internet don’t come with any action labels. This precludes learning from demonstration or imitation learning. Furthermore, goals and intents depicted in videos are not known, i.e., we don’t apriori know what each trajectory is a demonstration for. Even if we were to label this somehow, the depicted trajectories may not be optimal, a critical assumption in learning from demonstration [49] or inverse reinforcement learning [41]. Our formulation, Value Learning from Videos or VLV, tackles these problems by a) using pseudo action labels obtained by running an inverse model, and b) employing Q-learning to learn from video sequences that have been pseudo-labeled with actions. We follow work from Kumar et al. [36] and use a small number of interaction samples (40K) to acquire an inverse model. This inverse model is used to pseudo-label consecutive video frames with the action the robot would have taken to induce a similar view change. This tackles the problem of missing actions. Next, we obtain goal labels by classifying video frames based on whether or not they contain the desired target objects. Such labeling can be done using off-the shelf object detectors. Use of Q-learning [58] with consecutive frames, intervening actions (from inverse model), and rewards (from object category labels), leads to learning optimal Q-functions for reaching goals [53, 58]. We take the maximum Q-value over all actions, to obtain value functions. These value functions are exactly γs, where s is the number of steps to the nearest view location of the object of interest (γ is the Q-learning discount factor). These value functions implicitly learn semantic cues. An image looking at the corner towards the back of the restaurant will have a higher value (for bathroom as the semantic target) than an image looking at the entrance of the restaurant. These learned value functions when used with a hierarchical navigation policy, efficiently guide locomotion controllers to desired semantic targets in the environment. Learning from such videos can have many advantages, some of which address limitations of learning from direct interaction (such as via RL). Learning from direct interaction suffers from impractical sample complexity (the policy needs to discover high-reward trajectories which may be hard to find in sparse reward scenarios) and poor generalization (limited number of instrumented physical environments available for reward-based learning, or sim2real gap). Learning from videos side-steps both these issues. Our experiments in visually realistic simulations show 66% better performance than RL methods, while at the same time requiring 250× fewer active interaction samples for training.'''
-    # text = '''1 Introduction  Active learning is an important machine learning paradigm with a rich class of problems and mature literature [Prince, 2004, Settles, 2012, Hanneke et al., 2014]. Oftentimes, users have access to a large pool of unlabeled data and an oracle that can provide a label to a data point that is queried. Querying the oracle for the label comes at a cost, computational and/or monetary. Hence, a key objective for the algorithm is to â€œwiselyâ€� choose the set of points from the unlabelled pool that can provide better generalization. In this paper, we propose a probabilistic querying procedure to choose the points to be labeled by the oracle motivated from importance sampling literature [Tokdar and Kass, 2010]. Importance sampling is a popular statistical technique widely used for fast convergence in Monte Carlo based methods [Doucet et al., 2001] and stochastic optimization [Zhao and Zhang, 2015].  The main contributions of this paper are as follows. (a) We propose an importance sampling based algorithm for active learning, which we call Active Learning with Importance Sampling (ALIS). (b) We derive a high probability upper bound on the true loss and design the ALIS algorithm to directly minimize the bound. (c) We determine an optimal sampling probability distribution for the algorithm. (d) We demonstrate that the optimal sampling distribution gives a tighter bound on the true loss compared to the baseline uniform sampling procedure.'''
+    rp = RawPaper.fromPdf(path=args.in_pdf_path)
 
-    text_abstract = args.text_abstract
-    text_intro = args.text_intro
-    text_body = args.text_body
-    text_conclusion = args.text_conclusion
+    # text_abstract = args.text_abstract
+    # text_intro = args.text_intro
+    # text_body = args.text_body
+    # text_conclusion = args.text_conclusion
 
-    if(args.text_abstract is None ): text_abstract = input("text-abstract to be faked: ")
-    if(args.text_intro is None ): text_intro = input("text-intro to be faked: ")
-    if(args.text_body is None ): text_body = input("text-body to be faked: ")
-    if(args.text_conclusion is None ): text_conclusion = input("text-conclusion to be faked: ")
+    # if(args.text_abstract is None ): text_abstract = input("text-abstract to be faked: ")
+    # if(args.text_intro is None ): text_intro = input("text-intro to be faked: ")
+    # if(args.text_body is None ): text_body = input("text-body to be faked: ")
+    # if(args.text_conclusion is None ): text_conclusion = input("text-conclusion to be faked: ")
 
-    # TODO se file singolo o testo completo creo un rawPaper e faccio extrat sections 
-    
-    fulltext = text_abstract+" "+text_intro+" "+text_body+" "+text_conclusion
-    sections = {
-            PaperSections.PAPER_ABSTRACT : text_abstract,
-            PaperSections.PAPER_INTRO : text_intro,
-            PaperSections.PAPER_CORPUS : text_body,
-            PaperSections.PAPER_CONCLUSION : text_conclusion
-        }
+    # fulltext = text_abstract+" "+text_intro+" "+text_body+" "+text_conclusion
+    # sections = {
+    #         PaperSections.PAPER_ABSTRACT : text_abstract,
+    #         PaperSections.PAPER_INTRO : text_intro,
+    #         PaperSections.PAPER_CORPUS : text_body,
+    #         PaperSections.PAPER_CONCLUSION : text_conclusion
+    #     }
 
-    p_test = StructuredPaper(sections,fulltext,parser)
+    p_test = StructuredPaper.from_raw(rp)
 
 
     # found = []
@@ -419,7 +425,7 @@ def main(args):
         text += "\n"+"="*40+"\n"
 
         text += "="*20+"REPLACEMENTS"+"="*20+"\n"
-        text += "\n"+"\n".join([str(s) for s in substitutions])
+        text += ",\n"+"\n".join([str(s) for s in substitutions])
         text += "\n"
         text += "\n"+str(treplace)
         text += "\n"+"="*40+"\n"
@@ -443,6 +449,9 @@ def main(args):
         text += "="*20+"ORIGINAL CONCLUSIONS"+"="*20+"\n"
         text += p_test.sections[PaperSections.PAPER_CONCLUSION]
         text += "\n"+"="*40+"\n"
+        text += "="*20+"COMPLETE TEXT"+"="*20+"\n"
+        text += p_test.fulltext
+        text += "\n"+"="*40+"\n"
 
         result.write(text.encode("utf-8"))
         print("\t[done]")
@@ -457,7 +466,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "--conc-list-size",
+        "--concept-list-size",
         help="maximum replacement elements for each concept",
         default=50,
     )
@@ -467,31 +476,36 @@ if __name__ == "__main__":
         "--output",
         help="file where store result output",
         default=50,
+        
     )
 
-    parser.add_argument(
-        "--text-abstract",
-        help="text-abstract to be faked",
-        default=None,
-    )
+    # parser.add_argument(
+    #     "--text-abstract",
+    #     help="text-abstract to be faked",
+    #     default=None,
+    #     
+    # )
 
-    parser.add_argument(
-        "--text-intro",
-        help="text-intro to be faked",
-        default=None,
-    )
+    # parser.add_argument(
+    #     "--text-intro",
+    #     help="text-intro to be faked",
+    #     default=None,
+    #     
+    # )
 
-    parser.add_argument(
-        "--text-body",
-        help="text-body to be faked",
-        default=None,
-    )
+    # parser.add_argument(
+    #     "--text-body",
+    #     help="text-body to be faked",
+    #     default=None,
+    #     
+    # )
 
-    parser.add_argument(
-        "--text-conclusion",
-        help="text-conclusion to be faked",
-        default=None,
-    )
+    # parser.add_argument(
+    #     "--text-conclusion",
+    #     help="text-conclusion to be faked",
+    #     default=None,
+    #     
+    # )
 
     parser.add_argument(
         "--fake-paper-dump",
@@ -503,32 +517,49 @@ if __name__ == "__main__":
         "--dump-raw-papers",
         help="if provided, each raw-paper is dumped",
         default=None,
+            
     )
 
     parser.add_argument(
         "--pdf-repo",
         help="specify repository where pick pdfs",
         default=None,
+            
     )
 
     parser.add_argument(
         "--csv-dir",
         help="specify repository where export extracted csv",
         default=None,
+            
     )
 
     parser.add_argument(
         "--mp",
         help="start process on NUM multiple cpus",
         default=None,
+            
     )
 
     parser.add_argument(
-        "--repo-limit",
+        "--limit",
         help="specify max paper from repo",
         default=None,
+            
     )
-    
+
+    parser.add_argument(
+        "--csv-datasets-dir",
+        help="specify csv folder where are stored sections",
+        default=None,
+            
+    )
+
+    parser.add_argument(
+        "--in-pdf-path",
+        help="pdf file to be faked",
+        required=True,
+    )
 
     # csv path (valutare i csv cper intro, abstract....)
 
