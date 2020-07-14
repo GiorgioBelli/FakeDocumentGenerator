@@ -27,6 +27,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.parse import stanford
 from ontology_analysis import rdf_get_sibligs, isInOntology, getWnTerm, showTree, sentence_similarity
 from pdf_parsing.paper_to_txt import RepositoryExtractor, RawPaper, PaperSections
+from pdf_parsing.txt2pdf import PDFCreator, Args, Margins
 
 stopwords_en_set=set(stopwords.words('english'))
 
@@ -54,9 +55,7 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
     # if( iteration == total): print()
 
 def replace_multi_regex(text,rep_dict):
-    # use these three lines to do the replacement
     rep_dict = dict((re.escape(k), v) for k, v in rep_dict.items()) 
-    #Python 3 renamed dict.iteritems to dict.items so use rep.items() for latest versions
     pattern = re.compile("|".join(rep_dict.keys()))
     text = pattern.sub(lambda m: rep_dict[re.escape(m.group(0))], text)
     return text
@@ -90,7 +89,7 @@ def forge_jaccard_distance(label1, label2):
 
 class StructuredPaper():
     def __init__(self,sections,fulltext,parser):
-        str_rep = {"ï¬�":"fi","ï¬":"fi","ï¬‚":"fl"}
+        str_rep = {"ï¬�":"fi","ï¬":"fi","ï¬‚":"fl","ﬁ":"fi","ﬀ":"ff","ﬂ":"fl"}
 
         self.sections = sections
         # self.fulltext = re.sub("ï¬�|ï¬","fi",fulltext)
@@ -197,6 +196,18 @@ class StructuredPaper():
             distances.append((topic,sentence_similarity(focus_topic,topic)))
         distances.sort(reverse=True,key=lambda x: x[1])
         return (focus_topic,distances)
+
+    def generatePdf(self,args={},layout=None):
+
+        args = Args(args)
+
+        creator = PDFCreator(args, Margins(
+            args.margin_right,
+            args.margin_left,
+            args.margin_top,
+            args.margin_bottom))
+
+        creator.generate()
 
 
 class Repository():
@@ -409,7 +420,7 @@ def main(args):
     num_concepts = len(p_test.topics)
     if(num_concepts>0): printProgressBar(0,num_concepts,prefix="Finding substitution [{}/{}]".format(0,num_concepts),suffix="",length=50)
 
-    for i,focus_topic in enumerate(p_test.topics):
+    for i,focus_topic in enumerate(list(p_test.topics)[1:4]):
         printProgressBar(i+1,num_concepts,prefix="Finding substitutions [{}/{}]".format(i+1,num_concepts),suffix="computing: "+focus_topic,length=50)
         topic, candidates = p_test.getCandicateConcepts(focus_topic,repo.generalTopics)
         substitutions.append((topic,[c[0] for c in candidates[:50]]))
@@ -455,6 +466,11 @@ def main(args):
 
         result.write(text.encode("utf-8"))
         print("\t[done]")
+
+    p_test.generatePdf(args={
+        "filename":fake_paper_dump_file,
+        "output": "../Results/result.pdf",
+        })
     
     return    
     
