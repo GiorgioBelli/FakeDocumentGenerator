@@ -26,14 +26,21 @@ from nltk.stem.wordnet import WordNetLemmatizer
 
 from nltk.parse import stanford
 from ontology_analysis import rdf_get_sibligs, isInOntology, getWnTerm, showTree, sentence_similarity
-from pdf_parsing.paper_to_txt import RepositoryExtractor, RawPaper, PaperSections
+from pdf_parsing.paper_to_txt import RepositoryExtractor, RawPaper, PaperSections, removeEOL, removeWordWrap
 from pdf_parsing.txt2pdf import PDFCreator, Args, Margins
+
+import operator
+import json
+import itertools
+
+import multiprocessing as mp
+import psutil
 
 stopwords_en_set=set(stopwords.words('english'))
 
 
 nlp = spacy.load("en_core_web_sm")
-rake = Rake(language_code="en")
+rake = Rake(max_words=5,min_freq=1,language_code="en")
 
 def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
     """
@@ -87,8 +94,11 @@ def forge_jaccard_distance(label1, label2):
     if(not bool(label1) and not bool(label2)): return 0.0
     return len(label1.intersection(label2))/len(label1.union(label2))
 
+def removePunctualization(text):
+    return re.sub(r'\?|,|:','',text)
+
 class StructuredPaper():
-    def __init__(self,sections,fulltext,parser):
+    def __init__(self,sections,fulltext,info={},max_topics=None,parser=None):
         str_rep = {"ï¬�":"fi","ï¬":"fi","ï¬‚":"fl","ﬁ":"fi","ﬀ":"ff","ﬂ":"fl"}
 
         self.sections = sections
@@ -98,7 +108,7 @@ class StructuredPaper():
         self.contexts = dict()
         self.proximityFrequences = {}
         self.jcMatrix = dict()
-        # self.sentencesTrees = self.createTree(parser)
+        self.info = info
 
         self.transformedFullText = ""
         self.transformedTopics = set()
@@ -107,18 +117,65 @@ class StructuredPaper():
         for section in self.sections.keys() :
             # self.sections[section] = re.sub("ï¬�|ï¬","fi",self.sections[section])
             self.sections[section] = replace_multi_regex(self.sections[section],str_rep)
-            self.rake_extractTopics(self.sections[section])
+            if(fulltext == "" or fulltext is None): self.fulltext += section+"\n"+self.sections[section]+"\n"
+            section_sents = self.sections[section].split(". ")
+            section_sents_count = len(section_sents)
+            offset = 3
+            # for idx in range(0,section_sents_count,3):
+            #     if(idx+3 > section_sents_count-1): subtext = ". ".join(section_sents[idx:]).lower()
+            #     else: subtext = ". ".join(section_sents[idx:idx+offset]).lower()
+            #     self.rake_extractTopics(subtext,limit=max_topics)
+            self.rake_extractTopics(self.sections[section],limit=max_topics)
+            # self.stanford_extractTopics(self.sections[section],parser,limit=max_topics)
+            # self.spacy_extractTopics(self.sections[section])
+        
+        self.frequencies = self.computeFrequencies()
+        # if(max_topics): 
+        #     t_list = sorted(list(self.topics), key= lambda x: self.frequencies.get(x,0),reverse=True)
+        #     t_list = list(self.topics)
+        #     self.topics = set(t_list[:max_topics])
 
     @staticmethod
-    def from_raw(rawPaper,parser=None):
-        return StructuredPaper(rawPaper.sections_dict,rawPaper.full_text,parser)
+    def from_raw(rawPaper,max_topics=None,parser=None):
+        return StructuredPaper(rawPaper.sections_dict,rawPaper.full_text,info={},max_topics=max_topics,parser=parser)
+
+    @staticmethod
+    def from_json(json_path,max_topics=None,parser=None):
+        with open(json_path,"r") as json_fd:
+            json_string = json_fd.read()
+            p = json.loads(json_string)
+        
+        info = {
+            "filename": str(p["name"]),
+            "title": str(p["metadata"]["title"]),
+            "authors": str(p["metadata"]["authors"]),
+            "year": str(p["metadata"]["year"]),
+            "references": str(p["metadata"]["references"]),
+
+        }
+
+        sections = {
+            PaperSections.PAPER_ABSTRACT: str(p["metadata"]["abstractText"])
+        }
+
+        full_text = str(p["metadata"]["abstractText"])+"\n"
+
+        for section in p["metadata"]["sections"]:
+            sections.update({str(section["heading"]):str(section["text"])})
+            full_text+=str(section["heading"])+"\n"+str(section["text"])+"\n"
+
+        return StructuredPaper(sections,full_text,info=info,max_topics=max_topics,parser=parser)
+
 
 
     def createTree(self,text,parser):
         return parser.raw_parse_sents(text.split(". "))
 
-    def stanford_extractTopics(self):
-        for sentenceTree in self.sentencesTrees:
+    def stanford_extractTopics(self,text,parser,limit=None):
+
+        sentences_trees = self.createTree(text,parser)
+
+        for sentenceTree in sentences_trees:
             for t in sentenceTree: root = t
 
             partial_topics = set()
@@ -141,7 +198,7 @@ class StructuredPaper():
             self.contexts["#".join(token.split())] = set()
         self.cleanRedoundantTopics()
 
-    def rake_extractTopics(self,text,threshold=5.0):
+    def rake_extractTopics(self,text,limit=None,threshold=5.0):
         keywords = rake.apply(text)
         for keyword in keywords:
             k_rating = keyword[1]
@@ -151,33 +208,42 @@ class StructuredPaper():
                 self.transformedTopics.add("#".join(k_text.split()))
                 self.contexts["#".join(k_text.split())] = set()
 
-
     def cleanRedoundantTopics(self):
         self.topics = discardTopics(self.topics)
 
     def replaceTopicsInText(self,extraTopics = set()):
-        self.transformedFullText = self.fulltext
+        self.transformedFullText = removePunctualization(removeEOL(removeWordWrap(self.fulltext.lower())))
         for topic in self.topics.union(extraTopics):
             t_topic = '#'.join(topic.split())
             self.transformedFullText = self.transformedFullText.replace(topic,t_topic)
 
     def computeContextAndFrequencies(self,window=5,extraTransformedTopics = set()):
+        # create context and compute frequency with window size (only for current sentence)
+        allTopics = self.transformedTopics.union(extraTransformedTopics)
+
         for t_sentence in self.transformedFullText.split(". "):
         
             sentenceWords=t_sentence.split()
            
-            # create context and compute frequency with window size (only for current sentence)
-            allTopics = self.transformedTopics.union(extraTransformedTopics)
-
             for i,word in enumerate(sentenceWords):
                 if(word in allTopics):
                     contextWords = sentenceWords[max(0,i-window):i]+sentenceWords[i+1:min(i+window+1,len(sentenceWords))]
-                    if(word not in self.contexts.keys()): self.contexts[word] = set(contextWords)
-                    else: self.contexts[word].update(contextWords)
+
+                    self.contexts.setdefault(word,set()).update(contextWords)
+
                     for j in range(i+1,min((i+window+1),len(sentenceWords)-1)):
                         if(sentenceWords[j]!=word and sentenceWords[j] in allTopics):
                             new_val = self.proximityFrequences.get((word,sentenceWords[j]),0)+1
-                            self.proximityFrequences.update({(word,sentenceWords[j]): new_val}) 
+                            self.proximityFrequences.update({(word,sentenceWords[j]): new_val})
+
+            
+
+    def computeFrequencies(self):
+        frequencies = {}
+        for topic in self.topics:
+            frequency = self.fulltext.count(topic)
+            frequencies.update({topic:frequency})
+        return frequencies
     
     def getSubstituteConcept(self,focus_topic,alternatives):
         best_candidate = (None, None, -1)
@@ -189,12 +255,14 @@ class StructuredPaper():
         return best_candidate
 
         
-    def getCandicateConcepts(self,focus_topic,alternatives):
+    def getCandicateConcepts(self,focus_topic,alternatives,limit=None):
         distances = []
         topic_set = alternatives-self.topics
         for topic in topic_set:
-            distances.append((topic,sentence_similarity(focus_topic,topic)))
-        distances.sort(reverse=True,key=lambda x: x[1])
+            topic_frequency = self.frequencies.get(focus_topic,None)
+            distances.append((topic,sentence_similarity(focus_topic,topic),topic_frequency))
+        distances.sort(reverse=True,key= operator.itemgetter(2,1))
+        if(limit): distances = distances[0:limit]
         return (focus_topic,distances)
 
     def generatePdf(self,args={},layout=None):
@@ -223,8 +291,10 @@ class Repository():
         self.initTopics()
         print("\t[done]")
         
+        # print("\tprepare for JC...",end="")
+        self.prepareForJC()       
+        # print("\t[done]")
 
-        # self.prepareForJC()
         # print("\tcomputeJC...",end="")
         # self.computeJC()
         # print("\t[done]")
@@ -238,18 +308,43 @@ class Repository():
         for paper in self.papers:
             keys = self.generalContexts.keys()
             for k in paper.contexts.keys():
-                if k in keys: self.generalContexts[k].update(paper.contexts[k])
-                else: self.generalContexts[k] = paper.contexts[k]
+                self.generalContexts.setdefault(k,paper.contexts[k]).update(paper.contexts[k])
+
+    def replacePaperTopics(self,paper):
+        paper.replaceTopicsInText(extraTopics=self.generalTopics)
+        
+    def computePaperContext(self,paper):
+        paper.computeContextAndFrequencies(extraTransformedTopics=self.generalTransformedTopics)
 
     def replacePapersTopics(self):
+
+        # with mp.Pool(processes=None) as pool:
+        #         results = pool.map(self.replacePaperTopics,self.papers)
+
         for paper in self.papers:
             paper.replaceTopicsInText(extraTopics=self.generalTopics)
 
     def computePapersContext(self):
+
+        # with mp.Pool(processes=None) as pool:
+        #         results = pool.map(self.computePaperContext,self.papers)
+
         for paper in self.papers:
             paper.computeContextAndFrequencies(extraTransformedTopics=self.generalTransformedTopics)
 
-    def prepareForJC():
+        # for paper in self.papers:
+        #     paper.computeContextAndFrequencies(extraTransformedTopics=self.generalTransformedTopics)
+        #     print("====FULLTEXT====\n",)
+        #     print(removePunctualization(removeEOL(removeWordWrap(paper.fulltext.lower()))))
+        #     print("====FULLTEXT TRANS====\n",)
+        #     print(paper.transformedFullText)
+        #     print("====CONTEXTS TRANS====\n",)
+        #     for k,v in paper.contexts.items():
+        #         print(k,"->",v)
+        #     print("====END====\n",)
+            
+
+    def prepareForJC(self):
         print("\treplacePapersTopics...",end="")
         self.replacePapersTopics()
         print("\t[done]")
@@ -270,11 +365,15 @@ class Repository():
 
     def computeJCforPaper(self,paper):
         jcMatrix = dict()
+
+        paper.replaceTopicsInText(extraTopics=self.generalTopics)
+        paper.computeContextAndFrequencies(extraTransformedTopics=self.generalTransformedTopics)
+
         for tp in paper.transformedTopics:
             for tpp in self.generalTransformedTopics:
                 if(tp != tpp):
                     jc = forge_jaccard_distance(paper.contexts[tp],self.generalContexts[tpp])
-                    if(jc != 0 and jc > (paper.jcMatrix.get(tp,(tp,0)))[1]): 
+                    if(jc != 0 and jc > (paper.jcMatrix.get(tp,(tp,0)))[1]):
                         paper.jcMatrix[tp] = (tpp,jc)
         return paper.jcMatrix
         
@@ -283,20 +382,41 @@ def load_csv(path):
         rows = f.read().split("\f\n")
     return rows
 
+global_id = [-1,]
+
+def createPaper(idx,path,max_topics,parser):
+    p = StructuredPaper.from_json(path,max_topics=max_topics,parser=parser)
+    if(psutil.Process().cpu_num() == 0):
+        print('\rcreating paper: {}                       '.format(idx),end="")
+    return p
+
+def findSubstitutions(idx,paper,focus_topic,repo,max_candidates):
+    if(psutil.Process().cpu_num() == 0):
+        print('\rfinding substitutions: {}                       '.format(idx),end="")
+    topic, candidates = paper.getCandicateConcepts(focus_topic,repo.generalTopics)
+    
+    return (topic,[c[0] for c in candidates[:max_candidates]])
+
 def main(args):
 
-    # os.environ['STANFORD_PARSER'] = 'C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\FakeDocumentGenerator\\models\\stanford-parser-full-2018-10-17\\stanford-parser.jar'
-    # os.environ['STANFORD_MODELS'] = 'C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\FakeDocumentGenerator\\models\\stanford-parser-full-2018-10-17\\stanford-parser-3.9.2-models.jar'
-    
-    # java_path = "C:\\Program Files\\Java\\jre-10.0.1\\bin\\java.exe"
-    # os.environ['JAVAHOME'] = java_path
 
-    # parser = stanford.StanfordParser(model_path="C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\FakeDocumentGenerator\\models\\stanford-parser-full-2018-10-17\\models\\englishPCFG.ser.gz")
-    parser = None
+    os.environ['STANFORD_PARSER'] = '/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/stanford-parser.jar'
+    os.environ['STANFORD_MODELS'] = '/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/stanford-parser-4.0.0-models.jar'
+    os.environ['CLASSPATH'] = '/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/*'
     
+    java_path = "/usr/bin/java"
+    os.environ['JAVAHOME'] = java_path
+
+    stan_parser = stanford.StanfordParser(model_path="/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")
+
+    # parser = None
+
+    max_topics = int(args.extracted_topics_limit)
     # csv_path = "C:\\Users\\GIORGIO-DESKTOP\\Documents\\Universita\\FakeDocumentGenerator\\datasets\\arxiv\\4500_summaries_trainingSet.csv"
     # csv_path = "C:\\Users\\GIORGIO-DESKTOP\\Desktop\\intros.csv"
     csv_datasets_dir = args.csv_datasets_dir
+    json_papers_dir = args.json_papers_dir
+    pdf_papers_dir = args.pdf_papers_dir
 
     # abstract_csv = pandas.read_csv(os.path.join(csv_datasets_dir,"abstract.csv"), delimiter = '\f\n', engine="python")
     # intro_csv = pandas.read_csv(os.path.join(csv_datasets_dir,"intro.csv"), delimiter = '\f\n', engine="python")
@@ -327,13 +447,11 @@ def main(args):
                 PaperSections.PAPER_CONCLUSION : conclusion_csv[idx]
             }
             raw_papers.append(RawPaper.fromSections(sections))
-
-    else: # read pdf repo and generates papers
-        path = args.pdf_repo
+    elif pdf_papers_dir: # read pdf repo and generates papers
 
         csv_dir = args.csv_dir
 
-        repo_extr = RepositoryExtractor(path)
+        repo_extr = RepositoryExtractor(pdf_papers_dir)
 
         limit = int(args.limit) if args.limit else None
 
@@ -359,16 +477,48 @@ def main(args):
 
         raw_papers = repo_extr.papers
 
-    ## concepts extraction
 
     paper_list = []
-    paper_count = len(raw_papers)
-    printProgressBar(0,paper_count,prefix="Creating papers [{},{}]".format(0,paper_count),suffix="",length=50)
-    for i,raw_paper in enumerate(raw_papers):
-        # if(i==100): break
-        paper_list.append(StructuredPaper(raw_paper.sections_dict,raw_paper.full_text,parser))
-        printProgressBar(i+1,paper_count,prefix="Creating papers [{},{}]".format(i+1,paper_count),suffix="",length=50)
-    print()
+    
+    if json_papers_dir: #create directly structured papers from json
+        limit = int(args.limit) if args.limit else None
+        files = os.listdir(json_papers_dir)[:limit]
+        paper_count = len(files)
+
+        inputs = [(idx,os.path.join(json_papers_dir,json_path),max_topics,stan_parser) for idx,json_path in enumerate(files)]
+        
+        if(args.mp):
+            workers = None if args.mp == "all" else int(args.mp)
+            with mp.Pool(processes=workers) as pool:
+                results = pool.starmap(createPaper,inputs)
+            print('\rcreating paper: {}\t[done]             '.format(len(results)))
+            for paper in results:
+                paper_list.append(paper)
+        else:
+            printProgressBar(0,paper_count,prefix="Creating papers [{},{}]".format(0,paper_count),suffix="",length=50)
+            for i,json_path in enumerate(files):
+                # if(i==250): break
+                
+                p = StructuredPaper.from_json(os.path.join(json_papers_dir,json_path),max_topics=max_topics,parser=stan_parser)
+                paper_list.append(p)
+
+                printProgressBar(i+1,paper_count,prefix="Creating papers [{},{}]".format(i+1,paper_count),suffix="",length=50)
+
+        with open("../Results/generation/csvs/sp_introductions.csv","wb") as csv_out:
+            csv_text = "\f\n".join([removeEOL(text) for p in paper_list for heading,text in p.sections.items() if "introduction" in heading.lower()])
+            csv_text = removeWordWrap(csv_text)
+            csv_out.write(csv_text.encode("utf-8"))
+
+    else: # create structured papers on rawpapers
+        paper_count = len(raw_papers)
+        printProgressBar(0,paper_count,prefix="Creating papers [{},{}]".format(0,paper_count),suffix="",length=50)
+        for i,raw_paper in enumerate(raw_papers):
+            # if(i==100): break
+            paper_list.append(StructuredPaper(raw_paper.sections_dict,raw_paper.full_text,max_topics=max_topics,parser=stan_parser))
+            printProgressBar(i+1,paper_count,prefix="Creating papers [{},{}]".format(i+1,paper_count),suffix="",length=50)
+        print()
+
+    ## concepts extraction
     print("\ncreating repo...")
     repo = Repository(paper_list=paper_list)
 
@@ -376,7 +526,6 @@ def main(args):
 
     fake_paper_dump_file = args.fake_paper_dump
 
-    rp = RawPaper.fromPdf(path=args.in_pdf_path)
 
     # text_abstract = args.text_abstract
     # text_intro = args.text_intro
@@ -396,7 +545,14 @@ def main(args):
     #         PaperSections.PAPER_CONCLUSION : text_conclusion
     #     }
 
-    p_test = StructuredPaper.from_raw(rp)
+    if(args.in_file_path.endswith(".json")):
+        p_test = StructuredPaper.from_json(args.in_file_path,max_topics=max_topics,parser=stan_parser)
+    elif(args.in_file_path.endswith(".pdf")):
+        rp = RawPaper.fromPdf(path=args.in_pdf_path)
+        p_test = StructuredPaper.from_raw(rp,max_topics=max_topics,parser=stan_parser)
+    else:
+        raise Exception("input paper can be only pdf or json (.json, .pdf)")
+
 
 
     # found = []
@@ -418,13 +574,20 @@ def main(args):
 
     substitutions = []
     num_concepts = len(p_test.topics)
-    if(num_concepts>0): printProgressBar(0,num_concepts,prefix="Finding substitution [{}/{}]".format(0,num_concepts),suffix="",length=50)
+    # if(num_concepts>0): printProgressBar(0,num_concepts,prefix="Finding substitution [{}/{}]".format(0,num_concepts),suffix="",length=50)
 
-    for i,focus_topic in enumerate(list(p_test.topics)[1:4]):
-        printProgressBar(i+1,num_concepts,prefix="Finding substitutions [{}/{}]".format(i+1,num_concepts),suffix="computing: "+focus_topic,length=50)
-        topic, candidates = p_test.getCandicateConcepts(focus_topic,repo.generalTopics)
-        substitutions.append((topic,[c[0] for c in candidates[:50]]))
-    print()
+    # workers = None if args.mp == "all" else int(args.mp)
+    inputs = [(idx,p_test,focus_topic,repo,max_topics) for idx,focus_topic in enumerate(p_test.topics)]
+
+    # with mp.Pool(processes=None) as pool:
+    #     substitutions = pool.starmap(findSubstitutions,inputs)
+    #     print()
+
+    # for i,focus_topic in enumerate(p_test.topics):
+    #     printProgressBar(i+1,num_concepts,prefix="Finding substitutions [{}/{}]".format(i+1,num_concepts),suffix="computing: "+focus_topic,length=50)
+    #     topic, candidates = p_test.getCandicateConcepts(focus_topic,repo.generalTopics)
+    #     substitutions.append((topic,[c[0] for c in candidates[:50]]))
+    # print()
 
     with open(fake_paper_dump_file,"wb") as result:
         print("writing results...",end="")
@@ -436,35 +599,29 @@ def main(args):
         text += "\n"+"="*40+"\n"
 
         text += "="*20+"REPLACEMENTS"+"="*20+"\n"
-        text += ",\n"+"\n".join([str(s) for s in substitutions])
+        text += "\n"+",\n".join([str(s) for s in substitutions])
         text += "\n"
         text += "\n"+str(treplace)
         text += "\n"+"="*40+"\n"
 
-        # matrix = repo.computeJCforPaper(p_test)
-        # l = [(k,matrix[k][0],matrix[k][1])for k in matrix.keys()]
-        # l.sort(reverse=True,key=(lambda x: x[2]))
-        # text += "="*20+"JC"+"="*20+"\n"
-        # text += "\n"+str(l)
-        # text += "\n"+"="*40+"\n"
+        matrix = repo.computeJCforPaper(p_test)
+        # print(matrix)
+        l = [(k,v[0],v[1])for k, v in matrix.items()]
+        l.sort(reverse=True,key=(lambda x: x[2]))
+        text += "="*20+"JC"+"="*20+"\n"
+        text += "\n"+str(l)
+        text += "\n"+"="*40+"\n"
 
-        text += "="*20+"ORIGINAL ABSTRACT"+"="*20+"\n"
-        text += p_test.sections[PaperSections.PAPER_ABSTRACT]
-        text += "\n"+"="*40+"\n"
-        text += "="*20+"ORIGINAL INTRO"+"="*20+"\n"
-        text += p_test.sections[PaperSections.PAPER_INTRO]
-        text += "\n"+"="*40+"\n"
-        text += "="*20+"ORIGINAL BODY"+"="*20+"\n"
-        text += p_test.sections[PaperSections.PAPER_CORPUS]
-        text += "\n"+"="*40+"\n"
-        text += "="*20+"ORIGINAL CONCLUSIONS"+"="*20+"\n"
-        text += p_test.sections[PaperSections.PAPER_CONCLUSION]
-        text += "\n"+"="*40+"\n"
+        for name,content in p_test.sections.items():
+            text += "="*20+"ORIGINAL "+name+"="*20+"\n"
+            text += content
+            text += "\n"+"="*40+"\n"
+
         text += "="*20+"COMPLETE TEXT"+"="*20+"\n"
         text += p_test.fulltext
         text += "\n"+"="*40+"\n"
 
-        result.write(text.encode("utf-8"))
+        result.write(text.encode("utf-8",'surrogatepass'))
         print("\t[done]")
 
     p_test.generatePdf(args={
@@ -479,15 +636,21 @@ if __name__ == "__main__":
     import argparse
     import timeit
 
-    parser = argparse.ArgumentParser()
+    arg_parser = argparse.ArgumentParser()
 
-    parser.add_argument(
+    arg_parser.add_argument(
         "--concept-list-size",
         help="maximum replacement elements for each concept",
         default=50,
     )
 
-    parser.add_argument(
+    arg_parser.add_argument(
+        "--extracted-topics-limit",
+        help="maximum topics extracted for each paper",
+        default=50,
+    )
+
+    arg_parser.add_argument(
         "-o",
         "--output",
         help="file where store result output",
@@ -495,86 +658,92 @@ if __name__ == "__main__":
         
     )
 
-    # parser.add_argument(
+    # arg_parser.add_argument(
     #     "--text-abstract",
     #     help="text-abstract to be faked",
     #     default=None,
     #     
     # )
 
-    # parser.add_argument(
+    # arg_parser.add_argument(
     #     "--text-intro",
     #     help="text-intro to be faked",
     #     default=None,
     #     
     # )
 
-    # parser.add_argument(
+    # arg_parser.add_argument(
     #     "--text-body",
     #     help="text-body to be faked",
     #     default=None,
     #     
     # )
 
-    # parser.add_argument(
+    # arg_parser.add_argument(
     #     "--text-conclusion",
     #     help="text-conclusion to be faked",
     #     default=None,
     #     
     # )
 
-    parser.add_argument(
+    arg_parser.add_argument(
         "--fake-paper-dump",
         help="result of keyword extraction and substitutions",
         default="../Results/result.out",
     )
 
-    parser.add_argument(
+    arg_parser.add_argument(
         "--dump-raw-papers",
         help="if provided, each raw-paper is dumped",
         default=None,
             
     )
 
-    parser.add_argument(
-        "--pdf-repo",
+    arg_parser.add_argument(
+        "--pdf-papers-dir",
         help="specify repository where pick pdfs",
         default=None,
             
     )
 
-    parser.add_argument(
+    arg_parser.add_argument(
         "--csv-dir",
         help="specify repository where export extracted csv",
         default=None,
             
     )
 
-    parser.add_argument(
+    arg_parser.add_argument(
         "--mp",
         help="start process on NUM multiple cpus",
         default=None,
             
     )
 
-    parser.add_argument(
+    arg_parser.add_argument(
         "--limit",
         help="specify max paper from repo",
         default=None,
             
     )
 
-    parser.add_argument(
+    arg_parser.add_argument(
         "--csv-datasets-dir",
         help="specify csv folder where are stored sections",
         default=None,
             
     )
 
-    parser.add_argument(
-        "--in-pdf-path",
-        help="pdf file to be faked",
+    arg_parser.add_argument(
+        "--in-file-path",
+        help="file to be faked, must end in .pdf or .json",
         required=True,
+    )
+
+    arg_parser.add_argument(
+        "--json-papers-dir",
+        help="json directory",
+        default=None
     )
 
     # csv path (valutare i csv cper intro, abstract....)
@@ -583,6 +752,6 @@ if __name__ == "__main__":
 
 
 
-    args = parser.parse_args()
+    args = arg_parser.parse_args()
 
     print(timeit.Timer(lambda: main(args)).repeat(1, 1))

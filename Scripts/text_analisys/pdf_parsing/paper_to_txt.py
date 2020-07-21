@@ -99,7 +99,7 @@ class RawPaper():
         p = RawPaper(path=path)
         p.full_text = re.sub(r'\f',"\n", pdf_to_txt(p.path))
         p.full_text = removeWordWrap(p.full_text)
-        p.extract_content_table()
+        print(p.extract_content_table())
         p.extract_sections()
         
         return p
@@ -132,7 +132,7 @@ class RawPaper():
         lines = []
         for idx,line in enumerate(self.full_text.split("\n")):
             if(RawPaper.isTitle(line,idx,self.contents)): lines.append((line,idx))
-
+        
         hasContentTable = False
         counter = 0
         startIdx = 0
@@ -146,6 +146,8 @@ class RawPaper():
         return lines
         
     def isTitle(sentence,idx,contentsList=[]):
+        sentence = re.sub(r'^ +',"",sentence)
+        sentence = re.sub(r' +$',"",sentence)
         string = re.sub(r'\b(the|a|and|an|for|nor|but|or|yet|so|in|on|for|up|of|to|with|The|A|And|An|For|Nor|But|Or|Yet|So|In|On|For|Up|Of|To|With)\b','',sentence)
         hasListEnum = bool(re.search(r'^([0-9]+[\.]|[0-9]+(\.[0-9]+)*|M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})(\.M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})+)+) ',string))
         if(hasListEnum): string = re.sub("^[^ ]* ","",string)

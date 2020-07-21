@@ -61,6 +61,7 @@ class Args():
         self.keywords=''
         self.break_on_blanks=False
         self.encoding='utf8'
+        self.quiet=True
 
         self.page_numbers=None
         self.line_numbers=None
