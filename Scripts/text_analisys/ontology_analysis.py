@@ -145,6 +145,23 @@ def sentence_similarity(sentence1, sentence2):
     score /= count
     return score
 
+def tf_idf_similarity_matrix(focus_topic, candidates):
+    
+    complete_set = [focus_topic,*candidates]
+
+    vect = TfidfVectorizer(min_df=1, stop_words="english")
+    tfidf = vect.fit_transform(complete_set)
+    pairwise_similarity = tfidf * tfidf.T
+
+    arr = pairwise_similarity.toarray()
+
+    np.fill_diagonal(arr, np.nan)
+
+    focus_topic_idx = 0
+
+    most_similar_idx = np.nanargmax(arr[focus_topic_idx])
+
+    return complete_set[most_similar_idx]
 def computeDistance(sent1, sent2):
     wn_sent1 = []
     wn_sent2 = []
