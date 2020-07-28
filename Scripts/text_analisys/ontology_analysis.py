@@ -8,11 +8,18 @@ import urllib
 
 from nltk import word_tokenize, pos_tag
 from nltk.corpus import wordnet as wn
-from pprint import pprint
+from nltk.corpus import wordnet_ic
 
+import numpy as np
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+from pprint import pprint
 from queue import Queue
 
 import itertools as it
+
+
 
 cso_nt_path = "..\\datasets\\CSO.3.1.12.nt"
 
@@ -145,6 +152,40 @@ def sentence_similarity(sentence1, sentence2):
     score /= count
     return score
 
+def ic_sentence_similarity(sentence1, sentence2, context):
+    """ compute the sentence similarity using Wordnet """
+    # Tokenize and tag
+    sentence1 = pos_tag(word_tokenize(sentence1))
+    sentence2 = pos_tag(word_tokenize(sentence2))
+
+    ic = wordnet_ic.ic("ic-brown.dat")
+ 
+    # Get the synsets for the tagged words
+    synsets1 = [tagged_to_synset(*tagged_word) for tagged_word in sentence1]
+    synsets2 = [tagged_to_synset(*tagged_word) for tagged_word in sentence2]
+ 
+    # Filter out the Nones
+    synsets1 = [ss for ss in synsets1 if ss]
+    synsets2 = [ss for ss in synsets2 if ss]
+ 
+    score, count, best_score = 0.0, 0, 0.0
+ 
+    # For each word in the first sentence
+    for synset in synsets1:
+        # Get the similarity value of the most similar word in the other sentence
+        score_list = list(filter(lambda ps: ps, [synset.shortest_path_distance(ss) for ss in synsets2]))
+        best_score = max(score_list) if score_list else 0
+ 
+        # Check that the similarity could have been computed
+        if best_score is not None:
+            score += best_score
+            count += 1
+ 
+    # Average the values
+    if(count==0): return 0
+    score /= count
+    return score
+
 def tf_idf_similarity_matrix(focus_topic, candidates):
     
     complete_set = [focus_topic,*candidates]
@@ -162,6 +203,7 @@ def tf_idf_similarity_matrix(focus_topic, candidates):
     most_similar_idx = np.nanargmax(arr[focus_topic_idx])
 
     return complete_set[most_similar_idx]
+
 def computeDistance(sent1, sent2):
     wn_sent1 = []
     wn_sent2 = []
