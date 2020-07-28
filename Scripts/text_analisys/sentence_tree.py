@@ -516,11 +516,25 @@ def main(args):
 
                 printProgressBar(i+1,paper_count,prefix="Creating papers [{},{}]".format(i+1,paper_count),suffix="",length=50)
 
-        with open("../Results/generation/csvs/sp_introductions.csv","wb") as csv_out:
-            csv_text = "\f\n".join([removeEOL(text) for p in paper_list for heading,text in p.sections.items() if "introduction" in heading.lower()])
-            csv_text = removeWordWrap(csv_text)
-            csv_out.write(csv_text.encode("utf-8"))
+        # with open("../Results/generation/csvs/sp_introductions.csv","wb") as csv_out:
+        #     csv_text = "\n".join([removeEOL(removeWordWrap(text)) for p in paper_list for heading,text in p.sections.items() if "introduction" in heading.lower() and text != ""])
+        #     csv_out.write(csv_text.encode("utf-8"))
 
+        # with open("../Results/generation/csvs/sp_introductions.json","wb") as csv_out:
+        #     csv_text = ""
+        #     for p in paper_list:
+        #         intro = ""
+        #         for heading,text in p.sections.items():
+        #             if text and heading and "introduction" in heading.lower(): 
+        #                 intro += heading+"\n"+removeEOL(removeWordWrap(text))+"\n"
+        #         dumped_string = json.dumps({
+        #             "keywords": list(p.topics),
+        #             "introducton": intro,
+        #             })
+
+        #         csv_text += "<|startoftext|>\n"+dumped_string+"\n<|endoftext|>\n" 
+        #     csv_out.write(csv_text.encode("utf-8"))
+        
     else: # create structured papers on rawpapers
         paper_count = len(raw_papers)
         printProgressBar(0,paper_count,prefix="Creating papers [{},{}]".format(0,paper_count),suffix="",length=50)
