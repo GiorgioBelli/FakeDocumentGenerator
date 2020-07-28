@@ -97,6 +97,18 @@ def forge_jaccard_distance(label1, label2):
 def removePunctualization(text):
     return re.sub(r'\?|,|:','',text)
 
+def computeSynonymsDict(paper,topics, synsets_dict):
+    res_dict = dict()
+    for t in topics:
+        for w,lst in synsets_dict.items(): 
+            topic_set = set(wn.synsets("_".join(t.split())))
+            word_set = set(lst)
+            if topic_set and word_set and not topic_set.isdisjoint(word_set):
+                item = res_dict.setdefault(t,[[],0])
+                item[0].append(w)
+                item[1]+=paper.fulltext.lower().count(" "+w.lower()+" ")
+    return res_dict
+
 class StructuredPaper():
     def __init__(self,sections,fulltext,info={},max_topics=None,parser=None):
         str_rep = {"ï¬�":"fi","ï¬":"fi","ï¬‚":"fl","ﬁ":"fi","ﬀ":"ff","ﬂ":"fl"}
@@ -589,6 +601,12 @@ def main(args):
     #     substitutions.append((topic,[c[0] for c in candidates[:50]]))
     # print()
 
+    synset_dict = {}
+    for word in set(p_test.fulltext.split()):
+        synset_dict[word] = wn.synsets(word)
+    
+    syns_dict = computeSynonymsDict(p_test,p_test.topics,synset_dict)
+    
     with open(fake_paper_dump_file,"wb") as result:
         print("writing results...",end="")
 
