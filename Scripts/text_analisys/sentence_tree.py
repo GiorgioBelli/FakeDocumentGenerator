@@ -631,9 +631,15 @@ def main(args):
         text += "\n"+"="*40+"\n"
 
         text += "="*20+"REPLACEMENTS"+"="*20+"\n"
-        text += "\n"+",\n".join([str(s) for s in substitutions])
-        text += "\n"
-        text += "\n"+str(treplace)
+        l = [(s[0],p_test.frequencies.get(s[0]),s[1]) for s in substitutions]
+        #add synonyms
+        for s in substitutions: 
+            item = syns_dict.get(s[0],False)
+            if item:
+                for synonym in item[0]: 
+                    l.append((synonym,item[1],s[1]))
+        l.sort(key=lambda s: s[1],reverse=True)
+        text += "\n"+",\n".join([str(lp) for lp in l])
         text += "\n"+"="*40+"\n"
 
         matrix = repo.computeJCforPaper(p_test)
