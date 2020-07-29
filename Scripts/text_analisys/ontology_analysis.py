@@ -9,6 +9,7 @@ import urllib
 from nltk import word_tokenize, pos_tag
 from nltk.corpus import wordnet as wn
 from nltk.corpus import wordnet_ic
+from nltk.corpus import stopwords 
 
 import numpy as np
 
@@ -185,6 +186,46 @@ def ic_sentence_similarity(sentence1, sentence2, context):
     if(count==0): return 0
     score /= count
     return score
+
+
+def order_by_cosine_similarity(focus_topic,alternatives):
+
+    # tokenization 
+    X_list = word_tokenize(focus_topic)  
+
+    # sw contains the list of stopwords 
+    sw = stopwords.words('english')  
+
+    # remove stop words from the string 
+    X_set = {w for w in X_list if not w in sw}  
+
+    ret = []
+
+    for alt in alternatives:
+        l1 =[];l2 =[] 
+
+        Y_list = word_tokenize(alt) 
+
+        # remove stop words from the string 
+        Y_set = {w for w in Y_list if not w in sw} 
+
+        # form a set containing keywords of both strings  
+        rvector = X_set.union(Y_set)  
+        for w in rvector: 
+            if w in X_set: l1.append(1) # create a vector 
+            else: l1.append(0) 
+            if w in Y_set: l2.append(1) 
+            else: l2.append(0) 
+        c = 0
+        
+        # cosine formula  
+        for i in range(len(rvector)): 
+                c+= l1[i]*l2[i] 
+        cosine = c / float((sum(l1)*sum(l2))**0.5) 
+
+        ret.append((alt,cosine))
+    ret.sort(key=lambda x: x[1],reverse=True)
+    return ret
 
 def tf_idf_similarity_matrix(focus_topic, candidates):
     

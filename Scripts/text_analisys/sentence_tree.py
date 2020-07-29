@@ -26,7 +26,7 @@ from nltk.corpus import wordnet as wn
 # from sklearn.feature_extraction.text import CountVectorizer
 
 from nltk.parse import stanford
-from ontology_analysis import rdf_get_sibligs, isInOntology, getWnTerm, showTree, sentence_similarity, ic_sentence_similarity
+from ontology_analysis import rdf_get_sibligs, isInOntology, getWnTerm, showTree, sentence_similarity, ic_sentence_similarity, order_by_cosine_similarity
 from pdf_parsing.paper_to_txt import RepositoryExtractor, RawPaper, PaperSections, removeEOL, removeWordWrap
 from pdf_parsing.txt2pdf import PDFCreator, Args, Margins
 
@@ -68,10 +68,10 @@ def replace_multi_regex(text,rep_dict):
     text = pattern.sub(lambda m: rep_dict[re.escape(m.group(0))], text)
     return text
 
-with open("../datasets/AI_glossary.txt","r") as ai_glossary_fd:
-    field_words = set()
-    for word in ai_glossary_fd.readlines():
-        field_words.add(word[:-1].lower())
+# with open("../datasets/AI_glossary.txt","r") as ai_glossary_fd:
+#     field_words = set()
+#     for word in ai_glossary_fd.readlines():
+#         field_words.add(word[:-1].lower())
 
 def isSmallestNP(tree):
     adj_factor = 1 if tree.label()=="NP" else 0
@@ -263,9 +263,15 @@ class StructuredPaper():
     def getSubstituteConcept(self,focus_topic,alternatives):
         best_candidate = (None, None, -1)
         topic_set = alternatives-self.topics    
-        for topic in topic_set:
-            t = (focus_topic,topic,sentence_similarity(focus_topic,topic))
-            if(best_candidate[2]<t[2]): best_candidate = t
+
+        # cosine similaity
+        alternative, score = order_by_cosine_similarity(focus_topic,topic_set)[0]
+        best_candidate = (focus_topic, alternative, score)
+
+        # # wordnet similarity
+        # for topic in topic_set:
+        #     t = (focus_topic,topic,sentence_similarity(focus_topic,topic))
+        #     if(best_candidate[2]<t[2]): best_candidate = t
 
         return best_candidate
 
@@ -273,12 +279,16 @@ class StructuredPaper():
     def getCandicateConcepts(self,focus_topic,alternatives,limit=None):
         distances = []
         topic_set = alternatives-self.topics
-        full_text = "\n".join([str(k)+"\n"+str(v) for k,v in self.sections.items()])
-        for topic in topic_set:
-            topic_frequency = self.frequencies.get(focus_topic,None)
-            distances.append((topic,sentence_similarity(focus_topic,topic),topic_frequency))
-            # distances.append((topic,ic_sentence_similarity(focus_topic,topic,full_text),topic_frequency))
-        distances.sort(reverse=True,key= operator.itemgetter(2,1))
+        
+        distances = [(focus_topic,alt,self.frequencies.get(focus_topic,None)) for alt, score in order_by_cosine_similarity(focus_topic,topic_set)]
+        
+        # # wordnet similarity
+        # full_text = "\n".join([str(k)+"\n"+str(v) for k,v in self.sections.items()])
+        # for topic in topic_set:
+        #     topic_frequency = self.frequencies.get(focus_topic,None)
+        #     distances.append((topic,sentence_similarity(focus_topic,topic),topic_frequency))
+        #     # distances.append((topic,ic_sentence_similarity(focus_topic,topic,full_text),topic_frequency))
+        # distances.sort(reverse=True,key= operator.itemgetter(2,1))
         if(limit): distances = distances[0:limit]
         return (focus_topic,distances)
 
@@ -417,14 +427,14 @@ def findSubstitutions(idx,paper,focus_topic,repo,max_candidates):
 def main(args):
 
 
-    os.environ['STANFORD_PARSER'] = '/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/stanford-parser.jar'
-    os.environ['STANFORD_MODELS'] = '/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/stanford-parser-4.0.0-models.jar'
-    os.environ['CLASSPATH'] = '/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/*'
+    os.environ['STANFORD_PARSER'] = '/home/user/gbelli/FDG_Data/models/corenlp400/stanford-parser.jar'
+    os.environ['STANFORD_MODELS'] = '/home/user/gbelli/FDG_Data/models/corenlp400/stanford-parser-4.0.0-models.jar'
+    os.environ['CLASSPATH'] = '/home/user/gbelli/FDG_Data/models/corenlp400/*'
     
     java_path = "/usr/bin/java"
     os.environ['JAVAHOME'] = java_path
 
-    stan_parser = stanford.StanfordParser(model_path="/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")
+    stan_parser = stanford.StanfordParser(model_path="/home/user/gbelli/FDG_Data/models/corenlp400/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")
 
     # parser = None
 
@@ -622,10 +632,12 @@ def main(args):
     # print()
 
     synset_dict = {}
+    print("findinf synonyms",end="")
     for word in set(p_test.fulltext.split()):
         synset_dict[word] = wn.synsets(word)
     
     syns_dict = computeSynonymsDict(p_test,p_test.topics,synset_dict)
+    print("\t[done]")
     
     with open(fake_paper_dump_file,"wb") as result:
         print("writing results...",end="")
