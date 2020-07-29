@@ -68,10 +68,10 @@ def replace_multi_regex(text,rep_dict):
     text = pattern.sub(lambda m: rep_dict[re.escape(m.group(0))], text)
     return text
 
-with open("../datasets/AI_glossary.txt","r") as ai_glossary_fd:
-    field_words = set()
-    for word in ai_glossary_fd.readlines():
-        field_words.add(word[:-1].lower())
+# with open("../datasets/AI_glossary.txt","r") as ai_glossary_fd:
+#     field_words = set()
+#     for word in ai_glossary_fd.readlines():
+#         field_words.add(word[:-1].lower())
 
 def isSmallestNP(tree):
     adj_factor = 1 if tree.label()=="NP" else 0
@@ -427,14 +427,14 @@ def findSubstitutions(idx,paper,focus_topic,repo,max_candidates):
 def main(args):
 
 
-    os.environ['STANFORD_PARSER'] = '/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/stanford-parser.jar'
-    os.environ['STANFORD_MODELS'] = '/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/stanford-parser-4.0.0-models.jar'
-    os.environ['CLASSPATH'] = '/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/*'
+    os.environ['STANFORD_PARSER'] = '/home/user/gbelli/FDG_Data/models/corenlp400/stanford-parser.jar'
+    os.environ['STANFORD_MODELS'] = '/home/user/gbelli/FDG_Data/models/corenlp400/stanford-parser-4.0.0-models.jar'
+    os.environ['CLASSPATH'] = '/home/user/gbelli/FDG_Data/models/corenlp400/*'
     
     java_path = "/usr/bin/java"
     os.environ['JAVAHOME'] = java_path
 
-    stan_parser = stanford.StanfordParser(model_path="/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")
+    stan_parser = stanford.StanfordParser(model_path="/home/user/gbelli/FDG_Data/models/corenlp400/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")
 
     # parser = None
 
@@ -632,10 +632,12 @@ def main(args):
     # print()
 
     synset_dict = {}
+    print("findinf synonyms",end="")
     for word in set(p_test.fulltext.split()):
         synset_dict[word] = wn.synsets(word)
     
     syns_dict = computeSynonymsDict(p_test,p_test.topics,synset_dict)
+    print("\t[done]")
     
     with open(fake_paper_dump_file,"wb") as result:
         print("writing results...",end="")
