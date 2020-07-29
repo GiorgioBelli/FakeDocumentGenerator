@@ -75,6 +75,7 @@ class BertRanker():
 
         ret = [conc_prob for conc_prob in sorted(list(zip(ranks,probs)),key=lambda x: x[1],reverse=True)]
         print("\nRANKED OPTIONS:",ret)
+        print("\n\n")
 
         return ret
 
@@ -128,13 +129,18 @@ class BertRanker():
             
             sentence_context = self.get_context(sentences,sent_idx,window_size=1)
 
+            pre_context_len = len(sentence_context.get("pre-context"))
+            fol_context_len = len(sentence_context.get("fol-context"))
+
             for match in matches:
 
                 concept = concepts_objects[match.group(0)]
 
+                print("match concept:",concept.concept)
+
                 ranked_list = self.rank_concept(sentence,
                                                     sentence_context,
-                                                    Span(sentence_span.start+match.start(),sentence_span.start+match.end()),
+                                                    Span(pre_context_len+match.start()-1,pre_context_len+match.end()-1),
                                                     concept.alternatives)
 
                 ret[concept.concept] = ranked_list
