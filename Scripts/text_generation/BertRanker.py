@@ -140,7 +140,7 @@ class BertRanker():
 
                 ranked_list = self.rank_concept(sentence,
                                                     sentence_context,
-                                                    Span(pre_context_len+match.start()-1,pre_context_len+match.end()-1),
+                                                    Span(pre_context_len+match.start()-1,pre_context_len+match.end()),
                                                     concept.alternatives)
 
                 ret[concept.concept] = ranked_list
