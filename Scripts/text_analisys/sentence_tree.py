@@ -26,7 +26,7 @@ from nltk.corpus import wordnet as wn
 # from sklearn.feature_extraction.text import CountVectorizer
 
 from nltk.parse import stanford
-from ontology_analysis import rdf_get_sibligs, isInOntology, getWnTerm, showTree, sentence_similarity, ic_sentence_similarity
+from ontology_analysis import rdf_get_sibligs, isInOntology, getWnTerm, showTree, sentence_similarity, ic_sentence_similarity, order_by_cosine_similarity
 from pdf_parsing.paper_to_txt import RepositoryExtractor, RawPaper, PaperSections, removeEOL, removeWordWrap
 from pdf_parsing.txt2pdf import PDFCreator, Args, Margins
 
@@ -263,9 +263,15 @@ class StructuredPaper():
     def getSubstituteConcept(self,focus_topic,alternatives):
         best_candidate = (None, None, -1)
         topic_set = alternatives-self.topics    
-        for topic in topic_set:
-            t = (focus_topic,topic,sentence_similarity(focus_topic,topic))
-            if(best_candidate[2]<t[2]): best_candidate = t
+
+        # cosine similaity
+        alternative, score = order_by_cosine_similarity(focus_topic,topic_set)[0]
+        best_candidate = (focus_topic, alternative, score)
+
+        # # wordnet similarity
+        # for topic in topic_set:
+        #     t = (focus_topic,topic,sentence_similarity(focus_topic,topic))
+        #     if(best_candidate[2]<t[2]): best_candidate = t
 
         return best_candidate
 
@@ -273,12 +279,16 @@ class StructuredPaper():
     def getCandicateConcepts(self,focus_topic,alternatives,limit=None):
         distances = []
         topic_set = alternatives-self.topics
-        full_text = "\n".join([str(k)+"\n"+str(v) for k,v in self.sections.items()])
-        for topic in topic_set:
-            topic_frequency = self.frequencies.get(focus_topic,None)
-            distances.append((topic,sentence_similarity(focus_topic,topic),topic_frequency))
-            # distances.append((topic,ic_sentence_similarity(focus_topic,topic,full_text),topic_frequency))
-        distances.sort(reverse=True,key= operator.itemgetter(2,1))
+        
+        distances = [(focus_topic,alt,self.frequencies.get(focus_topic,None)) for alt, score in order_by_cosine_similarity(focus_topic,topic_set)]
+        
+        # # wordnet similarity
+        # full_text = "\n".join([str(k)+"\n"+str(v) for k,v in self.sections.items()])
+        # for topic in topic_set:
+        #     topic_frequency = self.frequencies.get(focus_topic,None)
+        #     distances.append((topic,sentence_similarity(focus_topic,topic),topic_frequency))
+        #     # distances.append((topic,ic_sentence_similarity(focus_topic,topic,full_text),topic_frequency))
+        # distances.sort(reverse=True,key= operator.itemgetter(2,1))
         if(limit): distances = distances[0:limit]
         return (focus_topic,distances)
 
