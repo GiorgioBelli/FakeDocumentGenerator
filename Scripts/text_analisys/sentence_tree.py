@@ -20,12 +20,13 @@ from nltk.stem.porter import PorterStemmer
 from nltk.tokenize import RegexpTokenizer
 #nltk.download('wordnet') 
 from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.corpus import wordnet as wn
 
 # from sklearn.feature_extraction.text import TfidfTransformer
 # from sklearn.feature_extraction.text import CountVectorizer
 
 from nltk.parse import stanford
-from ontology_analysis import rdf_get_sibligs, isInOntology, getWnTerm, showTree, sentence_similarity
+from ontology_analysis import rdf_get_sibligs, isInOntology, getWnTerm, showTree, sentence_similarity, ic_sentence_similarity
 from pdf_parsing.paper_to_txt import RepositoryExtractor, RawPaper, PaperSections, removeEOL, removeWordWrap
 from pdf_parsing.txt2pdf import PDFCreator, Args, Margins
 
@@ -91,11 +92,26 @@ def forge_jaccard_distance(label1, label2):
     """Distance metric comparing set-similarity.
 
     """
+
+    ## TODO should implement lemmatization and stemming
+
     if(not bool(label1) and not bool(label2)): return 0.0
     return len(label1.intersection(label2))/len(label1.union(label2))
 
 def removePunctualization(text):
     return re.sub(r'\?|,|:','',text)
+
+def computeSynonymsDict(paper,topics, synsets_dict):
+    res_dict = dict()
+    for t in topics:
+        for w,lst in synsets_dict.items(): 
+            topic_set = set(wn.synsets("_".join(t.split())))
+            word_set = set(lst)
+            if topic_set and word_set and not topic_set.isdisjoint(word_set):
+                item = res_dict.setdefault(t,[[],0])
+                item[0].append(w)
+                item[1]+=paper.fulltext.lower().count(" "+w.lower()+" ")
+    return res_dict
 
 class StructuredPaper():
     def __init__(self,sections,fulltext,info={},max_topics=None,parser=None):
@@ -130,10 +146,9 @@ class StructuredPaper():
             # self.spacy_extractTopics(self.sections[section])
         
         self.frequencies = self.computeFrequencies()
-        # if(max_topics): 
-        #     t_list = sorted(list(self.topics), key= lambda x: self.frequencies.get(x,0),reverse=True)
-        #     t_list = list(self.topics)
-        #     self.topics = set(t_list[:max_topics])
+        if(max_topics): 
+            t_list = sorted(list(self.topics), key= lambda x: self.frequencies.get(x,0),reverse=True)
+            self.topics = set(t_list[:max_topics])
 
     @staticmethod
     def from_raw(rawPaper,max_topics=None,parser=None):
@@ -153,6 +168,8 @@ class StructuredPaper():
             "references": str(p["metadata"]["references"]),
 
         }
+
+        if(p["metadata"]["sections"] is None): return None
 
         sections = {
             PaperSections.PAPER_ABSTRACT: str(p["metadata"]["abstractText"])
@@ -236,8 +253,6 @@ class StructuredPaper():
                             new_val = self.proximityFrequences.get((word,sentenceWords[j]),0)+1
                             self.proximityFrequences.update({(word,sentenceWords[j]): new_val})
 
-            
-
     def computeFrequencies(self):
         frequencies = {}
         for topic in self.topics:
@@ -258,9 +273,11 @@ class StructuredPaper():
     def getCandicateConcepts(self,focus_topic,alternatives,limit=None):
         distances = []
         topic_set = alternatives-self.topics
+        full_text = "\n".join([str(k)+"\n"+str(v) for k,v in self.sections.items()])
         for topic in topic_set:
             topic_frequency = self.frequencies.get(focus_topic,None)
             distances.append((topic,sentence_similarity(focus_topic,topic),topic_frequency))
+            # distances.append((topic,ic_sentence_similarity(focus_topic,topic,full_text),topic_frequency))
         distances.sort(reverse=True,key= operator.itemgetter(2,1))
         if(limit): distances = distances[0:limit]
         return (focus_topic,distances)
@@ -280,7 +297,7 @@ class StructuredPaper():
 
 class Repository():
     def __init__(self,paper_list = []):
-        self.papers = paper_list
+        self.papers = [paper for paper in paper_list if paper] 
 
         self.generalContexts = dict()
         self.generalTopics = set()
@@ -292,7 +309,7 @@ class Repository():
         print("\t[done]")
         
         # print("\tprepare for JC...",end="")
-        self.prepareForJC()       
+        # self.prepareForJC()       
         # print("\t[done]")
 
         # print("\tcomputeJC...",end="")
@@ -476,7 +493,7 @@ def main(args):
                 p.dump(outPath=os.path.join(args.dump_raw_papers,"paper-rawtest-%s.txt"%i))
 
         raw_papers = repo_extr.papers
-
+        
 
     paper_list = []
     
@@ -493,22 +510,36 @@ def main(args):
                 results = pool.starmap(createPaper,inputs)
             print('\rcreating paper: {}\t[done]             '.format(len(results)))
             for paper in results:
-                paper_list.append(paper)
+                if paper: paper_list.append(paper)
         else:
             printProgressBar(0,paper_count,prefix="Creating papers [{},{}]".format(0,paper_count),suffix="",length=50)
             for i,json_path in enumerate(files):
                 # if(i==250): break
                 
-                p = StructuredPaper.from_json(os.path.join(json_papers_dir,json_path),max_topics=max_topics,parser=stan_parser)
-                paper_list.append(p)
+                paper = StructuredPaper.from_json(os.path.join(json_papers_dir,json_path),max_topics=max_topics,parser=stan_parser)
+                if paper: paper_list.append(paper)
 
                 printProgressBar(i+1,paper_count,prefix="Creating papers [{},{}]".format(i+1,paper_count),suffix="",length=50)
 
-        with open("../Results/generation/csvs/sp_introductions.csv","wb") as csv_out:
-            csv_text = "\f\n".join([removeEOL(text) for p in paper_list for heading,text in p.sections.items() if "introduction" in heading.lower()])
-            csv_text = removeWordWrap(csv_text)
-            csv_out.write(csv_text.encode("utf-8"))
+        # with open("../Results/generation/csvs/sp_introductions.csv","wb") as csv_out:
+        #     csv_text = "\n".join([removeEOL(removeWordWrap(text)) for p in paper_list for heading,text in p.sections.items() if "introduction" in heading.lower() and text != ""])
+        #     csv_out.write(csv_text.encode("utf-8"))
 
+        # with open("../Results/generation/csvs/sp_introductions.json","wb") as csv_out:
+        #     csv_text = ""
+        #     for p in paper_list:
+        #         intro = ""
+        #         for heading,text in p.sections.items():
+        #             if text and heading and "introduction" in heading.lower(): 
+        #                 intro += heading+"\n"+removeEOL(removeWordWrap(text))+"\n"
+        #         dumped_string = json.dumps({
+        #             "keywords": list(p.topics),
+        #             "introducton": intro,
+        #             })
+
+        #         csv_text += "<|startoftext|>\n"+dumped_string+"\n<|endoftext|>\n" 
+        #     csv_out.write(csv_text.encode("utf-8"))
+        
     else: # create structured papers on rawpapers
         paper_count = len(raw_papers)
         printProgressBar(0,paper_count,prefix="Creating papers [{},{}]".format(0,paper_count),suffix="",length=50)
@@ -540,13 +571,14 @@ def main(args):
     # fulltext = text_abstract+" "+text_intro+" "+text_body+" "+text_conclusion
     # sections = {
     #         PaperSections.PAPER_ABSTRACT : text_abstract,
-    #         PaperSections.PAPER_INTRO : text_intro,
+    #         PaperSections.PAPER_INTRO : text_intro,q
     #         PaperSections.PAPER_CORPUS : text_body,
     #         PaperSections.PAPER_CONCLUSION : text_conclusion
     #     }
 
     if(args.in_file_path.endswith(".json")):
         p_test = StructuredPaper.from_json(args.in_file_path,max_topics=max_topics,parser=stan_parser)
+        if not p_test: raise Exception("cannot extract sections from paper")
     elif(args.in_file_path.endswith(".pdf")):
         rp = RawPaper.fromPdf(path=args.in_pdf_path)
         p_test = StructuredPaper.from_raw(rp,max_topics=max_topics,parser=stan_parser)
@@ -574,21 +606,27 @@ def main(args):
 
     substitutions = []
     num_concepts = len(p_test.topics)
-    # if(num_concepts>0): printProgressBar(0,num_concepts,prefix="Finding substitution [{}/{}]".format(0,num_concepts),suffix="",length=50)
 
     # workers = None if args.mp == "all" else int(args.mp)
     inputs = [(idx,p_test,focus_topic,repo,max_topics) for idx,focus_topic in enumerate(p_test.topics)]
 
-    # with mp.Pool(processes=None) as pool:
-    #     substitutions = pool.starmap(findSubstitutions,inputs)
-    #     print()
+    with mp.Pool(processes=None) as pool:
+        substitutions = pool.starmap(findSubstitutions,inputs)
+        print()
 
+    # if(num_concepts>0): printProgressBar(0,num_concepts,prefix="Finding substitution [{}/{}]".format(0,num_concepts),suffix="",length=50)
     # for i,focus_topic in enumerate(p_test.topics):
     #     printProgressBar(i+1,num_concepts,prefix="Finding substitutions [{}/{}]".format(i+1,num_concepts),suffix="computing: "+focus_topic,length=50)
     #     topic, candidates = p_test.getCandicateConcepts(focus_topic,repo.generalTopics)
     #     substitutions.append((topic,[c[0] for c in candidates[:50]]))
     # print()
 
+    synset_dict = {}
+    for word in set(p_test.fulltext.split()):
+        synset_dict[word] = wn.synsets(word)
+    
+    syns_dict = computeSynonymsDict(p_test,p_test.topics,synset_dict)
+    
     with open(fake_paper_dump_file,"wb") as result:
         print("writing results...",end="")
 
@@ -599,18 +637,24 @@ def main(args):
         text += "\n"+"="*40+"\n"
 
         text += "="*20+"REPLACEMENTS"+"="*20+"\n"
-        text += "\n"+",\n".join([str(s) for s in substitutions])
-        text += "\n"
-        text += "\n"+str(treplace)
+        l = [(s[0],p_test.frequencies.get(s[0]),s[1]) for s in substitutions]
+        #add synonyms
+        for s in substitutions: 
+            item = syns_dict.get(s[0],False)
+            if item:
+                for synonym in item[0]: 
+                    l.append((synonym,item[1],s[1]))
+        l.sort(key=lambda s: s[1],reverse=True)
+        text += "\n"+",\n".join([str(lp) for lp in l])
         text += "\n"+"="*40+"\n"
 
-        matrix = repo.computeJCforPaper(p_test)
-        # print(matrix)
-        l = [(k,v[0],v[1])for k, v in matrix.items()]
-        l.sort(reverse=True,key=(lambda x: x[2]))
-        text += "="*20+"JC"+"="*20+"\n"
-        text += "\n"+str(l)
-        text += "\n"+"="*40+"\n"
+        # matrix = repo.computeJCforPaper(p_test)
+        # # print(matrix)
+        # l = [(k,v[0],v[1])for k, v in matrix.items()]
+        # l.sort(reverse=True,key=(lambda x: x[2]))
+        # text += "="*20+"JC"+"="*20+"\n"
+        # text += "\n"+str(l)
+        # text += "\n"+"="*40+"\n"
 
         for name,content in p_test.sections.items():
             text += "="*20+"ORIGINAL "+name+"="*20+"\n"
@@ -624,10 +668,10 @@ def main(args):
         result.write(text.encode("utf-8",'surrogatepass'))
         print("\t[done]")
 
-    p_test.generatePdf(args={
-        "filename":fake_paper_dump_file,
-        "output": "../Results/result.pdf",
-        })
+    # p_test.generatePdf(args={
+    #     "filename":fake_paper_dump_file,
+    #     "output": "../Results/result.pdf",
+    #     })
     
     return    
     

@@ -107,5 +107,8 @@ if __name__ == "__main__":
             except:
                 failed += 1
                 pass
-            printProgressBar((j+l+1)%batch_size+1, batch_size, prefix = 'Progress batch [{}/{}]:'.format((j+batch_size)/batch_size,res_num/batch_size), suffix = '[{} failed][{} downloaded]'.format(failed,successes), length = 50)
-        sleep(tts)
+            printProgressBar((j+l+1)%batch_size+1, batch_size, prefix = 'Progress batch [{}/{}]:'.format((j+batch_size)/batch_size,res_num/batch_size), suffix = '[{} failed][{} downloaded]         '.format(failed,successes), length = 50)
+        for s in range(tts):
+            printProgressBar((j+l+1)%batch_size+1, batch_size, prefix = 'Progress batch [{}/{}]:'.format((j+batch_size)/batch_size,res_num/batch_size), suffix = 'next batch in {}s                  '.format(tts-s), length = 50)
+            sleep(1)
+        printProgressBar((j+l+1)%batch_size+1, batch_size, prefix = 'Progress batch [{}/{}]:'.format((j+batch_size)/batch_size,res_num/batch_size), suffix = '[{} failed][{} downloaded]         '.format(failed,successes), length = 50)

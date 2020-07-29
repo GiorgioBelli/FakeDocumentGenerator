@@ -99,7 +99,7 @@ class RawPaper():
         p = RawPaper(path=path)
         p.full_text = re.sub(r'\f',"\n", pdf_to_txt(p.path))
         p.full_text = removeWordWrap(p.full_text)
-        print(p.extract_content_table())
+        # print(p.extract_content_table())
         p.extract_sections()
         
         return p
