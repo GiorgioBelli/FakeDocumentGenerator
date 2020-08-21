@@ -1,5 +1,6 @@
 import arxiv #requirement
 from time import sleep
+import urllib
 import os
 
 
@@ -21,6 +22,8 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
     bar = fill * filledLength + '-' * (length - filledLength)
     print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = printEnd)
 
+class ProbablyBannedException(Exception):
+    pass
 
 if __name__ == "__main__":
     import argparse
@@ -62,6 +65,8 @@ if __name__ == "__main__":
         default=0
     )
 
+    ban_threshold = 5
+
     args = parser.parse_args()
 
     if(not os.path.isdir(args.dir)): os.makedirs(args.dir,exist_ok=True)
@@ -96,6 +101,7 @@ if __name__ == "__main__":
 
     failed = 0
     successes = 0
+    ban_risk = 0
 
     printProgressBar(0, batch_size, prefix = 'Progress batch [{},{}]:'.format(0,batch_size), suffix = 'Complete', length = 50)
     for j in range(0,res_num,batch_size):
@@ -104,11 +110,19 @@ if __name__ == "__main__":
             try:
                 arxiv.download(paper, dirpath=args.dir)
                 successes+=1
-            except:
+                ban_risk=0
+            except urllib.error.HTTPError as http_error:
+                if(http_error.code == 403 and ban_risk > ban_threshold): 
+                    raise ProbablyBannedException("You were probably banned from arxiv")
                 failed += 1
+                ban_risk+=1
                 pass
-            printProgressBar((j+l+1)%batch_size+1, batch_size, prefix = 'Progress batch [{}/{}]:'.format((j+batch_size)/batch_size,res_num/batch_size), suffix = '[{} failed][{} downloaded]         '.format(failed,successes), length = 50)
+            except Exception:
+                failed += 1
+                ban_risk = 0
+                pass
+            printProgressBar((j+l+1)%batch_size+1, batch_size, prefix = 'Progress batch [{}/{}]:'.format((j+batch_size)/batch_size,int(res_num/batch_size)), suffix = '[{} failed][{} downloaded]         '.format(failed,successes), length = 50)
         for s in range(tts):
-            printProgressBar((j+l+1)%batch_size+1, batch_size, prefix = 'Progress batch [{}/{}]:'.format((j+batch_size)/batch_size,res_num/batch_size), suffix = 'next batch in {}s                  '.format(tts-s), length = 50)
+            printProgressBar((j+l+1)%batch_size+1, batch_size, prefix = 'Progress batch [{}/{}]:'.format((j+batch_size)/batch_size,int(res_num/batch_size)), suffix = 'next batch in {}s                  '.format(tts-s), length = 50)
             sleep(1)
-        printProgressBar((j+l+1)%batch_size+1, batch_size, prefix = 'Progress batch [{}/{}]:'.format((j+batch_size)/batch_size,res_num/batch_size), suffix = '[{} failed][{} downloaded]         '.format(failed,successes), length = 50)
+        printProgressBar((j+l+1)%batch_size+1, batch_size, prefix = 'Progress batch [{}/{}]:'.format((j+batch_size)/batch_size,int(res_num/batch_size)), suffix = '[{} failed][{} downloaded]         '.format(failed,successes), length = 50)
