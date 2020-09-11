@@ -8,10 +8,12 @@ Created on Mon May 11 12:53:30 2020
 import sys
 import nltk #requiment
 import pandas #requirement
-from multi_rake import Rake #requirement
+from multi_rake import Rake as mRake #requirement
 import spacy #requirement
 import re
 import os
+
+import BigHugeThesaurus.BigHugeThesaurus as bgThesaurus
 
 from nltk.tree import Tree
 #nltk.download('stopwords')
@@ -26,8 +28,8 @@ from nltk.corpus import wordnet as wn
 # from sklearn.feature_extraction.text import CountVectorizer
 
 from nltk.parse import stanford
-from ontology_analysis import rdf_get_sibligs, isInOntology, getWnTerm, showTree, sentence_similarity, ic_sentence_similarity
-from pdf_parsing.paper_to_txt import RepositoryExtractor, RawPaper, PaperSections, removeEOL, removeWordWrap
+from ontology_analysis import rdf_get_sibligs, isInOntology, getWnTerm, showTree, sentence_similarity, ic_sentence_similarity, order_by_cosine_similarity
+from pdf_parsing.paper_to_txt import RepositoryExtractor, RawPaper, PaperSections, removeEOL, removeWordWrap, escape_semicolon
 from pdf_parsing.txt2pdf import PDFCreator, Args, Margins
 
 import operator
@@ -37,11 +39,35 @@ import itertools
 import multiprocessing as mp
 import psutil
 
-stopwords_en_set=set(stopwords.words('english'))
+# from rake_nltk import Rake as nltkRake
+from multi_rake.stopwords import STOPWORDS
 
+from nltk.stem import PorterStemmer
 
-nlp = spacy.load("en_core_web_sm")
-rake = Rake(max_words=5,min_freq=1,language_code="en")
+stopwords_en_set=set([*STOPWORDS.get("en"),"•"])
+
+global_jc_matrix = dict()
+
+t_list = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+# nlp = spacy.load("en_core_web_sm")
+m_rake = mRake(max_words=5,min_freq=2,language_code="en")
+# nltk_rake = nltkRake(min_length=2, max_length=5,stopwords=stopwords_en_set)
+
+stemmer = PorterStemmer()
+
+THESAURUS_API_CONFIG = bgThesaurus.ApiConfig(
+        "https://words.bighugelabs.com",
+        "api/2",
+        "f5acf68d71dad138a4374ec8e7c3522a", #proavston
+        # "461035564047c36ddca0468beda8a0a4", #sap
+    )
+
+THESAURUS_WEBSITE_CONFIG = bgThesaurus.ApiConfig(
+        "https://tuna.thesaurus.com/relatedWords/",
+        "",
+        "",
+    )
 
 def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
     """
@@ -62,16 +88,32 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
     print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = printEnd)
     # if( iteration == total): print()
 
+def group(lst, n):
+    for i in range(0, len(lst), n):
+        val = lst[i:i+n]
+        if len(val) == n:
+            yield tuple(val)
+
+def str2bool(v):
+    if isinstance(v, bool):
+       return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
 def replace_multi_regex(text,rep_dict):
     rep_dict = dict((re.escape(k), v) for k, v in rep_dict.items()) 
     pattern = re.compile("|".join(rep_dict.keys()))
     text = pattern.sub(lambda m: rep_dict[re.escape(m.group(0))], text)
     return text
 
-with open("../datasets/AI_glossary.txt","r") as ai_glossary_fd:
-    field_words = set()
-    for word in ai_glossary_fd.readlines():
-        field_words.add(word[:-1].lower())
+# with open("../datasets/AI_glossary.txt","r") as ai_glossary_fd:
+#     field_words = set()
+#     for word in ai_glossary_fd.readlines():
+#         field_words.add(word[:-1].lower())
 
 def isSmallestNP(tree):
     adj_factor = 1 if tree.label()=="NP" else 0
@@ -103,14 +145,22 @@ def removePunctualization(text):
 
 def computeSynonymsDict(paper,topics, synsets_dict):
     res_dict = dict()
+    syn_items = synsets_dict.items()
+    added_synonyms = []
     for t in topics:
-        for w,lst in synsets_dict.items(): 
+        for w,lst in syn_items: 
+            if w in topics or w in added_synonyms: 
+                continue
             topic_set = set(wn.synsets("_".join(t.split())))
             word_set = set(lst)
-            if topic_set and word_set and not topic_set.isdisjoint(word_set):
+            intersec =  topic_set.intersection(word_set)
+
+            if topic_set and word_set and not topic_set.isdisjoint(word_set) :
+                int_len = len(intersec)/min(len(topic_set),len(word_set))
                 item = res_dict.setdefault(t,[[],0])
                 item[0].append(w)
-                item[1]+=paper.fulltext.lower().count(" "+w.lower()+" ")
+                added_synonyms.append(w)
+                item[1] += paper.fulltext.lower().count(" "+w.lower()+" ")*(int_len)
     return res_dict
 
 class StructuredPaper():
@@ -129,6 +179,8 @@ class StructuredPaper():
         self.transformedFullText = ""
         self.transformedTopics = set()
 
+        self.scores = {}
+
         # self.spacy_extractTopics()
         for section in self.sections.keys() :
             # self.sections[section] = re.sub("ï¬�|ï¬","fi",self.sections[section])
@@ -141,13 +193,14 @@ class StructuredPaper():
             #     if(idx+3 > section_sents_count-1): subtext = ". ".join(section_sents[idx:]).lower()
             #     else: subtext = ". ".join(section_sents[idx:idx+offset]).lower()
             #     self.rake_extractTopics(subtext,limit=max_topics)
-            self.rake_extractTopics(self.sections[section],limit=max_topics)
+            self.multi_rake_extractTopics(self.sections[section],limit=max_topics)
+            # self.nltk_rake_extractTopics(self.sections[section],limit=max_topics)
             # self.stanford_extractTopics(self.sections[section],parser,limit=max_topics)
             # self.spacy_extractTopics(self.sections[section])
         
-        self.frequencies = self.computeFrequencies()
+        # self.frequencies = self.computeFrequencies()
         if(max_topics): 
-            t_list = sorted(list(self.topics), key= lambda x: self.frequencies.get(x,0),reverse=True)
+            t_list = sorted(list(self.topics), key= lambda x: self.scores.get(x,0),reverse=True)
             self.topics = set(t_list[:max_topics])
 
     @staticmethod
@@ -156,7 +209,7 @@ class StructuredPaper():
 
     @staticmethod
     def from_json(json_path,max_topics=None,parser=None):
-        with open(json_path,"r") as json_fd:
+        with open(json_path,"r",encoding="utf-8") as json_fd:
             json_string = json_fd.read()
             p = json.loads(json_string)
         
@@ -215,13 +268,24 @@ class StructuredPaper():
             self.contexts["#".join(token.split())] = set()
         self.cleanRedoundantTopics()
 
-    def rake_extractTopics(self,text,limit=None,threshold=5.0):
-        keywords = rake.apply(text)
-        for keyword in keywords:
-            k_rating = keyword[1]
-            k_text = keyword[0]
+    def multi_rake_extractTopics(self,text,limit=None,threshold=0.0):
+        keywords = m_rake.apply(text)
+        for k_text,k_rating in keywords:
             if(k_rating > threshold):
                 self.topics.add(k_text)
+                self.scores[k_text] = k_rating
+                self.transformedTopics.add("#".join(k_text.split()))
+                self.contexts["#".join(k_text.split())] = set()
+
+    def nltk_rake_extractTopics(self,text,limit=None,threshold=0.0):
+        nltk_rake.extract_keywords_from_text(text)
+
+        extracted = nltk_rake.get_ranked_phrases_with_scores()
+
+        for k_rating,k_text in extracted:
+            if(k_rating > threshold):
+                self.topics.add(k_text)
+                self.scores[k_text] = k_rating
                 self.transformedTopics.add("#".join(k_text.split()))
                 self.contexts["#".join(k_text.split())] = set()
 
@@ -245,7 +309,8 @@ class StructuredPaper():
             for i,word in enumerate(sentenceWords):
                 if(word in allTopics):
                     contextWords = sentenceWords[max(0,i-window):i]+sentenceWords[i+1:min(i+window+1,len(sentenceWords))]
-
+                    contextWords = [stemmer.stem(w.lower()) for w in contextWords]
+                    contextWords = set(contextWords) - stopwords_en_set
                     self.contexts.setdefault(word,set()).update(contextWords)
 
                     for j in range(i+1,min((i+window+1),len(sentenceWords)-1)):
@@ -263,24 +328,49 @@ class StructuredPaper():
     def getSubstituteConcept(self,focus_topic,alternatives):
         best_candidate = (None, None, -1)
         topic_set = alternatives-self.topics    
-        for topic in topic_set:
-            t = (focus_topic,topic,sentence_similarity(focus_topic,topic))
-            if(best_candidate[2]<t[2]): best_candidate = t
+
+        # cosine similaity
+        alternative, score = order_by_cosine_similarity(focus_topic,topic_set)[0]
+        best_candidate = (focus_topic, alternative, score)
+
+        # wordnet similarity
+        # for topic in topic_set:
+        #     t = (focus_topic,topic,sentence_similarity(focus_topic,topic))
+        #     if(best_candidate[2]<t[2]): best_candidate = t
 
         return best_candidate
 
         
-    def getCandicateConcepts(self,focus_topic,alternatives,limit=None):
+    def getCandidateConcepts(self,focus_topic,alternatives,limit=None):
         distances = []
         topic_set = alternatives-self.topics
-        full_text = "\n".join([str(k)+"\n"+str(v) for k,v in self.sections.items()])
-        for topic in topic_set:
-            topic_frequency = self.frequencies.get(focus_topic,None)
-            distances.append((topic,sentence_similarity(focus_topic,topic),topic_frequency))
-            # distances.append((topic,ic_sentence_similarity(focus_topic,topic,full_text),topic_frequency))
-        distances.sort(reverse=True,key= operator.itemgetter(2,1))
+
+        distances = [(alt,score,self.scores.get(alt,0)) for alt, score in order_by_cosine_similarity(focus_topic,topic_set)]
+        
+        # wordnet similarity
+        # full_text = "\n".join([str(k)+"\n"+str(v) for k,v in self.sections.items()])
+        # for topic in topic_set:
+        #     topic_frequency = self.scores.get(focus_topic,None)
+        #     distances.append((topic,sentence_similarity(focus_topic,topic),topic_frequency))
+        #     # distances.append((topic,ic_sentence_similarity(focus_topic,topic,full_text),topic_frequency))
+        # distances.sort(reverse=True,key= operator.itemgetter(2,1))
+        
         if(limit): distances = distances[0:limit]
         return (focus_topic,distances)
+
+    def alteredCandidateConcepts(self,thesaurus,focus_topic):
+        assert isinstance(thesaurus,bgThesaurus.Thesaurus)
+
+        words = focus_topic.split(" ")
+
+        res = []
+        for idx,syns in enumerate(map(lambda x: thesaurus.synonyms(x),words)):
+            for syn in syns:
+                res.append(" ".join([" ".join(words[:idx]),syn," ".join(words[idx+1:])]))
+        
+        return res
+
+
 
     def generatePdf(self,args={},layout=None):
 
@@ -304,15 +394,16 @@ class Repository():
         self.generalTransformedTopics = set()
         self.jcMatrix = dict()
 
-        print("\tinitTopics...",end="")
+        print("\tinitTopics...",flush=True,end="")
         self.initTopics()
         print("\t[done]")
         
-        # print("\tprepare for JC...",end="")
+        # print("\tprepare for JC...",flush=True,end="")
         # self.prepareForJC()       
         # print("\t[done]")
 
-        # print("\tcomputeJC...",end="")
+        ## do not use this low function
+        # print("\tcomputeJC...",flush=True,end="")
         # self.computeJC()
         # print("\t[done]")
         
@@ -321,11 +412,17 @@ class Repository():
             self.generalTopics = self.generalTopics.union(paper.topics)
             self.generalTransformedTopics = self.generalTransformedTopics.union(paper.transformedTopics)
     
+    #originale
+    # def initGeneralContexts(self):
+    #     for paper in self.papers:
+    #         keys = self.generalContexts.keys()
+    #         for k in paper.contexts.keys():
+    #             self.generalContexts.setdefault(k,paper.contexts[k]).update(paper.contexts[k])
+    
     def initGeneralContexts(self):
         for paper in self.papers:
-            keys = self.generalContexts.keys()
             for k in paper.contexts.keys():
-                self.generalContexts.setdefault(k,paper.contexts[k]).update(paper.contexts[k])
+                self.generalContexts.setdefault(k,list()).append(paper.contexts[k])
 
     def replacePaperTopics(self,paper):
         paper.replaceTopicsInText(extraTopics=self.generalTopics)
@@ -362,13 +459,13 @@ class Repository():
             
 
     def prepareForJC(self):
-        print("\treplacePapersTopics...",end="")
+        print("\treplacePapersTopics...",flush=True,end="")
         self.replacePapersTopics()
         print("\t[done]")
-        print("\tcomputePapersContext...",end="")
+        print("\tcomputePapersContext...",flush=True,end="")
         self.computePapersContext()
         print("\t[done]")
-        print("\tinitGeneralContexts...",end="")
+        print("\tinitGeneralContexts...",flush=True,end="")
         self.initGeneralContexts()
         print("\t[done]")
 
@@ -379,6 +476,27 @@ class Repository():
                 if(tp != tpp):
                     jc = forge_jaccard_distance(self.generalContexts[tp],self.generalContexts[tpp])
                     if(jc != 0 and jc > (self.jcMatrix.get(tp,(tp,0)))[1]): self.jcMatrix[tp] = (tpp,jc)
+    
+    #originale
+    # def computeJCforPaper(self,paper):
+    #     jcMatrix = dict()
+
+    #     paper.replaceTopicsInText(extraTopics=self.generalTopics)
+    #     paper.computeContextAndFrequencies(extraTransformedTopics=self.generalTransformedTopics)
+
+    #     t_topics_count = len(paper.transformedTopics)
+
+    #     printProgressBar(0,t_topics_count,prefix="Computing JC for paper [{},{}]".format(0,t_topics_count),suffix="",length=50)
+    #     i = 0
+    #     for tp in paper.transformedTopics:
+    #         i+=1
+    #         for tpp in self.generalTransformedTopics:
+    #             if(tp != tpp):
+    #                 jc = forge_jaccard_distance(paper.contexts[tp],self.generalContexts[tpp])
+    #                 if(jc != 0 and jc > (paper.jcMatrix.get(tp,(tp,0)))[1]):
+    #                     paper.jcMatrix[tp] = (tpp,jc)
+    #         printProgressBar(i,t_topics_count,prefix="Computing JC for paper [{},{}]".format(i,t_topics_count),suffix="",length=50)
+    #     return paper.jcMatrix
 
     def computeJCforPaper(self,paper):
         jcMatrix = dict()
@@ -386,16 +504,25 @@ class Repository():
         paper.replaceTopicsInText(extraTopics=self.generalTopics)
         paper.computeContextAndFrequencies(extraTransformedTopics=self.generalTransformedTopics)
 
+        t_topics_count = len(paper.transformedTopics)
+
+        printProgressBar(0,t_topics_count,prefix="Computing JC for paper [{},{}]".format(0,t_topics_count),suffix="",length=50)
+        i = 0
         for tp in paper.transformedTopics:
+            i+=1
+            ctx = paper.contexts[tp]
             for tpp in self.generalTransformedTopics:
                 if(tp != tpp):
-                    jc = forge_jaccard_distance(paper.contexts[tp],self.generalContexts[tpp])
-                    if(jc != 0 and jc > (paper.jcMatrix.get(tp,(tp,0)))[1]):
-                        paper.jcMatrix[tp] = (tpp,jc)
+                    best = 0
+                    for ctx_p in self.generalContexts[tpp]:
+                        jc = forge_jaccard_distance(ctx,ctx_p)
+                        if(best<jc): best = jc
+                    if(best > (paper.jcMatrix.get(tp,(tp,0))[1])): paper.jcMatrix[tp] = (tpp,best)
+            printProgressBar(i,t_topics_count,prefix="Computing JC for paper [{},{}]".format(i,t_topics_count),suffix="",length=50)
         return paper.jcMatrix
         
 def load_csv(path):
-    with open(path, "r") as f:
+    with open(path, "r", encoding="utf-8") as f:
         rows = f.read().split("\f\n")
     return rows
 
@@ -404,27 +531,32 @@ global_id = [-1,]
 def createPaper(idx,path,max_topics,parser):
     p = StructuredPaper.from_json(path,max_topics=max_topics,parser=parser)
     if(psutil.Process().cpu_num() == 0):
-        print('\rcreating paper: {}                       '.format(idx),end="")
+        print('\rcreating paper: {}                       '.format(idx),flush=True,end="")
     return p
 
 def findSubstitutions(idx,paper,focus_topic,repo,max_candidates):
-    if(psutil.Process().cpu_num() == 0):
-        print('\rfinding substitutions: {}                       '.format(idx),end="")
-    topic, candidates = paper.getCandicateConcepts(focus_topic,repo.generalTopics)
+    cpu_num = psutil.Process().cpu_num()
+    if(cpu_num == 0):
+        str_list = "\rStart subtitutuon search... ["+str(max(t_list))+"]    "
+        # for i in range(len(t_list)):
+        #     str_list += "[{}]: {}\t".format(i,idx)
+        print(str_list,flush=True,end="")
+    t_list[cpu_num] = idx
+    topic, candidates = paper.getCandidateConcepts(focus_topic,repo.generalTopics)
     
     return (topic,[c[0] for c in candidates[:max_candidates]])
 
 def main(args):
 
 
-    os.environ['STANFORD_PARSER'] = '/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/stanford-parser.jar'
-    os.environ['STANFORD_MODELS'] = '/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/stanford-parser-4.0.0-models.jar'
-    os.environ['CLASSPATH'] = '/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/*'
+    os.environ['STANFORD_PARSER'] = '/home/user/gbelli/FDG_Data/models/corenlp400/stanford-parser.jar'
+    os.environ['STANFORD_MODELS'] = '/home/user/gbelli/FDG_Data/models/corenlp400/stanford-parser-4.0.0-models.jar'
+    os.environ['CLASSPATH'] = '/home/user/gbelli/FDG_Data/models/corenlp400/*'
     
     java_path = "/usr/bin/java"
     os.environ['JAVAHOME'] = java_path
 
-    stan_parser = stanford.StanfordParser(model_path="/home/user/gbelli/FakeDocumentGenerator/models/corenlp400/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")
+    stan_parser = stanford.StanfordParser(model_path="/home/user/gbelli/FDG_Data/models/corenlp400/edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz")
 
     # parser = None
 
@@ -473,7 +605,7 @@ def main(args):
         limit = int(args.limit) if args.limit else None
 
         if(args.mp):
-            print("starting extraction... ",end="")
+            print("starting extraction... ",flush=True,end="")
             workers = None if args.mp == "all" else int(args.mp)
             failed = repo_extr.extractMP(limit=limit,processes=workers)
             print("\t[done] [{} fails]".format(failed))
@@ -482,7 +614,7 @@ def main(args):
 
 
         if(csv_dir):
-            print("starting csv creation... ",end="")
+            print("starting csv creation... ",flush=True,end="")
             repo_extr.exportSections(csv_dir,sections=PaperSections.as_list())
             print("\t[done]")
 
@@ -521,9 +653,12 @@ def main(args):
 
                 printProgressBar(i+1,paper_count,prefix="Creating papers [{},{}]".format(i+1,paper_count),suffix="",length=50)
 
-        # with open("../Results/generation/csvs/sp_introductions.csv","wb") as csv_out:
-        #     csv_text = "\n".join([removeEOL(removeWordWrap(text)) for p in paper_list for heading,text in p.sections.items() if "introduction" in heading.lower() and text != ""])
-        #     csv_out.write(csv_text.encode("utf-8"))
+        with open("../../FDG_Data/Results/generation/csvs/corpus_ML_MALWARE.csv","wb") as csv_out:
+            csv_text = "\n".join(["<|startoftext|>\n"+escape_semicolon(removeEOL(removeWordWrap(text)))+"\n<|endoftext|>\n" for p in paper_list for heading,text in p.sections.items() if "introduction" not in heading.lower() and "references" not in heading.lower() and len(text)>1024])
+            csv_out.write(csv_text.encode("utf-8",'surrogatepass'))
+        
+        return
+
 
         # with open("../Results/generation/csvs/sp_introductions.json","wb") as csv_out:
         #     csv_text = ""
@@ -586,6 +721,28 @@ def main(args):
         raise Exception("input paper can be only pdf or json (.json, .pdf)")
 
 
+    substitutions = []
+    num_concepts = len(p_test.topics)
+    if (args.alter_concepts):
+        ts = bgThesaurus.Thesaurus(THESAURUS_API_CONFIG)
+
+        substitutions = [(t,[(at,0,0) for at in p_test.alteredCandidateConcepts(ts,t)]) for t in p_test.topics]
+
+        inputs = [(idx,p_test,focus_topic,repo,max_topics) for idx,focus_topic in enumerate([t for t,lst in substitutions if lst == []])]
+        
+        # print("start subtitution search...",flush=True,end="")
+        # with mp.Pool(processes=None) as pool:
+        #     substitutions += list(pool.starmap(findSubstitutions,inputs))
+        # print("\t[done]")
+
+    else:
+        # workers = None if args.mp == "all" else int(args.mp)
+        inputs = [(idx,p_test,focus_topic,repo,max_topics) for idx,focus_topic in enumerate(p_test.topics)]
+
+        print("start subtitution search...",flush=True,end="")
+        with mp.Pool(processes=None) as pool:
+            substitutions = pool.starmap(findSubstitutions,inputs)
+        print("\t[done]")
 
     # found = []
     # for t in p_test.transformedTopics:
@@ -604,16 +761,6 @@ def main(args):
     #         treplace=max(siblings.keys(),key=lambda x: sentence_similarity(topic,x))
     #         break
 
-    substitutions = []
-    num_concepts = len(p_test.topics)
-
-    # workers = None if args.mp == "all" else int(args.mp)
-    inputs = [(idx,p_test,focus_topic,repo,max_topics) for idx,focus_topic in enumerate(p_test.topics)]
-
-    with mp.Pool(processes=None) as pool:
-        substitutions = pool.starmap(findSubstitutions,inputs)
-        print()
-
     # if(num_concepts>0): printProgressBar(0,num_concepts,prefix="Finding substitution [{}/{}]".format(0,num_concepts),suffix="",length=50)
     # for i,focus_topic in enumerate(p_test.topics):
     #     printProgressBar(i+1,num_concepts,prefix="Finding substitutions [{}/{}]".format(i+1,num_concepts),suffix="computing: "+focus_topic,length=50)
@@ -621,14 +768,18 @@ def main(args):
     #     substitutions.append((topic,[c[0] for c in candidates[:50]]))
     # print()
 
-    synset_dict = {}
-    for word in set(p_test.fulltext.split()):
-        synset_dict[word] = wn.synsets(word)
-    
-    syns_dict = computeSynonymsDict(p_test,p_test.topics,synset_dict)
+    if(args.synonyms):
+        synset_dict = {}
+        print("finding synonyms",flush=True,end="")
+        for word in set(group(p_test.fulltext.split(),2)):
+            key = " ".join(word)
+            synset_dict[key] = wn.synsets("_".join(word))
+        
+        syns_dict = computeSynonymsDict(p_test,p_test.topics,synset_dict)
+        print("\t[done]")
     
     with open(fake_paper_dump_file,"wb") as result:
-        print("writing results...",end="")
+        print("writing results...",flush=True,end="")
 
         text = ""
 
@@ -637,14 +788,21 @@ def main(args):
         text += "\n"+"="*40+"\n"
 
         text += "="*20+"REPLACEMENTS"+"="*20+"\n"
-        l = [(s[0],p_test.frequencies.get(s[0]),s[1]) for s in substitutions]
+        l = [(s[0],p_test.scores.get(s[0]),s[1]) for s in substitutions]
         #add synonyms
-        for s in substitutions: 
-            item = syns_dict.get(s[0],False)
-            if item:
-                for synonym in item[0]: 
-                    l.append((synonym,item[1],s[1]))
-        l.sort(key=lambda s: s[1],reverse=True)
+        subs_keys = [s[0] for s in substitutions]
+
+        if(args.synonyms):
+            for s in substitutions: 
+                item = syns_dict.get(s[0],False)
+                if item:
+                    for synonym in item[0]:
+                        if synonym not in subs_keys: l.append((synonym,item[1],s[1]))
+        
+        if (args.alter_concepts):
+            l = [(s[0],[x[0] for x in s[1]]) for s in substitutions]
+        else:
+            l.sort(key=lambda s: s[1],reverse=True)
         text += "\n"+",\n".join([str(lp) for lp in l])
         text += "\n"+"="*40+"\n"
 
@@ -655,6 +813,7 @@ def main(args):
         # text += "="*20+"JC"+"="*20+"\n"
         # text += "\n"+str(l)
         # text += "\n"+"="*40+"\n"
+
 
         for name,content in p_test.sections.items():
             text += "="*20+"ORIGINAL "+name+"="*20+"\n"
@@ -789,6 +948,23 @@ if __name__ == "__main__":
         help="json directory",
         default=None
     )
+
+    arg_parser.add_argument(
+        "--synonyms",
+        help="if set, synonyms will be included in topic list",
+        type=str2bool,
+        nargs='?',
+        default=False,
+    )
+
+    arg_parser.add_argument(
+        "--alter-concepts",
+        help="if set, synonyms are computed with thesaurus",
+        type=str2bool,
+        nargs='?',
+        default=False,
+    )
+
 
     # csv path (valutare i csv cper intro, abstract....)
 

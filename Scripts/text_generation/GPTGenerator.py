@@ -14,99 +14,21 @@ class ReplacementConcept():
         self.concept = concept
         self.frequency = frequency
 
-class ConceptsUtils():
+class Paragraph():
+  def __init__(self,old_sents,new_sents,html_old_sents,html_new_sents):
+    self.old_sents = old_sents
+    self.new_sents = new_sents
+    self.html_old_sents = html_old_sents
+    self.html_new_sents = html_new_sents
 
-    @staticmethod
-    def get_concept_names(concepts):
-        return [concept.concept for concept in concepts]
+  def get_new_sents(self):
+    return "<p>{0}</p>".format(". ".join(self.html_new_sents))
+  
+  def get_old_sents(self):
+    return "<p>{0}</p>".format(". ".join(self.html_old_sents))
 
-    @staticmethod
-    def get_concept_dict(concepts):
-        conc_dict = {}
-        for concept in concepts:
-            conc_dict[concept.concept] = concept
-        return conc_dict
-
-
-    @staticmethod
-    def create_freq_dict(concepts):
-        freq_dict = {}
-        for concept in concepts:
-            freq_dict[concept.concept] = concept.frequency
-        return freq_dict
-
-    @staticmethod
-    def discard_by_frequency(concepts,threshold=2):
-        concepts = [concept for concept in concepts if concept.frequency>=threshold]
-        concepts.sort(key=lambda concept: len(concept.concept))
-        return concepts
-    
-
-class GPTGenerator():  
-    def __init__(self,gpt_args,sentence_separator=r"(\. [a-zA-Z])",context_threshold=500):
-        self.sentence_separator = sentence_separator
-        self.context_threshold = context_threshold
-        
-        self.session = gpt2.start_tf_sess()
-        self.run_name = gpt_args.get("run_name","checkpoint/run1")
-        gpt2.load_gpt2(self.session, **gpt_args)
-
-    def generate_eq_sentence(self,sentence,context, span, concept_string):
-        # sentence = sentence[:span.start] + concept_string
-        
-        contexted_text = context+concept_string
-        context_len = len(context)
-
-        print("\nCONTEXTED-TEXT:",contexted_text)
-        # text = sentence[:span.end]+"("+concept_string+")"+sentence[span.end:]+". A" ## TODO gen with gpt model
-        res = gpt2.generate(self.session,seed=0,run_name=self.run_name,return_as_list=True,prefix=contexted_text,truncate="<|endoftext|>",nsamples=1,temperature=0.75,top_k=40,top_p=0.9)
-
-        text = res[0]
-        print("\nGENERATED-TEXT:",res[0])
-
-        try:
-            first_match = next(re.finditer(self.sentence_separator,text[context_len:]))
-            
-            new_sentence = sentence[:span.start]+text[context_len:context_len+first_match.start()+1]
-        except StopIteration:
-            return None
-
-        return new_sentence
-
-    def get_context(self,whole_text,concept_span):
-        
-        min_lookback = concept_span.end-self.context_threshold
-        
-        if min_lookback > 0:
-        
-            matches = list(re.finditer(self.sentence_separator,whole_text[min_lookback:concept_span.start+1]))
-            
-            try:
-                first_match = next(re.finditer(self.sentence_separator,whole_text[min_lookback:]))
-                context = whole_text[min_lookback+first_match.end()-1:concept_span.start]
-            except StopIteration:
-                return None
-        else:
-            context = "<|startoftext|>"+whole_text[:concept_span.start]
-
-        return context
-
-    def __split_sentences(self,whole_text):
-        sentences = re.split(self.sentence_separator,text)
-        if(len(sentences)>1):
-            for idx in range(2,len(sentences),2):
-                first_char = sentences[idx-1][-1]
-                sentences[idx] = first_char+sentences[idx]
-                sentences[idx-2] += sentences[idx-1][0]
-            sentences = sentences[::2]
-        else: sentences = [whole_text]
-
-        return sentences
-
-    def printDiff(self,original,faked):
-        print(
-          '''
-            <html>
+  def getDocument(self):
+    return '''<html>
 
               <head>
                   <link href="https://fonts.googleapis.com/css2?family=Baskervville&family=Libre+Baskerville&display=swap" rel="stylesheet">
@@ -165,10 +87,99 @@ class GPTGenerator():
                   <p>{1}</p>
               </body>
             </html>
-          '''.format(". ".join(original),". ".join(faked))
-        )
+          '''.format(". ".join(self.html_old_sents),". ".join(self.html_new_sents))
 
-    def fake_text(self,text,concepts,concept_discard_func=(ConceptsUtils.discard_by_frequency,{"threshold":0}),):
+class ConceptsUtils():
+
+    @staticmethod
+    def get_concept_names(concepts):
+        return [concept.concept for concept in concepts]
+
+    @staticmethod
+    def get_concept_dict(concepts):
+        conc_dict = {}
+        for concept in concepts:
+            conc_dict[concept.concept] = concept
+        return conc_dict
+
+
+    @staticmethod
+    def create_freq_dict(concepts):
+        freq_dict = {}
+        for concept in concepts:
+            freq_dict[concept.concept] = concept.frequency
+        return freq_dict
+
+    @staticmethod
+    def discard_by_frequency(concepts,threshold=2):
+        concepts = [concept for concept in concepts if concept.frequency>=threshold]
+        concepts.sort(key=lambda concept: len(concept.concept))
+        return concepts
+    
+
+class GPTGenerator():  
+    def __init__(self,gpt_args,sentence_separator=r"(\. [a-zA-Z])",context_threshold=500):
+        self.sentence_separator = sentence_separator
+        self.context_threshold = context_threshold
+        
+        self.session = gpt2.start_tf_sess()
+        self.run_name = gpt_args.get("run_name","checkpoint/run1")
+        gpt2.load_gpt2(self.session, **gpt_args)
+
+    def generate_eq_sentence(self,sentence,context, span, concept_string):
+        # sentence = sentence[:span.start] + concept_string
+        
+        contexted_text = context+concept_string
+        context_len = len(context)
+
+        # print("\nCONTEXTED-TEXT:",contexted_text)
+        # text = sentence[:span.end]+"("+concept_string+")"+sentence[span.end:]+". A" ## TODO gen with gpt model
+        res = gpt2.generate(self.session,run_name=self.run_name,return_as_list=True,prefix=contexted_text,truncate="<|endoftext|>",nsamples=1,temperature=0.72,top_k=40,top_p=0.9)
+
+        text = res[0]
+        # print("\nGENERATED-TEXT:",res[0])
+
+        try:
+            first_match = next(re.finditer(self.sentence_separator,text[context_len:]))
+            
+            new_sentence = sentence[:span.start]+text[context_len:context_len+first_match.start()+1]
+        except StopIteration:
+            return None
+
+        return new_sentence
+
+    def get_context(self,whole_text,concept_span):
+        
+        min_lookback = concept_span.end-self.context_threshold
+        
+        if min_lookback > 0:
+        
+            matches = list(re.finditer(self.sentence_separator,whole_text[min_lookback:concept_span.start+1]))
+            
+            try:
+                first_match = next(re.finditer(self.sentence_separator,whole_text[min_lookback:]))
+                context = whole_text[min_lookback+first_match.end()-1:concept_span.start]
+            except StopIteration:
+                return None
+        else:
+            context = "<|startoftext|>"+whole_text[:concept_span.start]
+
+        return context
+
+    def __split_sentences(self,whole_text):
+        sentences = re.split(self.sentence_separator,whole_text)
+        if(len(sentences)>1):
+            for idx in range(2,len(sentences),2):
+                first_char = sentences[idx-1][-1]
+                sentences[idx] = first_char+sentences[idx]
+                sentences[idx-2] += sentences[idx-1][0]
+            sentences = sentences[::2]
+        else: sentences = [whole_text]
+
+        return sentences
+
+
+    def fake_text(self,text,concepts,idx=0,concept_discard_func=(ConceptsUtils.discard_by_frequency,{"threshold":0}),):
         
         text = text.replace("e.g.","e.g.,")
 
@@ -176,7 +187,7 @@ class GPTGenerator():
 
         sentences = self.__split_sentences(text)
 
-        concepts_regex = "|".join(ConceptsUtils.get_concept_names(concepts))
+        concepts_regex = "(?<=\s)"+"|".join(ConceptsUtils.get_concept_names(concepts))+"(?=\s)"
 
         concepts_freq_dict = ConceptsUtils.create_freq_dict(concepts)
         concepts_objects = ConceptsUtils.get_concept_dict(concepts)
@@ -189,9 +200,9 @@ class GPTGenerator():
         html_old_sentences += sentences
         html_new_sentences += sentences
 
-        print(len(html_old_sentences),len(html_new_sentences))
+        # print(len(html_old_sentences),len(html_new_sentences))
 
-        print(text)
+        # print(text)
 
         inc_len = 0
         replace = 0
@@ -216,14 +227,12 @@ class GPTGenerator():
             
             new_concept = concept.alternatives[0]
 
-            new_concept = concept.concept
-
-            print("\nREPLACING:",concept.concept,"({},{})".format(concept_span.start,concept_span.end),"-->",new_concept)
-            print("\nSENTENCE:",sentence)
+            # print("\nREPLACING:",concept.concept,"({},{})".format(concept_span.start,concept_span.end),"-->",new_concept)
+            # print("\nSENTENCE:",sentence)
             sentence_context = self.get_context(". ".join(new_sentences),
                                                     Span(sentence_span.start+relevant_match.start(),sentence_span.start+relevant_match.end()),
                                                 )
-            print("\nCONTEXT:",sentence_context)
+            # print("\nCONTEXT:",sentence_context)
 
             
             
@@ -236,30 +245,32 @@ class GPTGenerator():
             if new_sentence: 
                 new_sentences[sent_idx] = new_sentence
                 
-                html_old_sentences[sent_idx] = sentence[:concept_span.start]+"<font id='orig-{}' class='highlight k{}'><a href='#fake-{}'>".format(replace,replace,replace)+concept.concept+"</a></font>"+sentence[concept_span.end:]
-                html_new_sentences[sent_idx] = new_sentence[:concept_span.start]+"<font id='fake-{}' class='highlight k{}'><a href='#orig-{}'>".format(replace,replace,replace)+new_concept+"</a></font>"+new_sentence[concept_span.start+len(new_concept):]
+                html_old_sentences[sent_idx] = sentence[:concept_span.start]+"<font id='orig-{}-{}' class='highlight k{}'><a href='#fake-{}-{}'>".format(idx,replace,replace,idx,replace)+concept.concept+"</a></font>"+"<font class='new_text>'"+sentence[concept_span.end:]+"</font>"
+                html_new_sentences[sent_idx] = new_sentence[:concept_span.start]+"<font id='fake-{}-{}' class='highlight k{}'><a href='#orig-{}-{}'>".format(idx,replace,replace,idx,replace)+new_concept+"</a></font>"+"<font class='new_text>'"+new_sentence[concept_span.start+len(new_concept):]+"</font>"
 
             else:
+                new_sentence = "non generata"
+
                 new_sentences[sent_idx] = "non generata"
 
-                html_old_sentences[sent_idx] = sentence[:concept_span.start]+"<font id='orig-{}' class='highlight k{}'><a href='#fake-{}'>".format(replace,replace,replace)+concept.concept+"</a></font>"+sentence[concept_span.end:]
-                html_new_sentences[sent_idx] = new_sentence[:concept_span.start]+"<font id='fake-{}' class='highlight k{}'><a href='#orig-{}'>".format(replace,replace,replace)+new_concept+"</a></font>"+"<font class='not_gen'> NOT GENERATED</font>"
+                html_old_sentences[sent_idx] = sentence[:concept_span.start]+"<font id='orig-{}-{}' class='highlight k{}'><a href='#fake-{}-{}'>".format(idx,replace,replace,idx,replace)+concept.concept+"</a></font>"+"<font class='new_text>'"+sentence[concept_span.end:]+"</font>"
+                html_new_sentences[sent_idx] = sentence[:concept_span.start]+"<font id='fake-{}-{}' class='highlight k{}'><a href='#orig-{}-{}'>".format(idx,replace,replace,idx,replace)+new_concept+"</a></font>"+"<font class='not_gen'> NOT GENERATED</font>"
 
 
-            print("\nNEW_SENTENCE:",new_sentence)
+            # print("\nNEW_SENTENCE:",new_sentence)
 
             
 
             inc_len+=len(new_sentence)+2
 
-            
-            
-            
-            print("\n\n\n")
-        print(len(html_old_sentences),len(html_new_sentences))
-        self.printDiff(html_old_sentences,html_new_sentences)
+        # print(len(html_old_sentences),len(html_new_sentences))
+        # self.printDiff(html_old_sentences,html_new_sentences)
 
-        return ". ".join(new_sentences)
+        return Paragraph(sentences,new_sentences,html_old_sentences,html_new_sentences)
+
+
+
+
 
 
 if __name__ == "__main__":
@@ -283,3 +294,27 @@ if __name__ == "__main__":
     ]
 
     print(generator.fake_text(text,concepts))
+
+
+if __name__ == "__main__":
+
+    gpt_args = {"run_name":'2000_sp_corpusnew_npz_[simple]',"model_name":"345M","checkpoint_dir":"/content/checkpoint/2000_sp_corpusnew_npz_[simple]/"}
+    tf.reset_default_graph()
+    generator = GPTGenerator(gpt_args, sentence_separator=r"([^\d\)]\. {1,4}[a-zA-Z?-])", context_threshold=2500)
+
+    old = ""
+    new = ""
+
+    for idx,s in enumerate(sections):
+        p = generator.fake_text(s,concepts,idx=idx)
+        old += p.get_old_sents()+"\n"
+        new += p.get_new_sents()+" \n"
+        
+        print(idx,"="*40)
+        print(Paragraph([],[],[old],[new]).getDocument())
+        print("="*40)
+        print("\n\n")
+  
+  
+
+
