@@ -222,7 +222,7 @@ def order_by_cosine_similarity(focus_topic,alternatives):
         
         # cosine formula  
         for i in range(len(rvector)): 
-                c+= l1[i]*l2[i]
+            c+= l1[i]*l2[i]
         if(float((sum(l1)*sum(l2))**0.5) == 0): cosine = 0
         else: cosine = c / float((sum(l1)*sum(l2))**0.5) 
 
