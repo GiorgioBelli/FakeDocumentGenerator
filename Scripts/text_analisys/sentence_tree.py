@@ -653,12 +653,6 @@ def main(args):
 
                 printProgressBar(i+1,paper_count,prefix="Creating papers [{},{}]".format(i+1,paper_count),suffix="",length=50)
 
-        with open("../../FDG_Data/Results/generation/csvs/corpus_ML_MALWARE.csv","wb") as csv_out:
-            csv_text = "\n".join(["<|startoftext|>\n"+escape_semicolon(removeEOL(removeWordWrap(text)))+"\n<|endoftext|>\n" for p in paper_list for heading,text in p.sections.items() if "introduction" not in heading.lower() and "references" not in heading.lower() and len(text)>1024])
-            csv_out.write(csv_text.encode("utf-8",'surrogatepass'))
-        
-        return
-
 
         # with open("../Results/generation/csvs/sp_introductions.json","wb") as csv_out:
         #     csv_text = ""

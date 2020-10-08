@@ -266,6 +266,8 @@ def removeWordWrap(text):
 def removeEOL(text):
     return re.sub(r'\n',' ',text)
 
+def escape_semicolon(text):
+    return re.sub(r';','\\;',text)
 
 class RepoExportTypes():
     TYPE_CSV = "csv"
